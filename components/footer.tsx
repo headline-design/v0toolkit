@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="border-t bg-muted/30 mt-auto">
       <div className="container mx-auto px-6 py-16">
         <div className="grid gap-12 lg:grid-cols-4">
-          {/* Brand section - more refined */}
+          {/* Brand section */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
@@ -24,7 +24,7 @@ export function Footer() {
             </p>
             <div className="flex items-center space-x-4 mt-6">
               <a
-                href="https://github.com/vercel/v0"
+                href="https://github.com/headline-design/v0toolkit"
                 className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -79,7 +79,7 @@ export function Footer() {
                 Changelog
               </Link>
               <a
-                href="https://github.com/vercel/v0/discussions"
+                href="https://github.com/headline-design/v0toolkit/discussions"
                 className="block text-muted-foreground hover:text-foreground transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
