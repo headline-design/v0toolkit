@@ -22,12 +22,18 @@ export function Navigation() {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
 
+  const isToolsPage = pathname.startsWith("/tools");
+
   const isActiveSection = (href: string) => {
     return pathname.startsWith(href)
   }
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark")
+  }
+
+  if (isToolsPage) {
+  return null
   }
 
   return (

@@ -80,6 +80,8 @@ const getDifficultyColor = (difficulty: string) => {
 
 export default function ToolsArchitecturePage() {
   return (
+    <div className="flex-1 p-6">
+
     <div className="space-y-8">
       {/* Header */}
       <div className="space-y-4">
@@ -187,6 +189,7 @@ export default function ToolsArchitecturePage() {
           </Card>
         </div>
       </div>
+    </div>
     </div>
   )
 }

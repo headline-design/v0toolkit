@@ -167,6 +167,8 @@ const getTypeColor = (type: string) => {
 
 export default function ToolsBestPracticesPage() {
   return (
+    <div className="flex-1 p-6">
+
     <div className="space-y-8">
       {/* Header */}
       <div className="space-y-4">
@@ -250,5 +252,6 @@ export default function ToolsBestPracticesPage() {
         </CardContent>
       </Card>
     </div>
+  </div>
   )
 }

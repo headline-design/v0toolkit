@@ -11,7 +11,7 @@ export default function ToolsLayout({
     <div className="flex flex-col min-h-screen">
       <SidebarLayout>
         <div className="flex flex-col min-h-full">
-          <div className="flex-1 p-6">{children}</div>
+          <>{children}</>
           <Footer />
         </div>
       </SidebarLayout>

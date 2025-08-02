@@ -105,6 +105,8 @@ const namingConventions = [
 
 export default function ToolsStructurePage() {
   return (
+    <div className="flex-1 p-6">
+
     <div className="space-y-8">
       {/* Header */}
       <div className="space-y-4">
@@ -224,6 +226,7 @@ export default function ToolsStructurePage() {
           </ul>
         </CardContent>
       </Card>
+    </div>
     </div>
   )
 }

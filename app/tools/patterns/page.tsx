@@ -54,6 +54,7 @@ export default function ToolsPatternsPage() {
   }
 
   return (
+    <div className="flex-1 p-6">
     <div className="space-y-6">
       {/* Header */}
       <div className="space-y-4">
@@ -243,6 +244,7 @@ export default function ToolsPatternsPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }
