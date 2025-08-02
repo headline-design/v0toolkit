@@ -1,17 +1,3 @@
-export interface PromptTemplate {
-  id: string
-  name: string
-  description: string
-  category: string
-  difficulty: "Beginner" | "Intermediate" | "Advanced"
-  fields: PromptField[]
-  template: string
-  examples: PromptExample[]
-  tags: string[]
-  estimatedTokens: number
-  successRate?: number
-}
-
 export interface PromptField {
   id: string
   label: string
@@ -26,6 +12,21 @@ export interface PromptField {
     maxLength?: number
     pattern?: string
   }
+  category?: string
+  icon?: string
+}
+
+export interface PromptTemplate {
+  id: string
+  name: string
+  description: string
+  category: string
+  difficulty: "Beginner" | "Intermediate" | "Advanced"
+  tags: string[]
+  fields: PromptField[]
+  template: string
+  examples: PromptExample[]
+  icon?: string
 }
 
 export interface PromptExample {
@@ -41,15 +42,5 @@ export interface GeneratedPrompt {
   category: string
   fieldValues: Record<string, any>
   tags: string[]
-  estimatedTokens: number
   createdAt: Date
-}
-
-export interface PromptGeneratorState {
-  templates: PromptTemplate[]
-  selectedTemplate: PromptTemplate | null
-  fieldValues: Record<string, any>
-  generatedPrompt: string
-  isGenerating: boolean
-  errors: Record<string, string>
 }

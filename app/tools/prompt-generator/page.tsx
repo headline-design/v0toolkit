@@ -1,249 +1,456 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { History, BookOpen, Lightbulb, Target, Zap, Clock, Sparkles } from "lucide-react"
-import { PromptGenerator } from "@/components/prompt-generator"
-import { InteractivePromptHero } from "@/components/interactive-prompt-hero"
-import { usePromptGenerator, useGeneratedPrompts } from "@/lib/hooks/use-prompt-generator"
+import {
+  Search,
+  Star,
+  Users,
+  ArrowRight,
+  Sparkles,
+  Target,
+  Code2,
+  Layers,
+  Wand2,
+  BookOpen,
+  History,
+  UserCog,
+  FileCode,
+  Palette,
+} from "lucide-react"
+import { promptGeneratorService } from "@/lib/services/prompt-generator-service"
+import { useGeneratedPrompts } from "@/lib/hooks/use-prompt-generator"
+import type { PromptTemplate } from "@/lib/types/prompt-generator"
 
 export default function PromptGeneratorPage() {
   const router = useRouter()
-  const promptGeneratorHook = usePromptGenerator()
-  const { prompts: generatedPrompts, loading: historyLoading } = useGeneratedPrompts()
-  const [mainTab, setMainTab] = useState<"templates" | "history" | "guide">("templates")
+  const { prompts: recentPrompts } = useGeneratedPrompts()
+  const [templates, setTemplates] = useState<PromptTemplate[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [selectedDifficulty, setSelectedDifficulty] = useState("all")
+  const [sortBy, setSortBy] = useState("name")
 
-  // Handle template selection - navigate to editor page
-  const handleTemplateSelect = (template: any) => {
+  // Load templates on mount
+  useEffect(() => {
+    const loadedTemplates = promptGeneratorService.getTemplates()
+    setTemplates(loadedTemplates)
+  }, [])
+
+  // Filter and sort templates
+  const filteredTemplates = templates
+    .filter((template) => {
+      const matchesSearch =
+        template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        template.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+
+      const matchesCategory = selectedCategory === "all" || template.category === selectedCategory
+      const matchesDifficulty = selectedDifficulty === "all" || template.difficulty === selectedDifficulty
+
+      return matchesSearch && matchesCategory && matchesDifficulty
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "name":
+          return a.name.localeCompare(b.name)
+        case "category":
+          return a.category.localeCompare(b.category)
+        case "difficulty":
+          const difficultyOrder = { Beginner: 1, Intermediate: 2, Advanced: 3 }
+          return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]
+        default:
+          return 0
+      }
+    })
+
+  const categories = ["all", ...new Set(templates.map((t) => t.category))]
+  const difficulties = ["all", "Beginner", "Intermediate", "Advanced"]
+
+  const handleTemplateSelect = (template: PromptTemplate) => {
     router.push(`/tools/prompt-generator/editor?template=${template.id}`)
   }
 
-  return (
-    <div className="flex-1 p-6">
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "Beginner":
+        return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400"
+      case "Intermediate":
+        return "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/20 dark:text-yellow-400"
+      case "Advanced":
+        return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400"
+      default:
+        return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950/20 dark:text-gray-400"
+    }
+  }
 
-    <div className="container mx-auto px-6 py-8 max-w-7xl space-y-8">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
-          <Sparkles className="h-4 w-4" />
-          V0 Prompt Generator
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case "Development":
+        return <Code2 className="h-4 w-4" />
+      case "Architecture":
+        return <Layers className="h-4 w-4" />
+      case "UI/UX":
+        return <Sparkles className="h-4 w-4" />
+      case "Components":
+        return <Target className="h-4 w-4" />
+      default:
+        return <Wand2 className="h-4 w-4" />
+    }
+  }
+
+  const getTemplateIcon = (iconName?: string) => {
+    switch (iconName) {
+      case "UserCog":
+        return <UserCog className="h-4 w-4" />
+      case "FileCode":
+        return <FileCode className="h-4 w-4" />
+      case "Palette":
+        return <Palette className="h-4 w-4" />
+      default:
+        return <Wand2 className="h-4 w-4" />
+    }
+  }
+
+  return (
+    <div className="container mx-auto p-6 space-y-8">
+      {/* Header Section */}
+      <div className="space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Wand2 className="h-6 w-6 text-primary" />
+              </div>
+              Prompt Generator
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl">
+              Create sophisticated AI prompts using professional templates designed for V0 and modern development
+              workflows.
+            </p>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="flex flex-wrap gap-4 lg:flex-col lg:items-end">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <BookOpen className="h-4 w-4" />
+              <span>{templates.length} templates available</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <History className="h-4 w-4" />
+              <span>{recentPrompts.length} prompts generated</span>
+            </div>
+          </div>
         </div>
-        <h1 className="text-4xl font-bold tracking-tight">Create Powerful AI Prompts</h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Generate sophisticated, professional-grade prompts using structured templates. Transform simple ideas into
-          detailed, context-rich instructions that get better results.
-        </p>
+
+        {/* Featured Template Highlight */}
+        {templates.length > 0 && (
+          <Card className="bg-gradient-to-r from-primary/5 via-primary/3 to-secondary/5 border-primary/20">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-5 w-5 text-yellow-500" />
+                    <span className="font-semibold text-primary">Featured Template</span>
+                  </div>
+                  <h3 className="text-xl font-bold">{templates[0].name}</h3>
+                  <p className="text-muted-foreground">{templates[0].description}</p>
+                </div>
+                <Button onClick={() => handleTemplateSelect(templates[0])} size="lg" className="shrink-0">
+                  Try Now
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      {/* Interactive Hero */}
-      <InteractivePromptHero />
-
-      {/* Main Tabs */}
-      <Tabs value={mainTab} onValueChange={(value) => setMainTab(value as "templates" | "history" | "guide")}>
-        <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-2">
-            <History className="h-4 w-4" />
-            History
+      <Tabs defaultValue="templates" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2">
+          <TabsTrigger value="templates" className="flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            Browse Templates
           </TabsTrigger>
-          <TabsTrigger value="guide" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            Guide
+          <TabsTrigger value="recent" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            Recent Prompts ({recentPrompts.length})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="templates" className="space-y-4 mt-8">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold mb-2">Choose Your Template</h2>
-            <p className="text-muted-foreground">
-              Select a professionally crafted template to get started with your prompt generation
-            </p>
-          </div>
-          <PromptGenerator hook={promptGeneratorHook} onTemplateSelect={handleTemplateSelect} />
-        </TabsContent>
-
-        <TabsContent value="history" className="mt-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-2 mb-6">
-              <History className="h-6 w-6" />
-              <h2 className="text-2xl font-bold">Prompt History</h2>
-              <Badge variant="secondary" className="ml-auto">
-                {generatedPrompts.length}
-              </Badge>
-            </div>
-
-            {historyLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-5 w-5 animate-spin" />
-                  <span>Loading history...</span>
+        {/* Templates Tab */}
+        <TabsContent value="templates" className="space-y-6">
+          {/* Search and Filters */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search templates by name, description, or tags..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 h-12"
+                  />
                 </div>
+
+                {/* Filters */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="space-y-2 flex-1">
+                    <label className="text-sm font-medium">Category</label>
+                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category} value={category} className="capitalize">
+                            {category === "all" ? "All Categories" : category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2 flex-1">
+                    <label className="text-sm font-medium">Difficulty</label>
+                    <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {difficulties.map((difficulty) => (
+                          <SelectItem key={difficulty} value={difficulty} className="capitalize">
+                            {difficulty === "all" ? "All Levels" : difficulty}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2 flex-1">
+                    <label className="text-sm font-medium">Sort By</label>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="name">Name</SelectItem>
+                        <SelectItem value="category">Category</SelectItem>
+                        <SelectItem value="difficulty">Difficulty</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Active Filters Display */}
+                {(searchQuery || selectedCategory !== "all" || selectedDifficulty !== "all") && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Active filters:</span>
+                    {searchQuery && (
+                      <Badge variant="secondary" className="gap-1">
+                        Search: "{searchQuery}"
+                        <button onClick={() => setSearchQuery("")} className="ml-1 hover:text-destructive">
+                          ×
+                        </button>
+                      </Badge>
+                    )}
+                    {selectedCategory !== "all" && (
+                      <Badge variant="secondary" className="gap-1">
+                        {selectedCategory}
+                        <button onClick={() => setSelectedCategory("all")} className="ml-1 hover:text-destructive">
+                          ×
+                        </button>
+                      </Badge>
+                    )}
+                    {selectedDifficulty !== "all" && (
+                      <Badge variant="secondary" className="gap-1">
+                        {selectedDifficulty}
+                        <button onClick={() => setSelectedDifficulty("all")} className="ml-1 hover:text-destructive">
+                          ×
+                        </button>
+                      </Badge>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSearchQuery("")
+                        setSelectedCategory("all")
+                        setSelectedDifficulty("all")
+                      }}
+                      className="h-6 px-2 text-xs"
+                    >
+                      Clear all
+                    </Button>
+                  </div>
+                )}
               </div>
-            ) : generatedPrompts.length === 0 ? (
-              <div className="text-center py-12">
-                <History className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No prompts saved yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Start by selecting a template and generating your first prompt
-                </p>
-                <Button onClick={() => setMainTab("templates")}>Browse Templates</Button>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {generatedPrompts.map((prompt) => (
-                  <Card key={prompt.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
+            </CardContent>
+          </Card>
+
+          {/* Templates Grid */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredTemplates.map((template) => (
+              <Card
+                key={template.id}
+                className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-primary/30 hover:scale-[1.02]"
+                onClick={() => handleTemplateSelect(template)}
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                        {getTemplateIcon(template.icon)}
+                      </div>
+                      <div className="space-y-1">
+                        <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-1">
+                          {template.name}
+                        </CardTitle>
+                        <div className="flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">
-                            {prompt.category}
+                            {template.category}
                           </Badge>
-                          <span className="text-xs text-muted-foreground">{prompt.createdAt.toLocaleDateString()}</span>
-                        </div>
-                        <div className="text-sm bg-muted/50 p-3 rounded font-mono leading-relaxed">
-                          {prompt.prompt.length > 120 ? `${prompt.prompt.substring(0, 120)}...` : prompt.prompt}
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Zap className="h-3 w-3" />
-                            {prompt.estimatedTokens} tokens
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigator.clipboard.writeText(prompt.prompt)}
-                          >
-                            Copy
-                          </Button>
+                          <Badge className={`text-xs border ${getDifficultyColor(template.difficulty)}`}>
+                            {template.difficulty}
+                          </Badge>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  <CardDescription className="text-sm leading-relaxed line-clamp-2">
+                    {template.description}
+                  </CardDescription>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1">
+                    {template.tags.slice(0, 3).map((tag) => (
+                      <Badge key={tag} variant="outline" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {template.tags.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{template.tags.length - 3} more
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Examples indicator */}
+                  <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+                    <div className="flex items-center gap-1">
+                      <BookOpen className="h-3 w-3" />
+                      <span>
+                        {template.examples.length} example{template.examples.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="h-3 w-3" />
+                      <span>{template.fields.length} fields</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+
+          {/* No Results State */}
+          {filteredTemplates.length === 0 && (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <div className="space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
+                    <Search className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">No templates found</h3>
+                    <p className="text-muted-foreground">
+                      Try adjusting your search criteria or filters to find what you're looking for.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSearchQuery("")
+                      setSelectedCategory("all")
+                      setSelectedDifficulty("all")
+                    }}
+                  >
+                    Clear all filters
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
-        <TabsContent value="guide" className="mt-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-2 mb-6">
-              <BookOpen className="h-6 w-6" />
-              <h2 className="text-2xl font-bold">Usage Guide</h2>
+        {/* Recent Prompts Tab */}
+        <TabsContent value="recent" className="space-y-6">
+          {recentPrompts.length === 0 ? (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <div className="space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
+                    <History className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">No recent prompts</h3>
+                    <p className="text-muted-foreground">
+                      Start by selecting a template and generating your first prompt.
+                    </p>
+                  </div>
+                  <Button onClick={() => handleTemplateSelect(templates[0])}>Create Your First Prompt</Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {recentPrompts.slice(0, 12).map((prompt) => (
+                <Card key={prompt.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className="text-xs">
+                        {prompt.category}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">{prompt.createdAt.toLocaleDateString()}</span>
+                    </div>
+
+                    <div className="bg-muted/50 p-3 rounded-md">
+                      <pre className="text-xs font-mono leading-relaxed whitespace-pre-wrap line-clamp-4">
+                        {prompt.prompt}
+                      </pre>
+                    </div>
+
+                    <div className="flex items-center justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          navigator.clipboard.writeText(prompt.prompt)
+                        }}
+                      >
+                        Copy
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-
-            <div className="grid gap-8 md:grid-cols-2">
-              {/* Getting Started */}
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold flex items-center gap-2 mb-4">
-                    <Lightbulb className="h-5 w-5" />
-                    Getting Started
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
-                        1
-                      </div>
-                      <div>
-                        <p className="font-medium">Choose a Template</p>
-                        <p className="text-muted-foreground text-sm">
-                          Browse our collection of professionally crafted templates
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
-                        2
-                      </div>
-                      <div>
-                        <p className="font-medium">Fill the Fields</p>
-                        <p className="text-muted-foreground text-sm">
-                          Complete the form with your specific requirements
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
-                        3
-                      </div>
-                      <div>
-                        <p className="font-medium">Generate & Use</p>
-                        <p className="text-muted-foreground text-sm">
-                          Copy your prompt and use it with V0 or other AI tools
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Best Practices */}
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold flex items-center gap-2 mb-4">
-                    <Target className="h-5 w-5" />
-                    Best Practices
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="space-y-1">
-                      <p className="font-medium">Be Specific</p>
-                      <p className="text-muted-foreground text-sm">Provide detailed information for better results</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-medium">Use Examples</p>
-                      <p className="text-muted-foreground text-sm">
-                        Load example configurations to understand structure
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-medium">Iterate</p>
-                      <p className="text-muted-foreground text-sm">Try variations and refine based on results</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-medium">Save Successful Prompts</p>
-                      <p className="text-muted-foreground text-sm">Build a library of prompts that work well for you</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Pro Tips */}
-              <Card className="md:col-span-2">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold flex items-center gap-2 mb-4">
-                    <Zap className="h-5 w-5" />
-                    Pro Tips
-                  </h3>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div className="flex items-start space-x-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                      <p className="text-sm">Use tag fields for multiple related concepts</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                      <p className="text-sm">Multi-select allows comprehensive coverage</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                      <p className="text-sm">Load examples to understand field usage</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                      <p className="text-sm">Check token estimates to optimize length</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+          )}
         </TabsContent>
       </Tabs>
-    </div>
     </div>
   )
 }

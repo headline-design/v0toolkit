@@ -1,213 +1,184 @@
 "use client"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
-import { History, BookOpen, Lightbulb, Target, Zap, Clock, PanelRightClose, PanelRightOpen } from "lucide-react"
-import { useGeneratedPrompts } from "@/lib/hooks/use-prompt-generator"
-import { useIsMobile } from "@/hooks/use-mobile"
+import {
+  X,
+  HelpCircle,
+  Lightbulb,
+  BookOpen,
+  Zap,
+  Target,
+  Users,
+  Star,
+  ExternalLink,
+  ChevronRight,
+  Code,
+  Palette,
+  Database,
+  Globe,
+  Settings,
+  TrendingUp,
+  PanelRightClose,
+  PanelRightOpen,
+} from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface AssistantPanelProps {
   isOpen: boolean
   onToggle: () => void
+  isMobile: boolean
 }
 
-export function AssistantPanel({ isOpen, onToggle }: AssistantPanelProps) {
-  const { prompts: generatedPrompts, loading: historyLoading } = useGeneratedPrompts()
-  const isMobile = useIsMobile()
+export function AssistantPanel({ isOpen, onToggle, isMobile }: AssistantPanelProps) {
+  const [activeTab, setActiveTab] = useState("tips")
 
-  const AssistantContent = () => (
-    <div className="flex flex-col h-full">
-      <Tabs defaultValue="history" className="flex-1 flex flex-col">
-        <div className="px-4 py-3 border-b">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <History className="h-4 w-4" />
-              History
-            </TabsTrigger>
-            <TabsTrigger value="guide" className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              Guide
-            </TabsTrigger>
-          </TabsList>
-        </div>
+  const tips = [
+    {
+      icon: <Target className="h-4 w-4" />,
+      title: "Be Specific",
+      description: "The more specific your requirements, the better the AI will understand your needs.",
+      example: "Instead of 'make a button', try 'create a primary CTA button with hover effects'",
+    },
+    {
+      icon: <Code className="h-4 w-4" />,
+      title: "Include Context",
+      description: "Provide context about your project, tech stack, and constraints.",
+      example: "Building a Next.js 14 app with TypeScript and Tailwind CSS",
+    },
+    {
+      icon: <Users className="h-4 w-4" />,
+      title: "Define Your Role",
+      description: "Clearly state your expertise level and what kind of help you need.",
+      example: "I'm a beginner developer learning React hooks",
+    },
+    {
+      icon: <Palette className="h-4 w-4" />,
+      title: "Describe Design Goals",
+      description: "Include visual preferences, brand guidelines, and accessibility needs.",
+      example: "Modern, minimalist design with high contrast for accessibility",
+    },
+  ]
 
-        <ScrollArea className="flex-1">
-          <TabsContent value="history" className="p-4 space-y-4 mt-0">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium flex items-center gap-2">
-                  <History className="h-4 w-4" />
-                  Generated Prompts
-                </h3>
-                <Badge variant="secondary" className="text-xs">
-                  {generatedPrompts.length}
-                </Badge>
-              </div>
+  const patterns = [
+    {
+      category: "Components",
+      icon: <Code className="h-4 w-4" />,
+      items: [
+        "Interactive forms with validation",
+        "Data tables with sorting/filtering",
+        "Modal dialogs and overlays",
+        "Navigation menus and breadcrumbs",
+        "Card layouts and grids",
+      ],
+    },
+    {
+      category: "Features",
+      icon: <Zap className="h-4 w-4" />,
+      items: [
+        "Authentication flows",
+        "Search and filtering",
+        "Real-time updates",
+        "File upload/download",
+        "Dashboard layouts",
+      ],
+    },
+    {
+      category: "Integrations",
+      icon: <Database className="h-4 w-4" />,
+      items: [
+        "Database connections",
+        "API integrations",
+        "Third-party services",
+        "Payment processing",
+        "Email notifications",
+      ],
+    },
+  ]
 
-              {historyLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 animate-spin" />
-                    <span className="text-sm">Loading...</span>
-                  </div>
-                </div>
-              ) : generatedPrompts.length === 0 ? (
-                <div className="text-center py-8">
-                  <History className="mx-auto h-8 w-8 text-muted-foreground/50 mb-2" />
-                  <p className="text-sm text-muted-foreground">No prompts saved yet</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {generatedPrompts.slice(0, 10).map((prompt) => (
-                    <Card key={prompt.id} className="hover:shadow-sm transition-shadow cursor-pointer">
-                      <CardContent className="p-3">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <Badge variant="outline" className="text-xs">
-                              {prompt.category}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {prompt.createdAt.toLocaleDateString()}
-                            </span>
-                          </div>
-                          <div className="text-xs bg-muted/50 p-2 rounded font-mono">
-                            {prompt.prompt.length > 80 ? `${prompt.prompt.substring(0, 80)}...` : prompt.prompt}
-                          </div>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Zap className="h-3 w-3" />
-                              {prompt.estimatedTokens} tokens
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 px-2 text-xs"
-                              onClick={() => navigator.clipboard.writeText(prompt.prompt)}
-                            >
-                              Copy
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-          </TabsContent>
+  const resources = [
+    {
+      title: "V0 Documentation",
+      description: "Official V0 documentation and guides",
+      url: "https://v0.dev/docs",
+      icon: <BookOpen className="h-4 w-4" />,
+      category: "Official",
+    },
+    {
+      title: "Next.js Documentation",
+      description: "Complete Next.js framework documentation",
+      url: "https://nextjs.org/docs",
+      icon: <Globe className="h-4 w-4" />,
+      category: "Framework",
+    },
+    {
+      title: "Tailwind CSS",
+      description: "Utility-first CSS framework documentation",
+      url: "https://tailwindcss.com/docs",
+      icon: <Palette className="h-4 w-4" />,
+      category: "Styling",
+    },
+    {
+      title: "shadcn/ui",
+      description: "Beautiful UI components built with Radix UI",
+      url: "https://ui.shadcn.com",
+      icon: <Star className="h-4 w-4" />,
+      category: "Components",
+    },
+    {
+      title: "TypeScript Handbook",
+      description: "Complete guide to TypeScript",
+      url: "https://www.typescriptlang.org/docs",
+      icon: <Code className="h-4 w-4" />,
+      category: "Language",
+    },
+  ]
 
-          <TabsContent value="guide" className="p-4 space-y-6 mt-0">
-            <div className="space-y-6 text-sm">
-              {/* Getting Started */}
-              <div className="space-y-3">
-                <h4 className="font-medium flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4" />
-                  Getting Started
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
-                      1
-                    </div>
-                    <div>
-                      <p className="font-medium">Fill the Fields</p>
-                      <p className="text-muted-foreground text-xs">
-                        Complete the form fields with your specific requirements
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
-                      2
-                    </div>
-                    <div>
-                      <p className="font-medium">Preview & Refine</p>
-                      <p className="text-muted-foreground text-xs">Review the generated prompt and make adjustments</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
-                      3
-                    </div>
-                    <div>
-                      <p className="font-medium">Copy & Use</p>
-                      <p className="text-muted-foreground text-xs">
-                        Copy your prompt and use it with V0 or other AI tools
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+  const bestPractices = [
+    {
+      title: "Component Structure",
+      practices: [
+        "Use TypeScript for better type safety",
+        "Implement proper error boundaries",
+        "Follow the single responsibility principle",
+        "Use composition over inheritance",
+      ],
+    },
+    {
+      title: "Performance",
+      practices: [
+        "Implement lazy loading for large components",
+        "Use React.memo for expensive renders",
+        "Optimize images with Next.js Image component",
+        "Minimize bundle size with tree shaking",
+      ],
+    },
+    {
+      title: "Accessibility",
+      practices: [
+        "Use semantic HTML elements",
+        "Implement proper ARIA labels",
+        "Ensure keyboard navigation works",
+        "Maintain sufficient color contrast",
+      ],
+    },
+    {
+      title: "Code Quality",
+      practices: [
+        "Write comprehensive tests",
+        "Use ESLint and Prettier",
+        "Follow consistent naming conventions",
+        "Document complex logic with comments",
+      ],
+    },
+  ]
 
-              <Separator />
-
-              {/* Best Practices */}
-              <div className="space-y-3">
-                <h4 className="font-medium flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Best Practices
-                </h4>
-                <div className="space-y-2">
-                  <div className="space-y-1">
-                    <p className="font-medium">Be Specific</p>
-                    <p className="text-muted-foreground text-xs">Provide detailed information for better results</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="font-medium">Use Examples</p>
-                    <p className="text-muted-foreground text-xs">Load example configurations to understand structure</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="font-medium">Iterate</p>
-                    <p className="text-muted-foreground text-xs">Try variations and refine based on results</p>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Pro Tips */}
-              <div className="space-y-3">
-                <h4 className="font-medium flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  Pro Tips
-                </h4>
-                <div className="space-y-2 text-xs text-muted-foreground">
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                    <p>Use tag fields for multiple related concepts</p>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                    <p>Multi-select allows comprehensive coverage</p>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                    <p>Save successful prompts for future reference</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </ScrollArea>
-      </Tabs>
-    </div>
-  )
-
-  if (isMobile) {
-    return (
-      <Sheet open={isOpen} onOpenChange={onToggle}>
-        <SheetContent side="right" className="w-80 p-0">
-          <AssistantContent />
-        </SheetContent>
-      </Sheet>
-    )
-  }
-
-  if (!isOpen) {
+  // Desktop collapsed state
+  if (!isOpen && !isMobile) {
     return (
       <div className="w-12 border-l bg-background flex flex-col items-center py-4">
         <Button variant="ghost" size="sm" onClick={onToggle} className="h-8 w-8 p-0">
@@ -217,15 +188,202 @@ export function AssistantPanel({ isOpen, onToggle }: AssistantPanelProps) {
     )
   }
 
+  // Mobile - don't render if not open
+  if (!isOpen && isMobile) {
+    return null
+  }
+
   return (
-    <div className="w-80 border-l bg-background flex flex-col">
-      <div className="flex items-center justify-between p-3 border-b">
-        <h2 className="font-semibold text-sm">Assistant</h2>
-        <Button variant="ghost" size="sm" onClick={onToggle} className="h-7 w-7 p-0">
-          <PanelRightClose className="h-4 w-4" />
+    <div className={cn("bg-background border-l flex flex-col", isMobile ? "w-full h-full" : "w-80 h-full")}>
+      {/* Header */}
+      <div className="p-4 border-b flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <HelpCircle className="h-5 w-5" />
+          <h2 className="font-semibold">Assistant</h2>
+        </div>
+        <Button variant="ghost" size="sm" onClick={onToggle} className="h-8 w-8 p-0">
+          {isMobile ? <X className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
         </Button>
       </div>
-      <AssistantContent />
+
+      {/* Content */}
+      <div className="flex-1 overflow-hidden">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          <TabsList className="grid w-full grid-cols-4 m-4 mb-0">
+            <TabsTrigger value="tips" className="text-xs">
+              Tips
+            </TabsTrigger>
+            <TabsTrigger value="patterns" className="text-xs">
+              Patterns
+            </TabsTrigger>
+            <TabsTrigger value="resources" className="text-xs">
+              Resources
+            </TabsTrigger>
+            <TabsTrigger value="practices" className="text-xs">
+              Best Practices
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 pt-2">
+                {/* Tips Tab */}
+                <TabsContent value="tips" className="mt-0 space-y-4">
+                  <div className="space-y-3">
+                    {tips.map((tip, index) => (
+                      <Card key={index} className="p-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            {tip.icon}
+                            <h4 className="font-medium text-sm">{tip.title}</h4>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-relaxed">{tip.description}</p>
+                          <div className="bg-muted/50 p-2 rounded text-xs">
+                            <strong>Example:</strong> {tip.example}
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+
+                  <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <Lightbulb className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-blue-900 dark:text-blue-100 text-sm">Pro Tip</h4>
+                          <p className="text-xs text-blue-800 dark:text-blue-200 leading-relaxed">
+                            Use the examples in each template to understand the expected format and level of detail for
+                            each field.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                {/* Patterns Tab */}
+                <TabsContent value="patterns" className="mt-0 space-y-4">
+                  {patterns.map((pattern, index) => (
+                    <Card key={index}>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-sm">
+                          {pattern.icon}
+                          {pattern.category}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-2">
+                          {pattern.items.map((item, itemIndex) => (
+                            <div key={itemIndex} className="flex items-center gap-2 text-xs">
+                              <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                              <span>{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <TrendingUp className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-green-900 dark:text-green-100 text-sm">Popular Patterns</h4>
+                          <p className="text-xs text-green-800 dark:text-green-200 leading-relaxed">
+                            These are the most commonly requested patterns. They have high success rates and are
+                            well-tested.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                {/* Resources Tab */}
+                <TabsContent value="resources" className="mt-0 space-y-4">
+                  {resources.map((resource, index) => (
+                    <Card key={index} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3 flex-1">
+                            {resource.icon}
+                            <div className="space-y-1 flex-1">
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-medium text-sm">{resource.title}</h4>
+                                <Badge variant="outline" className="text-xs">
+                                  {resource.category}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground leading-relaxed">{resource.description}</p>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" asChild>
+                            <a href={resource.url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200 dark:border-purple-800">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <BookOpen className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm">Keep Learning</h4>
+                          <p className="text-xs text-purple-800 dark:text-purple-200 leading-relaxed">
+                            These resources are regularly updated. Bookmark them for quick reference during development.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                {/* Best Practices Tab */}
+                <TabsContent value="practices" className="mt-0 space-y-4">
+                  {bestPractices.map((section, index) => (
+                    <Card key={index}>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm">{section.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-2">
+                          {section.practices.map((practice, practiceIndex) => (
+                            <div key={practiceIndex} className="flex items-start gap-2 text-xs">
+                              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                              <span className="leading-relaxed">{practice}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  <Card className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border-orange-200 dark:border-orange-800">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <Settings className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-orange-900 dark:text-orange-100 text-sm">Quality First</h4>
+                          <p className="text-xs text-orange-800 dark:text-orange-200 leading-relaxed">
+                            Following these practices will help you build maintainable, scalable, and performant
+                            applications.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </div>
+            </ScrollArea>
+          </div>
+        </Tabs>
+      </div>
     </div>
   )
 }

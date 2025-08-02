@@ -2,196 +2,178 @@
 
 import { useState, useCallback, useEffect } from "react"
 import { promptGeneratorService } from "@/lib/services/prompt-generator-service"
-import type { PromptTemplate, PromptGeneratorState, GeneratedPrompt } from "@/lib/types/prompt-generator"
+import type { PromptTemplate, GeneratedPrompt } from "@/lib/types/prompt-generator"
 
 export function usePromptGenerator() {
-  const [state, setState] = useState<PromptGeneratorState>({
-    selectedTemplate: null,
-    fieldValues: {},
-    generatedPrompt: "",
-    isGenerating: false,
-    errors: {},
-    history: [],
-  })
-
-  // Load history on mount
-  useEffect(() => {
-    setState((prev) => ({
-      ...prev,
-      history: promptGeneratorService.getHistory(),
-    }))
-  }, [])
+  const [templates, setTemplates] = useState<PromptTemplate[]>(() => promptGeneratorService.getTemplates())
+  const [selectedTemplate, setSelectedTemplate] = useState<PromptTemplate | null>(null)
+  const [fieldValues, setFieldValues] = useState<Record<string, any>>({})
+  const [generatedPrompt, setGeneratedPrompt] = useState<string>("")
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const selectTemplate = useCallback((template: PromptTemplate) => {
-    setState((prev) => ({
-      ...prev,
-      selectedTemplate: template,
-      fieldValues: {},
-      generatedPrompt: "",
-      errors: {},
-    }))
-  }, [])
-
-  const updateFieldValue = useCallback((fieldName: string, value: string | string[]) => {
-    setState((prev) => {
-      const newValues = {
-        ...prev.fieldValues,
-        [fieldName]: value,
-      }
-
-      // Clear error for this field
-      const newErrors = { ...prev.errors }
-      delete newErrors[fieldName]
-
-      // Generate prompt if template is selected
-      let generatedPrompt = ""
-      if (prev.selectedTemplate) {
-        try {
-          generatedPrompt = promptGeneratorService.generatePrompt(prev.selectedTemplate, newValues)
-        } catch (error) {
-          console.error("Error generating prompt:", error)
-        }
-      }
-
-      return {
-        ...prev,
-        fieldValues: newValues,
-        generatedPrompt,
-        errors: newErrors,
+    setSelectedTemplate(template)
+    // Reset field values when a new template is selected
+    const initialValues: Record<string, any> = {}
+    template.fields.forEach((field) => {
+      if (field.type === "tags" || field.type === "multiselect") {
+        initialValues[field.id] = []
+      } else {
+        initialValues[field.id] = ""
       }
     })
+    setFieldValues(initialValues)
+    setGeneratedPrompt("") // Clear any previously generated prompt
+    setErrors({}) // Clear any previous errors
+  }, [])
+
+  const updateFieldValue = useCallback((fieldId: string, value: any) => {
+    setFieldValues((prev) => ({
+      ...prev,
+      [fieldId]: value,
+    }))
   }, [])
 
   const loadExample = useCallback(
     (exampleIndex: number) => {
-      if (!state.selectedTemplate || !state.selectedTemplate.examples[exampleIndex]) return
+      if (!selectedTemplate) return
 
-      const example = state.selectedTemplate.examples[exampleIndex]
-      setState((prev) => ({
-        ...prev,
-        fieldValues: { ...example.values },
-        generatedPrompt: promptGeneratorService.generatePrompt(prev.selectedTemplate!, example.values),
-        errors: {},
-      }))
+      const example = selectedTemplate.examples[exampleIndex]
+      if (example) {
+        setFieldValues(example.values)
+        setErrors({})
+      }
     },
-    [state.selectedTemplate],
+    [selectedTemplate],
   )
 
   const validateAndGenerate = useCallback(() => {
-    if (!state.selectedTemplate) return false
+    if (!selectedTemplate) return
 
-    setState((prev) => ({ ...prev, isGenerating: true }))
+    const validationErrors = promptGeneratorService.validateFields(selectedTemplate, fieldValues)
+    setErrors(validationErrors)
 
-    const errors = promptGeneratorService.validateFields(state.selectedTemplate, state.fieldValues)
-
-    setState((prev) => ({
-      ...prev,
-      errors,
-      isGenerating: false,
-    }))
-
-    return Object.keys(errors).length === 0
-  }, [state.selectedTemplate, state.fieldValues])
+    if (Object.keys(validationErrors).length === 0) {
+      const prompt = promptGeneratorService.generatePrompt(selectedTemplate, fieldValues)
+      setGeneratedPrompt(prompt)
+    }
+  }, [selectedTemplate, fieldValues])
 
   const savePrompt = useCallback(() => {
-    if (!state.selectedTemplate || !state.generatedPrompt) return
+    if (!selectedTemplate || !generatedPrompt) return
 
-    const prompt: GeneratedPrompt = {
-      id: `prompt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      templateId: state.selectedTemplate.id,
-      content: state.generatedPrompt,
-      values: { ...state.fieldValues },
+    const generatedPromptData: GeneratedPrompt = {
+      id: Date.now().toString(),
+      templateId: selectedTemplate.id,
+      category: selectedTemplate.category,
+      prompt: generatedPrompt,
+      fieldValues: { ...fieldValues },
+      tags: selectedTemplate.tags,
+      estimatedTokens: promptGeneratorService.estimateTokens(generatedPrompt),
       createdAt: new Date(),
-      estimatedTokens: promptGeneratorService.estimateTokens(state.generatedPrompt),
-      category: state.selectedTemplate.category,
-      tags: state.selectedTemplate.tags,
-      prompt: state.generatedPrompt,
     }
 
-    // Save to localStorage via service
-    promptGeneratorService.saveToHistory(prompt)
-
-    // Update local state
-    setState((prev) => ({
-      ...prev,
-      history: [prompt, ...prev.history.slice(0, 49)],
-    }))
-
-    return prompt
-  }, [state.selectedTemplate, state.generatedPrompt, state.fieldValues])
-
-  const clearHistory = useCallback(() => {
-    promptGeneratorService.clearHistory()
-    setState((prev) => ({
-      ...prev,
-      history: [],
-    }))
-  }, [])
+    promptGeneratorService.saveToHistory(generatedPromptData)
+  }, [selectedTemplate, generatedPrompt, fieldValues])
 
   const resetForm = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      fieldValues: {},
-      generatedPrompt: "",
-      errors: {},
-    }))
-  }, [])
+    if (!selectedTemplate) return
 
-  const resetGenerator = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      selectedTemplate: null,
-      fieldValues: {},
-      generatedPrompt: "",
-      errors: {},
-    }))
+    // Reset field values to initial state
+    const initialValues: Record<string, any> = {}
+    selectedTemplate.fields.forEach((field) => {
+      if (field.type === "tags" || field.type === "multiselect") {
+        initialValues[field.id] = []
+      } else {
+        initialValues[field.id] = ""
+      }
+    })
+    setFieldValues(initialValues)
+    setGeneratedPrompt("")
+    setErrors({})
+  }, [selectedTemplate])
+
+  const estimateTokens = useCallback((text: string) => {
+    return promptGeneratorService.estimateTokens(text)
   }, [])
 
   return {
-    ...state,
-    templates: promptGeneratorService.getTemplates(),
+    templates,
+    selectedTemplate,
+    fieldValues,
+    generatedPrompt,
+    isGenerating,
+    errors,
     selectTemplate,
     updateFieldValue,
     loadExample,
     validateAndGenerate,
     savePrompt,
-    clearHistory,
     resetForm,
-    resetGenerator,
-    estimateTokens: (prompt: string) => promptGeneratorService.estimateTokens(prompt),
+    estimateTokens,
   }
 }
 
 // Separate hook for generated prompts history
 export function useGeneratedPrompts() {
   const [prompts, setPrompts] = useState<GeneratedPrompt[]>([])
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const loadPrompts = () => {
       try {
-        setLoading(true)
         const history = promptGeneratorService.getHistory()
         setPrompts(history)
       } catch (error) {
-        console.error("Error loading prompts:", error)
+        console.error("Failed to load prompt history:", error)
       } finally {
-        setLoading(false)
+        setIsLoading(false)
       }
     }
 
     loadPrompts()
+  }, [])
 
-    // Listen for storage changes to update prompts when saved from other tabs
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "v0-toolkit-prompt-history") {
-        loadPrompts()
+  const addPrompt = (prompt: GeneratedPrompt) => {
+    promptGeneratorService.saveToHistory(prompt)
+    setPrompts((prev) => [prompt, ...prev.slice(0, 49)])
+  }
+
+  const clearHistory = () => {
+    promptGeneratorService.clearHistory()
+    setPrompts([])
+  }
+
+  return {
+    prompts,
+    isLoading,
+    addPrompt,
+    clearHistory,
+  }
+}
+
+export function usePromptTemplates() {
+  const [templates, setTemplates] = useState<PromptTemplate[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const loadTemplates = () => {
+      try {
+        const allTemplates = promptGeneratorService.getTemplates()
+        setTemplates(allTemplates)
+      } catch (error) {
+        console.error("Failed to load templates:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    window.addEventListener("storage", handleStorageChange)
-    return () => window.removeEventListener("storage", handleStorageChange)
+    loadTemplates()
   }, [])
 
-  return { prompts, loading }
+  return {
+    templates,
+    isLoading,
+  }
 }
