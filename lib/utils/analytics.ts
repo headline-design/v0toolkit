@@ -1,81 +1,104 @@
 /**
- * Analytics utilities for tracking user interactions
- * Privacy-focused analytics implementation
+ * Analytics utilities for V0 Toolkit
+ * Track usage of prompts and profiles for insights
  */
 
 interface AnalyticsEvent {
-  name: string
+  event: string
   properties?: Record<string, any>
+  timestamp: Date
 }
 
-class Analytics {
-  private isEnabled = false
+class AnalyticsService {
+  private readonly STORAGE_KEY = "v0-toolkit-analytics"
+  private events: AnalyticsEvent[] = []
 
   constructor() {
-    // Only enable analytics in production and with user consent
-    this.isEnabled =
-      process.env.NODE_ENV === "production" &&
-      typeof window !== "undefined" &&
-      localStorage.getItem("analytics-consent") === "true"
+    if (typeof window !== "undefined") {
+      this.loadEvents()
+    }
   }
 
-  /**
-   * Track a custom event
-   */
-  track(event: AnalyticsEvent) {
-    if (!this.isEnabled) return
-
-    // Implementation would integrate with your analytics provider
-    // For now, we'll use a privacy-focused approach
-    console.log("Analytics Event:", event)
-
-    // Example: Send to your analytics endpoint
-    // fetch('/api/analytics', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(event)
-    // })
+  private loadEvents() {
+    try {
+      const stored = localStorage.getItem(this.STORAGE_KEY)
+      if (stored) {
+        this.events = JSON.parse(stored).map((event: any) => ({
+          ...event,
+          timestamp: new Date(event.timestamp),
+        }))
+      }
+    } catch (error) {
+      console.error("Failed to load analytics events:", error)
+    }
   }
 
-  /**
-   * Track page views
-   */
-  page(path: string) {
-    this.track({
-      name: "page_view",
-      properties: { path },
+  private saveEvents() {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.events))
+    } catch (error) {
+      console.error("Failed to save analytics events:", error)
+    }
+  }
+
+  track(event: string, properties?: Record<string, any>) {
+    const analyticsEvent: AnalyticsEvent = {
+      event,
+      properties,
+      timestamp: new Date(),
+    }
+
+    this.events.push(analyticsEvent)
+
+    // Keep only last 1000 events
+    if (this.events.length > 1000) {
+      this.events = this.events.slice(-1000)
+    }
+
+    this.saveEvents()
+
+    // In production, you might want to send this to an analytics service
+    if (process.env.NODE_ENV === "development") {
+      console.log("Analytics Event:", analyticsEvent)
+    }
+  }
+
+  getEvents(eventName?: string): AnalyticsEvent[] {
+    if (eventName) {
+      return this.events.filter((event) => event.event === eventName)
+    }
+    return this.events
+  }
+
+  getEventCounts(): Record<string, number> {
+    const counts: Record<string, number> = {}
+    this.events.forEach((event) => {
+      counts[event.event] = (counts[event.event] || 0) + 1
     })
+    return counts
   }
 
-  /**
-   * Track pattern usage
-   */
-  trackPatternView(patternId: string, category: string) {
-    this.track({
-      name: "pattern_viewed",
-      properties: { patternId, category },
-    })
-  }
-
-  /**
-   * Track prompt copying
-   */
-  trackPromptCopy(promptId: string, category: string) {
-    this.track({
-      name: "prompt_copied",
-      properties: { promptId, category },
-    })
-  }
-
-  /**
-   * Track example interactions
-   */
-  trackExampleInteraction(exampleId: string, action: "view" | "demo" | "github") {
-    this.track({
-      name: "example_interaction",
-      properties: { exampleId, action },
-    })
+  clearEvents() {
+    this.events = []
+    this.saveEvents()
   }
 }
 
-export const analytics = new Analytics()
+export const analytics = new AnalyticsService()
+
+// Convenience functions for common events
+export const trackPromptGenerated = (templateId: string, category: string) => {
+  analytics.track("prompt_generated", { templateId, category })
+}
+
+export const trackProfileCreated = (profileId: string, category: string, fromTemplate: boolean) => {
+  analytics.track("profile_created", { profileId, category, fromTemplate })
+}
+
+export const trackProfileUsed = (profileId: string, taskId?: string) => {
+  analytics.track("profile_used", { profileId, taskId })
+}
+
+export const trackPromptCopied = (source: "generator" | "profile") => {
+  analytics.track("prompt_copied", { source })
+}

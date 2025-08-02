@@ -1,100 +1,100 @@
 import Link from "next/link"
-import { Separator } from "@/components/ui/separator"
-import { Github, Globe } from "lucide-react"
+import { Github, Twitter } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="border-t bg-muted/30 mt-auto">
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid gap-12 lg:grid-cols-4">
-          {/* Brand section */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <span className="text-sm font-bold text-primary-foreground">V0</span>
+    <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-6 py-12">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="flex h-6 w-6 items-center justify-center rounded bg-primary">
+                <span className="text-xs font-bold text-primary-foreground">V0</span>
               </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold leading-none">V0 Toolkit</span>
-                <span className="text-xs text-muted-foreground leading-none">Professional</span>
-              </div>
+              <span className="font-semibold">V0 Toolkit</span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
-              Professional patterns and practices for V0 development. Built by the community, for teams shipping
-              production software.
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Professional V0 prompting toolkit for developers. Create sophisticated AI prompts and personalized V0
+              profiles.
             </p>
-            <div className="flex items-center space-x-4 mt-6">
+          </div>
+
+          {/* Tools */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Tools</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link
+                  href="/prompt-generator"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Prompt Generator
+                </Link>
+              </li>
+              <li>
+                <Link href="/profiles" className="text-muted-foreground hover:text-foreground transition-colors">
+                  V0 Profiles
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Resources</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a
+                  href="https://v0.dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  V0 Platform
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://vercel.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Vercel
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Community */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Community</h3>
+            <div className="flex space-x-4">
               <a
                 href="https://github.com/headline-design/v0toolkit"
-                className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Github className="h-4 w-4" />
-                <span>GitHub</span>
+                <Github className="h-5 w-5" />
+                <span className="sr-only">GitHub</span>
               </a>
               <a
-                href="https://v0.dev"
-                className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                href="https://twitter.com/v0toolkit"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Globe className="h-4 w-4" />
-                <span>V0 Platform</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Navigation links */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Resources</h3>
-            <div className="space-y-3 text-sm">
-              <Link href="/patterns" className="block text-muted-foreground hover:text-foreground transition-colors">
-                Design Patterns
-              </Link>
-              <Link href="/prompts" className="block text-muted-foreground hover:text-foreground transition-colors">
-                Prompt Templates
-              </Link>
-              <Link
-                href="/architecture"
-                className="block text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Architecture
-              </Link>
-              <Link href="/examples" className="block text-muted-foreground hover:text-foreground transition-colors">
-                Examples
-              </Link>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Community</h3>
-            <div className="space-y-3 text-sm">
-              <Link
-                href="/contributing"
-                className="block text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Contributing
-              </Link>
-              <Link href="/changelog" className="block text-muted-foreground hover:text-foreground transition-colors">
-                Changelog
-              </Link>
-              <a
-                href="https://github.com/headline-design/v0toolkit/discussions"
-                className="block text-muted-foreground hover:text-foreground transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Discussions
+                <Twitter className="h-5 w-5" />
+                <span className="sr-only">Twitter</span>
               </a>
             </div>
           </div>
         </div>
 
-        <Separator className="my-8" />
-
-        <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>© 2024 V0 Toolkit. Open source and community driven.</p>
-          <p className="mt-2 sm:mt-0">Built with V0 by the community</p>
+        <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
+          <p>&copy; 2024 V0 Toolkit. Built with V0 and Next.js.</p>
         </div>
       </div>
     </footer>

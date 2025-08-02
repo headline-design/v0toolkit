@@ -74,7 +74,7 @@ export default function PromptGeneratorPage() {
   const difficulties = ["all", "Beginner", "Intermediate", "Advanced"]
 
   const handleTemplateSelect = (template: PromptTemplate) => {
-    router.push(`/tools/prompt-generator/editor?template=${template.id}`)
+    router.push(`/prompt-generator/editor?template=${template.id}`)
   }
 
   const getDifficultyColor = (difficulty: string) => {
@@ -128,11 +128,11 @@ export default function PromptGeneratorPage() {
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Wand2 className="h-6 w-6 text-primary" />
               </div>
-              Prompt Generator
+              V0 Prompt Generator
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl">
               Create sophisticated AI prompts using professional templates designed for V0 and modern development
-              workflows.
+              workflows. Configure V0's expertise, personality, and response style.
             </p>
           </div>
 
@@ -140,7 +140,7 @@ export default function PromptGeneratorPage() {
           <div className="flex flex-wrap gap-4 lg:flex-col lg:items-end">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <BookOpen className="h-4 w-4" />
-              <span>{templates.length} templates available</span>
+              <span>{templates.length} expert templates</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <History className="h-4 w-4" />
@@ -407,7 +407,7 @@ export default function PromptGeneratorPage() {
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold">No recent prompts</h3>
                     <p className="text-muted-foreground">
-                      Start by selecting a template and generating your first prompt.
+                      Start by selecting a template and generating your first V0 prompt.
                     </p>
                   </div>
                   <Button onClick={() => handleTemplateSelect(templates[0])}>Create Your First Prompt</Button>

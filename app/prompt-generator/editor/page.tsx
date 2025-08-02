@@ -33,11 +33,11 @@ export default function PromptGeneratorEditorPage() {
         setIsLoading(false)
       } else {
         // Template not found, redirect back
-        router.push("/tools/prompt-generator")
+        router.push("/prompt-generator")
       }
     } else if (!templateId && templates.length > 0) {
       // No template ID in URL, redirect back
-      router.push("/tools/prompt-generator")
+      router.push("/prompt-generator")
     }
   }, [templateId, templates, templateInitialized, selectTemplate, router])
 
@@ -73,7 +73,7 @@ export default function PromptGeneratorEditorPage() {
                     : "Please select a template to start generating prompts"}
                 </p>
               </div>
-              <Button onClick={() => router.push("/tools/prompt-generator")} className="w-full">
+              <Button onClick={() => router.push("/prompt-generator")} className="w-full">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {templateId ? "Back to Templates" : "Select a Template"}
               </Button>
@@ -85,7 +85,7 @@ export default function PromptGeneratorEditorPage() {
   }
 
   const handleBack = () => {
-    router.push("/tools/prompt-generator")
+    router.push("/prompt-generator")
   }
 
   return (

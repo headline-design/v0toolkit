@@ -28,7 +28,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
-import { Palette, MessageSquare, Code2, Building, CheckCircle, Layers, Wand2 } from "lucide-react"
+import { Palette, MessageSquare, Code2, Building, CheckCircle, Layers, Wand2, Users } from "lucide-react"
 
 interface SidebarLayoutProps {
   children: any
@@ -40,6 +40,12 @@ const navigationItems = [
     url: "/tools/prompt-generator",
     icon: Wand2,
     description: "Generate sophisticated AI prompts",
+  },
+  {
+    title: "V0 Profiles",
+    url: "/tools/v0-profiles",
+    icon: Users,
+    description: "Personalized AI assistants",
   },
   {
     title: "Patterns",
