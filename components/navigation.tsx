@@ -55,7 +55,6 @@ export function Navigation() {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            <Button>Get Started</Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -90,9 +89,7 @@ export function Navigation() {
                   </Link>
                 )
               })}
-              <div className="pt-4 border-t">
-                <Button className="w-full">Get Started</Button>
-              </div>
+              
             </div>
           </div>
         )}

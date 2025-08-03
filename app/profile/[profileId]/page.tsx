@@ -33,8 +33,8 @@ import {
 } from "lucide-react"
 import { v0ProfileService } from "@/lib/services/v0-profile-service"
 import type { V0Profile, ComposedPrompt } from "@/lib/types/v0-profile"
-import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { ProfileEditDialog } from "@/components/profile-edit-dialog"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -163,22 +163,6 @@ export default function ProfilePage() {
     loadProfile()
   }, [profileId, router])
 
-  // Generate avatar color based on profile name
-  const getAvatarColor = (name: string) => {
-    const colors = [
-      "bg-red-500",
-      "bg-blue-500",
-      "bg-green-500",
-      "bg-yellow-500",
-      "bg-purple-500",
-      "bg-pink-500",
-      "bg-indigo-500",
-      "bg-teal-500",
-    ]
-    const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
-    return colors[hash % colors.length]
-  }
-
   // Get initials from name
   const getInitials = (name: string) => {
     return name
@@ -304,10 +288,18 @@ export default function ProfilePage() {
                   <span>Saving...</span>
                 </div>
               )}
-              <Button variant="outline" size="sm" onClick={() => router.push(`/profiles/${profileId}/edit`)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
+              <ProfileEditDialog
+                profile={profile}
+                onProfileUpdate={(updatedProfile) => {
+                  setProfile(updatedProfile)
+                  saveProfileWithToast(updatedProfile, "Profile updated")
+                }}
+              >
+                <Button variant="outline" size="sm">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              </ProfileEditDialog>
               <Button variant="outline" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Settings
@@ -326,9 +318,11 @@ export default function ProfilePage() {
           <CardContent className="relative p-6">
             {/* Avatar */}
             <div className="absolute -top-16 left-6">
-              <Avatar className={cn("h-24 w-24 border-4 border-background", getAvatarColor(profile.name))}>
-                <AvatarImage src={profile.avatar || "/placeholder.svg"} />
-                <AvatarFallback className="text-white text-xl font-bold">{getInitials(profile.name)}</AvatarFallback>
+              <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
+                <AvatarImage src={`https://avatar.vercel.sh/${profile.id}?size=400`} />
+                <AvatarFallback className="text-white font-bold text-xl bg-gradient-to-br from-primary to-primary/80">
+                  {getInitials(profile.name)}
+                </AvatarFallback>
               </Avatar>
             </div>
 

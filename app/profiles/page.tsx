@@ -30,6 +30,9 @@ import {
   Filter,
   X,
   Crown,
+  ChevronRight,
+  Clock,
+  Target,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -40,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { v0ProfileService } from "@/lib/services/v0-profile-service"
 import type { V0Profile, ProfileTemplate } from "@/lib/types/v0-profile"
+import { ProfileEditDialog } from "@/components/profile-edit-dialog"
 
 export default function V0ProfilesPage() {
   const router = useRouter()
@@ -119,8 +123,8 @@ export default function V0ProfilesPage() {
     }
   }
 
-  const handleEditProfile = (profileId: string) => {
-    router.push(`/profile/${profileId}/edit`)
+  const handleEditProfile = (profile: V0Profile) => {
+    // This will be handled by the ProfileEditDialog component
   }
 
   const handleUseProfile = (profileId: string) => {
@@ -153,21 +157,6 @@ export default function V0ProfilesPage() {
     setProfiles([...profiles, duplicatedProfile])
   }
 
-  const getAvatarColor = (name: string) => {
-    const colors = [
-      "bg-gradient-to-br from-blue-500 to-blue-600",
-      "bg-gradient-to-br from-purple-500 to-purple-600",
-      "bg-gradient-to-br from-green-500 to-green-600",
-      "bg-gradient-to-br from-orange-500 to-orange-600",
-      "bg-gradient-to-br from-pink-500 to-pink-600",
-      "bg-gradient-to-br from-indigo-500 to-indigo-600",
-      "bg-gradient-to-br from-teal-500 to-teal-600",
-      "bg-gradient-to-br from-red-500 to-red-600",
-    ]
-    const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
-    return colors[hash % colors.length]
-  }
-
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -181,7 +170,7 @@ export default function V0ProfilesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen ">
+      <div className="min-h-screen">
         <div className="container mx-auto p-6">
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center space-y-4">
@@ -199,8 +188,144 @@ export default function V0ProfilesPage() {
     )
   }
 
+  // Show onboarding if no profiles exist
+  if (profiles.length === 0) {
+    return (
+      <div className="min-h-screen">
+        <div className="container mx-auto p-6 space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-4">
+            <div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+              <Users className="h-10 w-10 text-primary" />
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold tracking-tight">Welcome to V0 Profiles</h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Create personalized AI assistants that understand your workflow and provide tailored V0 assistance.
+              </p>
+            </div>
+          </div>
+
+          {/* Onboarding Steps */}
+          <div className="max-w-4xl mx-auto">
+            <div className="grid gap-6 md:grid-cols-3">
+              <Card className="text-center p-6">
+                <div className="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                  <Target className="h-6 w-6 text-blue-600" />
+                </div>
+                <h3 className="font-semibold mb-2">1. Choose Your Base</h3>
+                <p className="text-sm text-muted-foreground">
+                  Start with a generated prompt from our Prompt Generator or use a pre-built template
+                </p>
+              </Card>
+              <Card className="text-center p-6">
+                <div className="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <Settings className="h-6 w-6 text-green-600" />
+                </div>
+                <h3 className="font-semibold mb-2">2. Customize Traits</h3>
+                <p className="text-sm text-muted-foreground">
+                  Add personality traits and specialized knowledge to make your assistant unique
+                </p>
+              </Card>
+              <Card className="text-center p-6">
+                <div className="w-12 h-12 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                  <Zap className="h-6 w-6 text-purple-600" />
+                </div>
+                <h3 className="font-semibold mb-2">3. Start Using</h3>
+                <p className="text-sm text-muted-foreground">
+                  Generate prompts tailored to your specific needs and copy them to V0
+                </p>
+              </Card>
+            </div>
+          </div>
+
+          {/* Quick Start Options */}
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold mb-2">Get Started</h2>
+              <p className="text-muted-foreground">Choose how you'd like to create your first profile</p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card
+                className="cursor-pointer hover:shadow-md transition-all duration-200 border-2 hover:border-primary/50"
+                onClick={() => router.push("/prompt-generator")}
+              >
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                    <Sparkles className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-semibold">Generate a Prompt First</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Create a specialized prompt using our generator, then build a profile on top of it
+                    </p>
+                  </div>
+                  <Button className="w-full">
+                    Start with Prompt Generator
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card
+                className="cursor-pointer hover:shadow-md transition-all duration-200 border-2 hover:border-primary/50"
+                onClick={() => handleCreateProfile()}
+              >
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-semibold">Use a Template</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Start with a pre-built template designed for common V0 workflows
+                    </p>
+                  </div>
+                  <Button variant="outline" className="w-full bg-transparent">
+                    Browse Templates
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Popular Templates Preview */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-center">Popular Templates</h3>
+              <div className="grid gap-3">
+                {templates.slice(0, 2).map((template) => (
+                  <Card
+                    key={template.id}
+                    className="cursor-pointer hover:shadow-md transition-all duration-200"
+                    onClick={() => handleCreateProfile(template)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                            {getProfileIcon(template.icon)}
+                          </div>
+                          <div>
+                            <h4 className="font-medium">{template.name}</h4>
+                            <p className="text-sm text-muted-foreground">{template.description}</p>
+                          </div>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       <div className="container mx-auto p-6 space-y-8">
         {/* Header Section */}
         <div className="space-y-6">
@@ -219,11 +344,7 @@ export default function V0ProfilesPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button
-                onClick={() => handleCreateProfile()}
-                size="lg"
-                className="h-12 px-8"
-              >
+              <Button onClick={() => handleCreateProfile()} size="lg" className="h-12 px-8">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Profile
               </Button>
@@ -375,32 +496,22 @@ export default function V0ProfilesPage() {
                       <Users className="h-10 w-10 text-muted-foreground" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-semibold">
-                        {profiles.length === 0 ? "No profiles yet" : "No profiles found"}
-                      </h3>
+                      <h3 className="text-xl font-semibold">No profiles found</h3>
                       <p className="text-muted-foreground max-w-md mx-auto">
-                        {profiles.length === 0
-                          ? "Create your first V0 profile to get started with personalized AI assistance."
-                          : "Try adjusting your search criteria or filters to find what you're looking for."}
+                        Try adjusting your search criteria or filters to find what you're looking for.
                       </p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Button onClick={() => handleCreateProfile()} className="h-12 px-8">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create Your First Profile
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSearchQuery("")
+                          setSelectedCategory("all")
+                        }}
+                        className="h-12 px-8"
+                      >
+                        Clear Filters
                       </Button>
-                      {profiles.length > 0 && (
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            setSearchQuery("")
-                            setSelectedCategory("all")
-                          }}
-                          className="h-12 px-8"
-                        >
-                          Clear Filters
-                        </Button>
-                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -410,16 +521,14 @@ export default function V0ProfilesPage() {
                 {filteredProfiles.map((profile) => (
                   <Card
                     key={profile.id}
-                    className="group card-hover cursor-pointer border-2 hover:border-primary/30 transition-all duration-300"
+                    className="group cursor-pointer border-2 hover:border-primary/30 transition-all duration-300 hover:shadow-lg"
                   >
                     <CardHeader className="pb-4">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <Avatar
-                            className={`h-12 w-12 border-2 border-background shadow-lg ${getAvatarColor(profile.name)}`}
-                          >
-                            <AvatarImage src={profile.avatar || "/placeholder.svg"} />
-                            <AvatarFallback className="text-white font-bold text-sm">
+                          <Avatar className="h-12 w-12 border-2 border-background shadow-lg">
+                            <AvatarImage src={`https://avatar.vercel.sh/${profile.id}?size=400`} />
+                            <AvatarFallback className="text-white font-bold text-sm bg-gradient-to-br from-primary to-primary/80">
                               {getInitials(profile.name)}
                             </AvatarFallback>
                           </Avatar>
@@ -468,10 +577,18 @@ export default function V0ProfilesPage() {
                               <Play className="h-4 w-4 mr-2" />
                               Use Profile
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEditProfile(profile.id)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
+                            <ProfileEditDialog
+                              profile={profile}
+                              onProfileUpdate={(updatedProfile) => {
+                                setProfiles(profiles.map((p) => (p.id === updatedProfile.id ? updatedProfile : p)))
+                              }}
+                              trigger={
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                              }
+                            />
                             <DropdownMenuItem onClick={() => handleDuplicateProfile(profile)}>
                               <Copy className="h-4 w-4 mr-2" />
                               Duplicate
@@ -489,7 +606,7 @@ export default function V0ProfilesPage() {
                       </div>
                     </CardHeader>
 
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4" onClick={() => handleViewProfile(profile.id)}>
                       <CardDescription className="text-sm leading-relaxed line-clamp-2">
                         {profile.description}
                       </CardDescription>
@@ -528,14 +645,24 @@ export default function V0ProfilesPage() {
 
                       {/* Action Buttons */}
                       <div className="flex gap-2 pt-2">
-                        <Button size="sm" onClick={() => handleUseProfile(profile.id)} className="flex-1 h-9">
+                        <Button
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleUseProfile(profile.id)
+                          }}
+                          className="flex-1 h-9"
+                        >
                           <Play className="h-3 w-3 mr-1" />
                           Use
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleViewProfile(profile.id)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleViewProfile(profile.id)
+                          }}
                           className="flex-1 h-9"
                         >
                           <Eye className="h-3 w-3 mr-1" />
@@ -545,7 +672,8 @@ export default function V0ProfilesPage() {
 
                       {/* Last used */}
                       {profile.lastUsed && (
-                        <div className="text-xs text-muted-foreground pt-2 border-t">
+                        <div className="text-xs text-muted-foreground pt-2 border-t flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
                           Last used: {profile.lastUsed.toLocaleDateString()}
                         </div>
                       )}
@@ -562,7 +690,7 @@ export default function V0ProfilesPage() {
               {templates.map((template) => (
                 <Card
                   key={template.id}
-                  className="group card-hover cursor-pointer border-2 hover:border-primary/30 transition-all duration-300"
+                  className="group cursor-pointer border-2 hover:border-primary/30 transition-all duration-300 hover:shadow-lg"
                   onClick={() => handleCreateProfile(template)}
                 >
                   <CardHeader className="pb-4">

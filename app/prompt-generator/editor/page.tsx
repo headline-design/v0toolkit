@@ -5,17 +5,22 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { PromptGenerator } from "@/components/prompt-generator"
 import { AssistantPanel } from "@/components/assistant-panel"
 import { usePromptGenerator } from "@/lib/hooks/use-prompt-generator"
-import { ArrowLeft, HelpCircle, Sparkles, Menu, X, InfoIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage, BreadcrumbLink, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+import { ArrowLeft, HelpCircle, Sparkles, InfoIcon, Lightbulb, Target, Users } from "lucide-react"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbPage,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
-import * as React from "react"
-import { Plus } from "lucide-react"
+import type * as React from "react"
 
 import {
   Sidebar,
@@ -38,13 +43,11 @@ function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <HelpCircle className="h-5 w-5" />
             <h2 className="font-semibold">Assistant</h2>
           </div>
-
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <AssistantPanel isOpen={true} onToggle={() => { }} isMobile={false} />
+        <AssistantPanel isOpen={true} onToggle={() => {}} isMobile={false} />
         <SidebarSeparator className="mx-0" />
-
       </SidebarContent>
       <SidebarFooter className="hidden">
         <SidebarMenu>
@@ -61,14 +64,11 @@ function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   )
 }
 
-
 export default function PromptGeneratorEditorPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const promptGeneratorHook = usePromptGenerator()
   const { templates, selectedTemplate, selectTemplate, generatedPrompt } = promptGeneratorHook
-  const [isAssistantOpen, setIsAssistantOpen] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [templateInitialized, setTemplateInitialized] = useState(false)
   const templateId = searchParams.get("template") || ""
@@ -90,20 +90,6 @@ export default function PromptGeneratorEditorPage() {
       router.push("/prompt-generator")
     }
   }, [templateId, templates, templateInitialized, selectTemplate, router])
-
-  // Auto-open assistant on desktop when prompt is generated
-  useEffect(() => {
-    if (generatedPrompt && typeof window !== "undefined" && window.innerWidth >= 1024) {
-      setIsAssistantOpen(true)
-    }
-  }, [generatedPrompt])
-
-  // Close mobile menu when assistant panel opens/closes
-  useEffect(() => {
-    if (isAssistantOpen) {
-      setIsMobileMenuOpen(false)
-    }
-  }, [isAssistantOpen])
 
   // Show loading state while templates are loading or template is being selected
   if (isLoading || !selectedTemplate) {
@@ -139,47 +125,93 @@ export default function PromptGeneratorEditorPage() {
   }
 
   return (
-
-    <>
-      <SidebarProvider style={
+    <SidebarProvider
+      style={
         {
           "--sidebar-width": "350px",
         } as React.CSSProperties
-      }>
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+      }
+    >
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <div className="flex items-center gap-4 flex-1">
+            <Button variant="ghost" size="sm" onClick={handleBack} className="h-9">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            <div className="h-6 w-px bg-border" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                  <BreadcrumbLink href="/prompt-generator">Prompt Generator</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{selectedTemplate.name}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-            <SidebarTrigger className="-mr-1 ml-auto rotate-180" />
-          </header>
-          {/* Main Content Layout */}
-          <div className="flex-1 flex overflow-hidden">
-            {/* Main Generator Content */}
+          </div>
+          <SidebarTrigger className="-mr-1 rotate-180" />
+        </header>
 
-            <div className="flex-1 min-w-0 overflow-auto">
-              <div className="p-4 lg:p-6">
-                <PromptGenerator hook={promptGeneratorHook} onTemplateSelect={handleBack} />
+        {/* Template Info Banner */}
+        <div className="border-b bg-muted/30">
+          <div className="container mx-auto p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Target className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <h2 className="font-semibold">{selectedTemplate.name}</h2>
+                  <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs flex-shrink-0">
+                  {selectedTemplate.category}
+                </Badge>
+                <Badge
+                  variant={
+                    selectedTemplate.difficulty === "Beginner"
+                      ? "default"
+                      : selectedTemplate.difficulty === "Intermediate"
+                        ? "secondary"
+                        : "destructive"
+                  }
+                  className="text-xs flex-shrink-0"
+                >
+                  {selectedTemplate.difficulty}
+                </Badge>
+                {selectedTemplate.examples.length > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Users className="h-3 w-3" />
+                    <span>{selectedTemplate.examples.length} examples</span>
+                  </div>
+                )}
               </div>
             </div>
-
-
           </div>
-        </SidebarInset>
-        <AppSidebar side="right" />
-      </SidebarProvider>
-    </>
+        </div>
+
+        {/* Main Content Layout */}
+        <div className="flex-1 min-w-0 overflow-auto">
+          <div className="p-4 lg:p-6 space-y-6">
+            {/* Quick Tips */}
+            <Alert className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200">
+              <Lightbulb className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-800 dark:text-blue-200">
+                <strong>Quick Tips:</strong> Fill in all required fields to generate your prompt. Use the examples
+                dropdown to load pre-configured settings, and check the assistant panel for help and guidance.
+              </AlertDescription>
+            </Alert>
+
+            <PromptGenerator hook={promptGeneratorHook} onTemplateSelect={handleBack} />
+          </div>
+        </div>
+      </SidebarInset>
+      <AppSidebar side="right" />
+    </SidebarProvider>
   )
 }
-
-
