@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -28,7 +27,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
-import { Palette, MessageSquare, Code2, Building, CheckCircle, Layers, Wand2, Users } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Palette, MessageSquare, Code2, Building, CheckCircle, Layers, Wand2, Users, Sparkles } from "lucide-react"
 
 interface SidebarLayoutProps {
   children: any
@@ -40,12 +40,14 @@ const navigationItems = [
     url: "/tools/prompt-generator",
     icon: Wand2,
     description: "Generate sophisticated AI prompts",
+    badge: "Core",
   },
   {
     title: "V0 Profiles",
     url: "/tools/v0-profiles",
     icon: Users,
     description: "Personalized AI assistants",
+    badge: "New",
   },
   {
     title: "Patterns",
@@ -125,31 +127,50 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
 
   return (
     <SidebarProvider>
-      <Sidebar side="left">
-        <SidebarHeader className="border-b border-sidebar-border">
-          <div className="flex h-[2.75rem] items-center px-4">
-            <Link href="/tools" className="flex items-center space-x-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded bg-primary text-primary-foreground text-xs font-bold">
-                V0
+      <Sidebar side="left" className="border-r-2">
+        <SidebarHeader className="border-b-2 border-sidebar-border bg-gradient-to-r from-sidebar-background to-sidebar-background/80">
+          <div className="flex h-14 items-center px-6">
+            <Link href="/tools" className="flex items-center space-x-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md">
+                <Sparkles className="h-4 w-4" />
               </div>
-              <span className="font-semibold">Toolkit</span>
+              <span className="font-bold text-lg">V0 Toolkit</span>
             </Link>
           </div>
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="bg-gradient-to-b from-sidebar-background to-sidebar-background/95">
           <SidebarGroup>
-            <SidebarGroupLabel>Tools</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
+            <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium px-6 py-3">
+              Tools & Resources
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="px-3">
+              <SidebarMenu className="space-y-1">
                 {navigationItems.map((item) => {
                   // Check if current path starts with this item's URL
                   const isActive = pathname === item.url || pathname.startsWith(item.url + "/")
                   return (
                     <SidebarMenuItem key={item.url}>
-                      <SidebarMenuButton asChild isActive={isActive}>
-                        <Link href={item.url}>
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive}
+                        className="h-11 px-3 rounded-lg transition-all duration-200"
+                      >
+                        <Link href={item.url} className="flex items-center gap-3 w-full">
+                          <item.icon className="h-4 w-4 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="font-medium">{item.title}</span>
+                            {item.description && (
+                              <div className="text-xs text-sidebar-foreground/60 truncate">{item.description}</div>
+                            )}
+                          </div>
+                          {item.badge && (
+                            <Badge
+                              variant={isActive ? "secondary" : "outline"}
+                              className="text-xs px-2 py-0.5 flex-shrink-0"
+                            >
+                              {item.badge}
+                            </Badge>
+                          )}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -163,8 +184,8 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
       </Sidebar>
 
       <SidebarInset>
-        <header className="bg-background sticky top-0 flex shrink-0 items-center gap-2 border-b p-4 z-10">
-          <SidebarTrigger className="-ml-1" />
+        <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 flex shrink-0 items-center gap-2 border-b-2 p-4 z-10">
+          <SidebarTrigger className="-ml-1 h-8 w-8" />
           <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
           <Breadcrumb>
             <BreadcrumbList>
@@ -172,10 +193,12 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
                 <React.Fragment key={crumb.href}>
                   <BreadcrumbItem>
                     {crumb.isLast ? (
-                      <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                      <BreadcrumbPage className="font-medium">{crumb.label}</BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink asChild>
-                        <Link href={crumb.href}>{crumb.label}</Link>
+                        <Link href={crumb.href} className="font-medium hover:text-primary transition-colors">
+                          {crumb.label}
+                        </Link>
                       </BreadcrumbLink>
                     )}
                   </BreadcrumbItem>
@@ -185,7 +208,9 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-auto bg-gradient-to-br from-background via-background to-muted/10">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   )
