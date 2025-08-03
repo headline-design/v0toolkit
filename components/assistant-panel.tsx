@@ -64,42 +64,6 @@ export function AssistantPanel({ isOpen, onToggle, isMobile }: AssistantPanelPro
     },
   ]
 
-  const patterns = [
-    {
-      category: "Components",
-      icon: <Code className="h-4 w-4" />,
-      items: [
-        "Interactive forms with validation",
-        "Data tables with sorting/filtering",
-        "Modal dialogs and overlays",
-        "Navigation menus and breadcrumbs",
-        "Card layouts and grids",
-      ],
-    },
-    {
-      category: "Features",
-      icon: <Zap className="h-4 w-4" />,
-      items: [
-        "Authentication flows",
-        "Search and filtering",
-        "Real-time updates",
-        "File upload/download",
-        "Dashboard layouts",
-      ],
-    },
-    {
-      category: "Integrations",
-      icon: <Database className="h-4 w-4" />,
-      items: [
-        "Database connections",
-        "API integrations",
-        "Third-party services",
-        "Payment processing",
-        "Email notifications",
-      ],
-    },
-  ]
-
   const resources = [
     {
       title: "V0 Documentation",
@@ -213,9 +177,6 @@ export function AssistantPanel({ isOpen, onToggle, isMobile }: AssistantPanelPro
             <TabsTrigger value="tips" className="text-xs">
               Tips
             </TabsTrigger>
-            <TabsTrigger value="patterns" className="text-xs">
-              Patterns
-            </TabsTrigger>
             <TabsTrigger value="resources" className="text-xs">
               Resources
             </TabsTrigger>
@@ -261,46 +222,6 @@ export function AssistantPanel({ isOpen, onToggle, isMobile }: AssistantPanelPro
                     </CardContent>
                   </Card>
                 </TabsContent>
-
-                {/* Patterns Tab */}
-                <TabsContent value="patterns" className="mt-0 space-y-4">
-                  {patterns.map((pattern, index) => (
-                    <Card key={index}>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-sm">
-                          {pattern.icon}
-                          {pattern.category}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="space-y-2">
-                          {pattern.items.map((item, itemIndex) => (
-                            <div key={itemIndex} className="flex items-center gap-2 text-xs">
-                              <ChevronRight className="h-3 w-3 text-muted-foreground" />
-                              <span>{item}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-
-                  <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <TrendingUp className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-green-900 dark:text-green-100 text-sm">Popular Patterns</h4>
-                          <p className="text-xs text-green-800 dark:text-green-200 leading-relaxed">
-                            These are the most commonly requested patterns. They have high success rates and are
-                            well-tested.
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
                 {/* Resources Tab */}
                 <TabsContent value="resources" className="mt-0 space-y-4">
                   {resources.map((resource, index) => (
