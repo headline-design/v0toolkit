@@ -120,15 +120,15 @@ export default function V0ProfilesPage() {
   }
 
   const handleEditProfile = (profileId: string) => {
-    router.push(`/profiles/${profileId}/edit`)
+    router.push(`/profile/${profileId}/edit`)
   }
 
   const handleUseProfile = (profileId: string) => {
-    router.push(`/profiles/${profileId}`)
+    router.push(`/profile/${profileId}`)
   }
 
   const handleViewProfile = (profileId: string) => {
-    router.push(`/profiles/${profileId}`)
+    router.push(`/profile/${profileId}`)
   }
 
   const handleDeleteProfile = async (profileId: string) => {

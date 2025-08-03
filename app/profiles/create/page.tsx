@@ -157,7 +157,7 @@ export default function CreateProfilePage() {
       }
 
       // Navigate to the new profile
-      router.push(`/profiles/${newProfile.id}`)
+      router.push(`/profile/${newProfile.id}`)
     } catch (error) {
       console.error("Failed to create profile:", error)
       alert("Failed to create profile. Please try again.")
