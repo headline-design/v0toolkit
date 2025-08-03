@@ -30,6 +30,7 @@ import { v0ProfileService } from "@/lib/services/v0-profile-service"
 import { promptGeneratorService } from "@/lib/services/prompt-generator-service"
 import type { V0Profile } from "@/lib/types/v0-profile"
 import type { GeneratedPrompt } from "@/lib/types/prompt-generator"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function HomePage() {
   const router = useRouter()
@@ -80,6 +81,16 @@ export default function HomePage() {
     } catch (error) {
       console.error("Failed to create quick profile:", error)
     }
+  }
+
+  // Get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
   }
 
   if (isLoading) {
@@ -369,9 +380,12 @@ export default function HomePage() {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                            {getProfileIcon(profile.avatar)}
-                          </div>
+                          <Avatar  className="h-16 w-16 border-4 border-background shadow-lg">
+                <AvatarImage src={`https://avatar.vercel.sh/${profile.id}?size=400`} />
+                <AvatarFallback className="text-white font-bold text-xl bg-gradient-to-br from-primary to-primary/80">
+                  {getInitials(profile.name)}
+                </AvatarFallback>
+              </Avatar>
                           <div>
                             <h3 className="font-medium">{profile.name}</h3>
                             <p className="text-sm text-muted-foreground line-clamp-1">{profile.description}</p>
@@ -454,7 +468,7 @@ export default function HomePage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => createQuickProfile(prompt.id)}
+                          onClick={() => createQuickProfile()}
                           className="h-7 text-xs px-2"
                         >
                           <Plus className="h-3 w-3 mr-1" />

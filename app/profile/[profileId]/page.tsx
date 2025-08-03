@@ -294,12 +294,13 @@ export default function ProfilePage() {
                   setProfile(updatedProfile)
                   saveProfileWithToast(updatedProfile, "Profile updated")
                 }}
-              >
-                <Button variant="outline" size="sm">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
-              </ProfileEditDialog>
+                trigger={
+                  <Button variant="outline" size="sm">
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                }
+              />
               <Button variant="outline" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Settings
