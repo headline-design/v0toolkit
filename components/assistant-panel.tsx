@@ -158,22 +158,16 @@ export function AssistantPanel({ isOpen, onToggle, isMobile }: AssistantPanelPro
   }
 
   return (
-    <div className={cn("bg-background border-l flex flex-col", isMobile ? "w-full h-full" : "w-80 h-full")}>
-      {/* Header */}
-      <div className="p-4 border-b flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <HelpCircle className="h-5 w-5" />
-          <h2 className="font-semibold">Assistant</h2>
-        </div>
-        <Button variant="ghost" size="sm" onClick={onToggle} className="h-8 w-8 p-0">
-          {isMobile ? <X className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
-        </Button>
-      </div>
+    <>
 
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-4 m-4 mb-0">
+
+
+          <div className="flex-1 overflow-hidden">
+                 <div className="m-4 mb-4">
+          <TabsList className="w-full ">
             <TabsTrigger value="tips" className="text-xs">
               Tips
             </TabsTrigger>
@@ -184,9 +178,8 @@ export function AssistantPanel({ isOpen, onToggle, isMobile }: AssistantPanelPro
               Best Practices
             </TabsTrigger>
           </TabsList>
-
-          <div className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full">
+          </div>
+            <ScrollArea className="h-full ">
               <div className="p-4 pt-2">
                 {/* Tips Tab */}
                 <TabsContent value="tips" className="mt-0 space-y-4">
@@ -305,6 +298,6 @@ export function AssistantPanel({ isOpen, onToggle, isMobile }: AssistantPanelPro
           </div>
         </Tabs>
       </div>
-    </div>
+    </>
   )
 }

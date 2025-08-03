@@ -13,10 +13,7 @@ import {
   Star,
   Users,
   ArrowRight,
-  Sparkles,
   Target,
-  Code2,
-  Layers,
   Wand2,
   BookOpen,
   History,
@@ -27,6 +24,7 @@ import {
   Zap,
   Filter,
   X,
+  Clock,
 } from "lucide-react"
 import { promptGeneratorService } from "@/lib/services/prompt-generator-service"
 import { useGeneratedPrompts } from "@/lib/hooks/use-prompt-generator"
@@ -95,21 +93,6 @@ export default function PromptGeneratorPage() {
     }
   }
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "Development":
-        return <Code2 className="h-4 w-4" />
-      case "Architecture":
-        return <Layers className="h-4 w-4" />
-      case "UI/UX":
-        return <Sparkles className="h-4 w-4" />
-      case "Components":
-        return <Target className="h-4 w-4" />
-      default:
-        return <Wand2 className="h-4 w-4" />
-    }
-  }
-
   const getTemplateIcon = (iconName?: string) => {
     switch (iconName) {
       case "UserCog":
@@ -128,16 +111,14 @@ export default function PromptGeneratorPage() {
   ).length
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen ">
       <div className="container mx-auto p-6 space-y-8">
         {/* Header Section */}
         <div className="space-y-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg">
-                  <Wand2 className="h-6 w-6" />
-                </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+
                 <div>
                   <h1 className="text-3xl font-bold tracking-tight">V0 Prompt Generator</h1>
                   <p className="text-muted-foreground">Professional templates for sophisticated AI prompts</p>
@@ -168,11 +149,11 @@ export default function PromptGeneratorPage() {
 
           {/* Featured Template Highlight */}
           {templates.length > 0 && (
-            <Card className="relative overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent shadow-xl">
-              <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+            <Card className="relative overflow-hidden ">
+              <div className="absolute inset-0 bg-grid-small opacity-20" />
               <CardContent className="relative p-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2 text-primary">
                         <Star className="h-5 w-5 fill-current" />
@@ -200,7 +181,7 @@ export default function PromptGeneratorPage() {
                   <Button
                     onClick={() => handleTemplateSelect(templates[0])}
                     size="lg"
-                    className="shrink-0 h-12 px-8 shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="shrink-0 h-12 px-8 shadow-medium hover:shadow-large transition-all duration-200"
                   >
                     Try This Template
                     <ArrowRight className="h-4 w-4 ml-2" />
@@ -212,7 +193,7 @@ export default function PromptGeneratorPage() {
         </div>
 
         <Tabs defaultValue="templates" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2 h-12">
+          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2 h-12 bg-muted/50 backdrop-blur-sm">
             <TabsTrigger value="templates" className="flex items-center gap-2 text-base">
               <Target className="h-4 w-4" />
               Browse Templates
@@ -226,7 +207,7 @@ export default function PromptGeneratorPage() {
           {/* Templates Tab */}
           <TabsContent value="templates" className="space-y-8">
             {/* Search and Filters */}
-            <Card className="border-2">
+            <Card >
               <CardContent className="p-6">
                 <div className="space-y-6">
                   {/* Search Bar */}
@@ -236,7 +217,7 @@ export default function PromptGeneratorPage() {
                       placeholder="Search templates by name, description, or tags..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-12 h-14 text-base border-2 focus:border-primary transition-colors"
+                      className="pl-12 h-14 text-base transition-colors"
                     />
                     {searchQuery && (
                       <Button
@@ -252,7 +233,11 @@ export default function PromptGeneratorPage() {
 
                   {/* Filter Toggle */}
                   <div className="flex items-center justify-between">
-                    <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowFilters(!showFilters)}
+                      className="gap-2 shadow-soft"
+                    >
                       <Filter className="h-4 w-4" />
                       Filters
                       {activeFiltersCount > 0 && (
@@ -280,11 +265,11 @@ export default function PromptGeneratorPage() {
 
                   {/* Filters */}
                   {showFilters && (
-                    <div className="grid gap-4 md:grid-cols-3 p-4 bg-muted/30 rounded-lg border">
+                    <div className="grid gap-4 md:grid-cols-3 p-4 bg-muted/30 rounded-lg">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Category</label>
                         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-10 ">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -300,7 +285,7 @@ export default function PromptGeneratorPage() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Difficulty</label>
                         <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-10 ">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -316,7 +301,7 @@ export default function PromptGeneratorPage() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Sort By</label>
                         <Select value={sortBy} onValueChange={setSortBy}>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-10 ">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -368,13 +353,13 @@ export default function PromptGeneratorPage() {
               {filteredTemplates.map((template) => (
                 <Card
                   key={template.id}
-                  className="group card-hover cursor-pointer border-2 hover:border-primary/30 transition-all duration-300"
+                  className="group card-hover cursor-pointer  hover:shadow-medium bg-background/60 backdrop-blur-sm transition-all duration-300"
                   onClick={() => handleTemplateSelect(template)}
                 >
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-sm">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-soft">
                           {getTemplateIcon(template.icon)}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -434,10 +419,10 @@ export default function PromptGeneratorPage() {
 
             {/* No Results State */}
             {filteredTemplates.length === 0 && (
-              <Card className="border-2 border-dashed">
+              <Card className="border-0 border-dashed shadow-soft bg-background/40 backdrop-blur-sm">
                 <CardContent className="p-12 text-center">
                   <div className="space-y-6">
-                    <div className="w-20 h-20 mx-auto bg-muted rounded-full flex items-center justify-center">
+                    <div className="w-20 h-20 mx-auto bg-muted/50 rounded-full flex items-center justify-center">
                       <Search className="h-10 w-10 text-muted-foreground" />
                     </div>
                     <div className="space-y-2">
@@ -453,7 +438,7 @@ export default function PromptGeneratorPage() {
                         setSelectedCategory("all")
                         setSelectedDifficulty("all")
                       }}
-                      className="h-10"
+                      className="h-10 shadow-soft"
                     >
                       Clear all filters
                     </Button>
@@ -466,10 +451,10 @@ export default function PromptGeneratorPage() {
           {/* Recent Prompts Tab */}
           <TabsContent value="recent" className="space-y-8">
             {recentPrompts.length === 0 ? (
-              <Card className="border-2 border-dashed">
+              <Card className="border-0 shadow-soft bg-background/40 backdrop-blur-sm">
                 <CardContent className="p-12 text-center">
                   <div className="space-y-6">
-                    <div className="w-20 h-20 mx-auto bg-muted rounded-full flex items-center justify-center">
+                    <div className="w-20 h-20 mx-auto bg-muted/50 rounded-full flex items-center justify-center">
                       <History className="h-10 w-10 text-muted-foreground" />
                     </div>
                     <div className="space-y-2">
@@ -478,7 +463,7 @@ export default function PromptGeneratorPage() {
                         Start by selecting a template and generating your first V0 prompt.
                       </p>
                     </div>
-                    <Button onClick={() => handleTemplateSelect(templates[0])} className="h-12 px-8">
+                    <Button onClick={() => handleTemplateSelect(templates[0])} className="h-12 px-8 shadow-medium">
                       <Wand2 className="h-4 w-4 mr-2" />
                       Create Your First Prompt
                     </Button>
@@ -488,16 +473,22 @@ export default function PromptGeneratorPage() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {recentPrompts.slice(0, 12).map((prompt) => (
-                  <Card key={prompt.id} className="card-hover transition-all duration-300">
+                  <Card
+                    key={prompt.id}
+                    className="card-hover transition-all duration-300 border-0 shadow-soft bg-background/60 backdrop-blur-sm"
+                  >
                     <CardContent className="p-6 space-y-4">
                       <div className="flex items-center justify-between">
                         <Badge variant="outline" className="text-xs">
                           {prompt.category}
                         </Badge>
-                        <span className="text-xs text-muted-foreground">{prompt.createdAt.toLocaleDateString()}</span>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          <span>{prompt.createdAt.toLocaleDateString()}</span>
+                        </div>
                       </div>
 
-                      <div className="bg-muted/50 p-4 rounded-lg border">
+                      <div className="bg-muted/30 p-4 rounded-lg border-0 shadow-soft">
                         <pre className="text-xs font-mono leading-relaxed whitespace-pre-wrap line-clamp-6">
                           {prompt.prompt}
                         </pre>
@@ -511,7 +502,7 @@ export default function PromptGeneratorPage() {
                             e.stopPropagation()
                             navigator.clipboard.writeText(prompt.prompt)
                           }}
-                          className="h-8"
+                          className="h-8 shadow-soft"
                         >
                           <Zap className="h-3 w-3 mr-1" />
                           Copy

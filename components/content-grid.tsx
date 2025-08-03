@@ -1,456 +1,372 @@
-/**
- * Content Grid Component
- * A sophisticated grid layout for displaying patterns, prompts, and examples
- * with advanced features like virtualization, infinite scroll, and responsive design
- */
-
 "use client"
 
-import type React from "react"
-
-import { useState, useCallback, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import {
+  Search,
+  Filter,
+  Grid3X3,
+  List,
+  Clock,
+  Star,
   Copy,
-  Check,
-  Heart,
-  Eye,
-  Download,
   ExternalLink,
-  Github,
-  Verified,
-  Crown,
   Code2,
-  MessageSquare,
-  Layers,
-  User,
-  TrendingUp,
+  Users,
+  BookOpen,
+  Zap,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { Pattern, Prompt, Example } from "@/lib/core/types"
 
-type ContentItem = Pattern | Prompt | Example
-
-interface ContentGridProps<T extends ContentItem> {
-  items: T[]
-  loading?: boolean
-  onLoadMore?: () => void
-  hasMore?: boolean
-  onItemClick?: (item: T) => void
-  onCopy?: (item: T) => void
-  onLike?: (item: T) => void
-  className?: string
-  emptyState?: React.ReactNode
-  gridCols?: 1 | 2 | 3 | 4
+interface ContentItem {
+  id: string
+  title: string
+  description: string
+  type: "prompt" | "profile" | "pattern" | "template"
+  category: string
+  difficulty: "beginner" | "intermediate" | "advanced"
+  tags: string[]
+  author?: string
+  createdAt: Date
+  updatedAt: Date
+  featured?: boolean
+  code?: string
 }
 
-export function ContentGrid<T extends ContentItem>({
-  items,
-  loading = false,
-  onLoadMore,
-  hasMore = false,
-  onItemClick,
-  onCopy,
-  onLike,
-  className,
-  emptyState,
-  gridCols = 3,
-}: ContentGridProps<T>) {
-  const [copiedId, setCopiedId] = useState<string | null>(null)
-  const [likedItems, setLikedItems] = useState<Set<string>>(new Set())
+const sampleContent: ContentItem[] = [
+  {
+    id: "1",
+    title: "React Component Generator",
+    description: "Generate modern React components with TypeScript and best practices",
+    type: "prompt",
+    category: "Components",
+    difficulty: "intermediate",
+    tags: ["React", "TypeScript", "Components"],
+    author: "John Doe",
+    createdAt: new Date(2024, 0, 15),
+    updatedAt: new Date(2024, 0, 20),
+    featured: true,
+    code: "You are a React expert...",
+  },
+  {
+    id: "2",
+    title: "UI/UX Designer Profile",
+    description: "Specialized AI assistant for design-related tasks and feedback",
+    type: "profile",
+    category: "Design",
+    difficulty: "beginner",
+    tags: ["Design", "UI/UX", "Figma"],
+    author: "Jane Smith",
+    createdAt: new Date(2024, 0, 10),
+    updatedAt: new Date(2024, 0, 18),
+  },
+  {
+    id: "3",
+    title: "Dashboard Layout Pattern",
+    description: "Responsive dashboard layout with sidebar and main content area",
+    type: "pattern",
+    category: "Layouts",
+    difficulty: "advanced",
+    tags: ["Layout", "Dashboard", "Responsive"],
+    author: "Mike Johnson",
+    createdAt: new Date(2024, 0, 5),
+    updatedAt: new Date(2024, 0, 15),
+  },
+  {
+    id: "4",
+    title: "Authentication Flow Template",
+    description: "Complete authentication system with login, signup, and password reset",
+    type: "template",
+    category: "Authentication",
+    difficulty: "intermediate",
+    tags: ["Auth", "Security", "Forms"],
+    author: "Sarah Wilson",
+    createdAt: new Date(2024, 0, 1),
+    updatedAt: new Date(2024, 0, 12),
+    featured: true,
+  },
+]
 
-  // Handle copy action with visual feedback
-  const handleCopy = useCallback(
-    async (item: T, content: string) => {
-      try {
-        await navigator.clipboard.writeText(content)
-        setCopiedId(item.id)
-        onCopy?.(item)
+interface ContentGridProps {
+  items?: ContentItem[]
+  className?: string
+}
 
-        // Reset copy state after 2 seconds
-        setTimeout(() => setCopiedId(null), 2000)
-      } catch (error) {
-        console.error("Failed to copy content:", error)
+export function ContentGrid({ items = sampleContent, className }: ContentGridProps) {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedType, setSelectedType] = useState<string>("all")
+  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all")
+  const [sortBy, setSortBy] = useState<string>("updated")
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+
+  const filteredAndSortedItems = useMemo(() => {
+    const filtered = items.filter((item) => {
+      const matchesSearch =
+        !searchQuery ||
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+
+      const matchesType = selectedType === "all" || item.type === selectedType
+      const matchesCategory = selectedCategory === "all" || item.category === selectedCategory
+      const matchesDifficulty = selectedDifficulty === "all" || item.difficulty === selectedDifficulty
+
+      return matchesSearch && matchesType && matchesCategory && matchesDifficulty
+    })
+
+    // Sort items
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "title":
+          return a.title.localeCompare(b.title)
+        case "created":
+          return b.createdAt.getTime() - a.createdAt.getTime()
+        case "updated":
+          return b.updatedAt.getTime() - a.updatedAt.getTime()
+        default:
+          return 0
       }
-    },
-    [onCopy],
-  )
+    })
 
-  // Handle like action with optimistic updates
-  const handleLike = useCallback(
-    (item: T) => {
-      setLikedItems((prev) => {
-        const newSet = new Set(prev)
-        if (newSet.has(item.id)) {
-          newSet.delete(item.id)
-        } else {
-          newSet.add(item.id)
-        }
-        return newSet
-      })
-      onLike?.(item)
-    },
-    [onLike],
-  )
+    return filtered
+  }, [items, searchQuery, selectedType, selectedCategory, selectedDifficulty, sortBy])
 
-  // Get appropriate icon for content type
-  const getContentIcon = useCallback((item: T) => {
-    if ("code" in item) return Code2 // Pattern
-    if ("prompt" in item) return MessageSquare // Prompt
-    return Layers // Example
-  }, [])
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(items.map((item) => item.category)))
+    return cats.sort()
+  }, [items])
 
-  // Get difficulty color
-  const getDifficultyColor = useCallback((difficulty: string) => {
+  const getTypeIcon = (type: ContentItem["type"]) => {
+    switch (type) {
+      case "prompt":
+        return <Code2 className="h-4 w-4" />
+      case "profile":
+        return <Users className="h-4 w-4" />
+      case "pattern":
+        return <BookOpen className="h-4 w-4" />
+      case "template":
+        return <Zap className="h-4 w-4" />
+    }
+  }
+
+  const getDifficultyColor = (difficulty: ContentItem["difficulty"]) => {
     switch (difficulty) {
       case "beginner":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
       case "intermediate":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
       case "advanced":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
     }
-  }, [])
+  }
 
-  // Get grid columns class
-  const gridColsClass = useMemo(() => {
-    switch (gridCols) {
-      case 1:
-        return "grid-cols-1"
-      case 2:
-        return "grid-cols-1 md:grid-cols-2"
-      case 3:
-        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-      case 4:
-        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-      default:
-        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString([], {
+      month: "short",
+      day: "numeric",
+      year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
+    })
+  }
+
+  const handleCopy = async (content: string) => {
+    try {
+      await navigator.clipboard.writeText(content)
+      // You could add a toast notification here
+    } catch (error) {
+      console.error("Failed to copy:", error)
     }
-  }, [gridCols])
-
-  // Render loading skeletons
-  const renderSkeletons = () => (
-    <>
-      {Array.from({ length: 6 }).map((_, index) => (
-        <Card key={`skeleton-${index}`} className="border-0 shadow-sm ring-1 ring-border/50">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="space-y-2 flex-1">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-4 w-4" />
-                  <Skeleton className="h-5 w-16" />
-                  <Skeleton className="h-5 w-20" />
-                </div>
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex gap-1">
-              <Skeleton className="h-5 w-12" />
-              <Skeleton className="h-5 w-16" />
-              <Skeleton className="h-5 w-14" />
-            </div>
-            <div className="flex gap-2">
-              <Skeleton className="h-8 flex-1" />
-              <Skeleton className="h-8 w-8" />
-              <Skeleton className="h-8 w-8" />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </>
-  )
-
-  // Render empty state
-  if (!loading && items.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        {emptyState || (
-          <>
-            <div className="rounded-full bg-muted p-4 mb-4">
-              <Code2 className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No content found</h3>
-            <p className="text-muted-foreground max-w-md">
-              Try adjusting your search criteria or filters to find what you're looking for.
-            </p>
-          </>
-        )}
-      </div>
-    )
   }
 
   return (
-    <div className={cn("space-y-6", className)}>
-      {/* Content Grid */}
-      <div className={cn("grid gap-6", gridColsClass)}>
-        {items.map((item) => {
-          const ContentIcon = getContentIcon(item)
-          const isLiked = likedItems.has(item.id)
-          const isCopied = copiedId === item.id
-
-          return (
-            <Card
-              key={item.id}
-              className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm ring-1 ring-border/50 hover:ring-border cursor-pointer"
-              onClick={() => onItemClick?.(item)}
+    <div className={className}>
+      {/* Header */}
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground">Content Library</h2>
+            <p className="text-muted-foreground">Browse prompts, profiles, patterns, and templates</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={viewMode === "grid" ? "default" : "outline"}
+              size="icon"
+              onClick={() => setViewMode("grid")}
             >
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2 flex-1 min-w-0">
-                    {/* Content type and metadata */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <ContentIcon className="h-4 w-4 text-primary flex-shrink-0" />
-                      <Badge variant="outline" className="text-xs capitalize">
-                        {item.category}
-                      </Badge>
-                      <Badge className={`text-xs capitalize ${getDifficultyColor(item.difficulty)}`}>
-                        {item.difficulty}
-                      </Badge>
-                      {item.featured && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Crown className="h-3 w-3 text-yellow-500" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Featured content</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                      {item.verified && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Verified className="h-3 w-3 text-blue-500" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Verified by community</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                    </div>
+              <Grid3X3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "default" : "outline"}
+              size="icon"
+              onClick={() => setViewMode("list")}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
 
-                    {/* Title and description */}
-                    <CardTitle className="text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-                      {item.title}
-                    </CardTitle>
-                    <CardDescription className="text-sm leading-relaxed line-clamp-3">
-                      {item.description}
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search content..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
 
-              <CardContent className="space-y-4">
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1">
-                  {item.tags.slice(0, 4).map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                  {item.tags.length > 4 && (
-                    <Badge variant="secondary" className="text-xs">
-                      +{item.tags.length - 4} more
-                    </Badge>
-                  )}
-                </div>
+          <div className="flex gap-2">
+            <Select value={selectedType} onValueChange={setSelectedType}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="prompt">Prompts</SelectItem>
+                <SelectItem value="profile">Profiles</SelectItem>
+                <SelectItem value="pattern">Patterns</SelectItem>
+                <SelectItem value="template">Templates</SelectItem>
+              </SelectContent>
+            </Select>
 
-                {/* Metrics */}
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <div className="flex items-center gap-3">
-                    {"viewCount" in item && (
-                      <div className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        <span>{item.viewCount.toLocaleString()}</span>
-                      </div>
-                    )}
-                    {"likeCount" in item && (
-                      <div className="flex items-center gap-1">
-                        <Heart className="h-3 w-3" />
-                        <span>{item.likeCount.toLocaleString()}</span>
-                      </div>
-                    )}
-                    {"downloadCount" in item && (
-                      <div className="flex items-center gap-1">
-                        <Download className="h-3 w-3" />
-                        <span>{item.downloadCount.toLocaleString()}</span>
-                      </div>
-                    )}
-                  </div>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-                  <div className="flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    <span>{item.author.name}</span>
-                  </div>
-                </div>
+            <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Difficulty" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Levels</SelectItem>
+                <SelectItem value="beginner">Beginner</SelectItem>
+                <SelectItem value="intermediate">Intermediate</SelectItem>
+                <SelectItem value="advanced">Advanced</SelectItem>
+              </SelectContent>
+            </Select>
 
-                {/* Actions */}
-                <div className="flex items-center gap-2 pt-2">
-                  {/* Copy button */}
-                  {"code" in item && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button size="sm" className="flex-1" onClick={(e) => e.stopPropagation()}>
-                          {isCopied ? (
-                            <>
-                              <Check className="h-3 w-3 mr-2" />
-                              Copied!
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-3 w-3 mr-2" />
-                              Copy Code
-                            </>
-                          )}
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
-                        <DialogHeader>
-                          <DialogTitle>{item.title}</DialogTitle>
-                          <DialogDescription>{item.description}</DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <Textarea
-                            value={item.code}
-                            readOnly
-                            className="min-h-[400px] font-mono text-sm resize-none"
-                          />
-                          <div className="flex justify-end gap-2">
-                            <Button onClick={() => handleCopy(item, item.code)} disabled={isCopied}>
-                              {isCopied ? (
-                                <>
-                                  <Check className="h-4 w-4 mr-2" />
-                                  Copied!
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="h-4 w-4 mr-2" />
-                                  Copy Code
-                                </>
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  )}
-
-                  {/* Copy prompt button */}
-                  {"prompt" in item && (
-                    <Button
-                      size="sm"
-                      className="flex-1"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleCopy(item, item.prompt)
-                      }}
-                    >
-                      {isCopied ? (
-                        <>
-                          <Check className="h-3 w-3 mr-2" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3 w-3 mr-2" />
-                          Copy Prompt
-                        </>
-                      )}
-                    </Button>
-                  )}
-
-                  {/* Example links */}
-                  {"demoUrl" in item && item.demoUrl && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 bg-transparent"
-                      asChild
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <a href={item.demoUrl} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-3 w-3 mr-2" />
-                        Demo
-                      </a>
-                    </Button>
-                  )}
-
-                  {"sourceUrl" in item && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 bg-transparent"
-                      asChild
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer">
-                        <Github className="h-3 w-3 mr-2" />
-                        Source
-                      </a>
-                    </Button>
-                  )}
-
-                  {/* Like button */}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className={cn("px-3", isLiked && "text-red-500 hover:text-red-600")}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleLike(item)
-                    }}
-                  >
-                    <Heart className={cn("h-4 w-4", isLiked && "fill-current")} />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
-
-        {/* Loading skeletons */}
-        {loading && renderSkeletons()}
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="updated">Updated</SelectItem>
+                <SelectItem value="created">Created</SelectItem>
+                <SelectItem value="title">Title</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
-      {/* Load More Button */}
-      {hasMore && !loading && (
-        <div className="flex justify-center pt-8">
-          <Button variant="outline" size="lg" onClick={onLoadMore} className="min-w-32 bg-transparent">
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Load More
-          </Button>
-        </div>
-      )}
+      {/* Results Count */}
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-muted-foreground">
+          {filteredAndSortedItems.length} {filteredAndSortedItems.length === 1 ? "item" : "items"} found
+        </p>
+      </div>
 
-      {/* Loading indicator */}
-      {loading && items.length > 0 && (
-        <div className="flex justify-center py-8">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-            <span className="text-sm">Loading more content...</span>
-          </div>
+      {/* Content Grid/List */}
+      <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
+        {filteredAndSortedItems.map((item) => (
+          <Card
+            key={item.id}
+            className={`transition-all duration-200 hover:shadow-md ${viewMode === "list" ? "flex flex-row" : ""}`}
+          >
+            <CardHeader className={viewMode === "list" ? "flex-1" : ""}>
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2 mb-2">
+                  {getTypeIcon(item.type)}
+                  <Badge variant="outline" className="text-xs capitalize">
+                    {item.type}
+                  </Badge>
+                  <Badge className={`text-xs capitalize ${getDifficultyColor(item.difficulty)}`}>
+                    {item.difficulty}
+                  </Badge>
+                  {item.featured && (
+                    <Badge variant="default" className="text-xs">
+                      <Star className="h-3 w-3 mr-1" />
+                      Featured
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              <CardTitle className="text-lg leading-tight">{item.title}</CardTitle>
+              <CardDescription className="text-sm leading-relaxed">{item.description}</CardDescription>
+
+              <div className="flex flex-wrap gap-1 mt-2">
+                {item.tags.slice(0, 3).map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+                {item.tags.length > 3 && (
+                  <Badge variant="secondary" className="text-xs">
+                    +{item.tags.length - 3}
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+
+            <CardContent className={`space-y-3 ${viewMode === "list" ? "flex flex-col justify-between w-48" : ""}`}>
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  <span>Updated {formatDate(item.updatedAt)}</span>
+                </div>
+                {item.author && <span>by {item.author}</span>}
+              </div>
+
+              <div className="flex gap-2">
+                {item.code && (
+                  <Button size="sm" variant="outline" onClick={() => handleCopy(item.code!)} className="flex-1">
+                    <Copy className="h-3 w-3 mr-1" />
+                    Copy
+                  </Button>
+                )}
+                <Button size="sm" className="flex-1">
+                  <ExternalLink className="h-3 w-3 mr-1" />
+                  View
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Empty State */}
+      {filteredAndSortedItems.length === 0 && (
+        <div className="text-center py-12">
+          <Filter className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No content found</h3>
+          <p className="text-muted-foreground mb-4">Try adjusting your search criteria or filters.</p>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSearchQuery("")
+              setSelectedType("all")
+              setSelectedCategory("all")
+              setSelectedDifficulty("all")
+            }}
+          >
+            Clear Filters
+          </Button>
         </div>
       )}
     </div>

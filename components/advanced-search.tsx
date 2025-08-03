@@ -1,459 +1,239 @@
-/**
- * Advanced Search Component
- * A sophisticated search interface with real-time filtering, faceted search,
- * and intelligent suggestions. Built for the V0 Toolkit professional experience.
- */
-
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import type React from "react"
+
+import { useState, useCallback, useMemo } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible"
-import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
-import { Search, Filter, X, Sparkles, Clock, TrendingUp } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-import type { SearchFilters, SearchFacets } from "@/lib/core/types"
+import { Search, X, Filter, Tag, Clock } from "lucide-react"
+
+interface SearchSuggestion {
+  id: string
+  text: string
+  category: string
+  type: "recent" | "suggestion" | "tag"
+}
 
 interface AdvancedSearchProps {
-  onFiltersChange: (filters: SearchFilters) => void
-  facets?: SearchFacets
-  loading?: boolean
   placeholder?: string
-  showSuggestions?: boolean
+  onSearch?: (query: string, filters: string[]) => void
+  suggestions?: SearchSuggestion[]
+  recentSearches?: string[]
   className?: string
 }
 
-interface SearchSuggestion {
-  type: "recent" | "popular" | "suggestion"
-  text: string
-  count?: number
-}
+const defaultSuggestions: SearchSuggestion[] = [
+  { id: "1", text: "React components", category: "Components", type: "suggestion" },
+  { id: "2", text: "Authentication", category: "Features", type: "suggestion" },
+  { id: "3", text: "Dashboard layout", category: "Layouts", type: "suggestion" },
+  { id: "4", text: "Form validation", category: "Forms", type: "suggestion" },
+  { id: "5", text: "API integration", category: "Integration", type: "tag" },
+]
 
 export function AdvancedSearch({
-  onFiltersChange,
-  facets,
-  loading = false,
-  placeholder = "Search patterns, prompts, and examples...",
-  showSuggestionsProp = true,
+  placeholder = "Search prompts, profiles, and patterns...",
+  onSearch,
+  suggestions = defaultSuggestions,
+  recentSearches = [],
   className,
 }: AdvancedSearchProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [showSuggestions, setShowSuggestions] = useState(showSuggestionsProp) // Declared setShowSuggestions
+  const [query, setQuery] = useState("")
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([])
 
-  // State management
-  const [query, setQuery] = useState(searchParams.get("q") || "")
-  const [filters, setFilters] = useState<SearchFilters>({
-    query: searchParams.get("q") || "",
-    categories: searchParams.getAll("category"),
-    difficulty: searchParams.getAll("difficulty") as any[],
-    tags: searchParams.getAll("tag"),
-    featured: searchParams.get("featured") === "true" ? true : undefined,
-    verified: searchParams.get("verified") === "true" ? true : undefined,
-  })
-
-  const [showFilters, setShowFilters] = useState(false)
-  const [recentSearches, setRecentSearches] = useState<string[]>([])
-
-  // Mock suggestions - in a real app, these would come from an API
-  const suggestions: SearchSuggestion[] = useMemo(
-    () => [
-      { type: "popular", text: "dashboard layout", count: 234 },
-      { type: "popular", text: "data table", count: 189 },
-      { type: "popular", text: "authentication form", count: 156 },
-      { type: "suggestion", text: "responsive navigation" },
-      { type: "suggestion", text: "chart components" },
-      ...recentSearches.slice(0, 3).map((text) => ({ type: "recent" as const, text })),
-    ],
-    [recentSearches],
-  )
-
-  // Debounced search effect
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const newFilters = { ...filters, query }
-      setFilters(newFilters)
-      onFiltersChange(newFilters)
-      updateURL(newFilters)
-    }, 300)
-
-    return () => clearTimeout(timeoutId)
-  }, [query]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Update URL with current filters
-  const updateURL = useCallback(
-    (currentFilters: SearchFilters) => {
-      const params = new URLSearchParams()
-
-      if (currentFilters.query) params.set("q", currentFilters.query)
-      currentFilters.categories?.forEach((cat) => params.append("category", cat))
-      currentFilters.difficulty?.forEach((diff) => params.append("difficulty", diff))
-      currentFilters.tags?.forEach((tag) => params.append("tag", tag))
-      if (currentFilters.featured) params.set("featured", "true")
-      if (currentFilters.verified) params.set("verified", "true")
-
-      const newURL = params.toString() ? `?${params.toString()}` : ""
-      router.replace(newURL, { scroll: false })
-    },
-    [router],
-  )
-
-  // Handle filter changes
-  const handleFilterChange = useCallback(
-    (key: keyof SearchFilters, value: any) => {
-      const newFilters = { ...filters, [key]: value }
-      setFilters(newFilters)
-      onFiltersChange(newFilters)
-      updateURL(newFilters)
-    },
-    [filters, onFiltersChange, updateURL],
-  )
-
-  // Handle array filter changes (categories, tags, etc.)
-  const handleArrayFilterChange = useCallback(
-    (key: "categories" | "difficulty" | "tags", value: string, checked: boolean) => {
-      const currentArray = filters[key] || []
-      const newArray = checked ? [...currentArray, value] : currentArray.filter((item) => item !== value)
-
-      handleFilterChange(key, newArray.length > 0 ? newArray : undefined)
-    },
-    [filters, handleFilterChange],
-  )
-
-  // Handle search submission
-  const handleSearch = useCallback((searchQuery: string) => {
-    setQuery(searchQuery)
-    setShowSuggestions(false)
-
-    // Add to recent searches
-    setRecentSearches((prev) => {
-      const updated = [searchQuery, ...prev.filter((s) => s !== searchQuery)].slice(0, 5)
-      localStorage.setItem("v0toolkit-recent-searches", JSON.stringify(updated))
-      return updated
-    })
-  }, [])
-
-  // Load recent searches on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("v0toolkit-recent-searches")
-    if (saved) {
-      try {
-        setRecentSearches(JSON.parse(saved))
-      } catch (e) {
-        console.warn("Failed to parse recent searches")
-      }
+  const filteredSuggestions = useMemo(() => {
+    if (!query.trim()) {
+      return suggestions.slice(0, 8)
     }
+
+    return suggestions
+      .filter(
+        (suggestion) =>
+          suggestion.text.toLowerCase().includes(query.toLowerCase()) ||
+          suggestion.category.toLowerCase().includes(query.toLowerCase()),
+      )
+      .slice(0, 6)
+  }, [query, suggestions])
+
+  const recentSuggestions = useMemo(() => {
+    return recentSearches.slice(0, 4).map((search, index) => ({
+      id: `recent-${index}`,
+      text: search,
+      category: "Recent",
+      type: "recent" as const,
+    }))
+  }, [recentSearches])
+
+  const handleSearch = useCallback(
+    (searchQuery?: string) => {
+      const finalQuery = searchQuery || query
+      if (finalQuery.trim()) {
+        onSearch?.(finalQuery, selectedFilters)
+        setIsOpen(false)
+      }
+    },
+    [query, selectedFilters, onSearch],
+  )
+
+  const handleSuggestionClick = useCallback(
+    (suggestion: SearchSuggestion) => {
+      setQuery(suggestion.text)
+      handleSearch(suggestion.text)
+    },
+    [handleSearch],
+  )
+
+  const toggleFilter = useCallback((filter: string) => {
+    setSelectedFilters((prev) => (prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]))
   }, [])
 
-  // Clear all filters
   const clearFilters = useCallback(() => {
-    const clearedFilters: SearchFilters = { query }
-    setFilters(clearedFilters)
-    onFiltersChange(clearedFilters)
-    updateURL(clearedFilters)
-  }, [query, onFiltersChange, updateURL])
+    setSelectedFilters([])
+  }, [])
 
-  // Count active filters
-  const activeFilterCount = useMemo(() => {
-    let count = 0
-    if (filters.categories?.length) count += filters.categories.length
-    if (filters.difficulty?.length) count += filters.difficulty.length
-    if (filters.tags?.length) count += filters.tags.length
-    if (filters.featured) count += 1
-    if (filters.verified) count += 1
-    return count
-  }, [filters])
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+        handleSearch()
+      } else if (e.key === "Escape") {
+        setIsOpen(false)
+      }
+    },
+    [handleSearch],
+  )
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn("relative w-full max-w-2xl", className)}>
       {/* Search Input */}
       <div className="relative">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setShowFilters(true)}
-            placeholder={placeholder}
-            className="pl-10 pr-12 h-12 text-base"
-            disabled={loading}
-          />
-          {query && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
-              onClick={() => {
-                setQuery("")
-                handleFilterChange("query", "")
-              }}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-
-        {/* Search Suggestions */}
-        {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-popover border rounded-md shadow-lg">
-            <Command>
-              <CommandList className="max-h-64">
-                {suggestions.filter((s) => s.type === "recent").length > 0 && (
-                  <CommandGroup heading="Recent Searches">
-                    {suggestions
-                      .filter((s) => s.type === "recent")
-                      .map((suggestion, index) => (
-                        <CommandItem
-                          key={`recent-${index}`}
-                          onSelect={() => handleSearch(suggestion.text)}
-                          className="flex items-center gap-2"
-                        >
-                          <Clock className="h-3 w-3 text-muted-foreground" />
-                          {suggestion.text}
-                        </CommandItem>
-                      ))}
-                  </CommandGroup>
-                )}
-
-                {suggestions.filter((s) => s.type === "popular").length > 0 && (
-                  <CommandGroup heading="Popular Searches">
-                    {suggestions
-                      .filter((s) => s.type === "popular")
-                      .map((suggestion, index) => (
-                        <CommandItem
-                          key={`popular-${index}`}
-                          onSelect={() => handleSearch(suggestion.text)}
-                          className="flex items-center justify-between"
-                        >
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="h-3 w-3 text-muted-foreground" />
-                            {suggestion.text}
-                          </div>
-                          {suggestion.count && (
-                            <Badge variant="secondary" className="text-xs">
-                              {suggestion.count}
-                            </Badge>
-                          )}
-                        </CommandItem>
-                      ))}
-                  </CommandGroup>
-                )}
-
-                {suggestions.filter((s) => s.type === "suggestion").length > 0 && (
-                  <CommandGroup heading="Suggestions">
-                    {suggestions
-                      .filter((s) => s.type === "suggestion")
-                      .map((suggestion, index) => (
-                        <CommandItem
-                          key={`suggestion-${index}`}
-                          onSelect={() => handleSearch(suggestion.text)}
-                          className="flex items-center gap-2"
-                        >
-                          <Sparkles className="h-3 w-3 text-muted-foreground" />
-                          {suggestion.text}
-                        </CommandItem>
-                      ))}
-                  </CommandGroup>
-                )}
-              </CommandList>
-            </Command>
-          </div>
-        )}
-      </div>
-
-      {/* Filter Controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)} className="h-9">
-            <Filter className="h-4 w-4 mr-2" />
-            Filters
-            {activeFilterCount > 0 && (
-              <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
-                {activeFilterCount}
-              </Badge>
-            )}
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setIsOpen(true)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          className="pl-10 pr-10 h-12 text-base bg-background border-border"
+        />
+        {query && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setQuery("")}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted"
+          >
+            <X className="h-3 w-3" />
           </Button>
-
-          {activeFilterCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 text-muted-foreground">
-              Clear all
-            </Button>
-          )}
-        </div>
-
-        {/* Active Filter Tags */}
-        {activeFilterCount > 0 && (
-          <div className="flex items-center gap-1 flex-wrap">
-            {filters.categories?.map((category) => (
-              <Badge
-                key={category}
-                variant="secondary"
-                className="h-6 text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                onClick={() => handleArrayFilterChange("categories", category, false)}
-              >
-                {category}
-                <X className="h-3 w-3 ml-1" />
-              </Badge>
-            ))}
-            {filters.difficulty?.map((difficulty) => (
-              <Badge
-                key={difficulty}
-                variant="secondary"
-                className="h-6 text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                onClick={() => handleArrayFilterChange("difficulty", difficulty, false)}
-              >
-                {difficulty}
-                <X className="h-3 w-3 ml-1" />
-              </Badge>
-            ))}
-            {filters.tags?.map((tag) => (
-              <Badge
-                key={tag}
-                variant="secondary"
-                className="h-6 text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                onClick={() => handleArrayFilterChange("tags", tag, false)}
-              >
-                {tag}
-                <X className="h-3 w-3 ml-1" />
-              </Badge>
-            ))}
-            {filters.featured && (
-              <Badge
-                variant="secondary"
-                className="h-6 text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                onClick={() => handleFilterChange("featured", undefined)}
-              >
-                Featured
-                <X className="h-3 w-3 ml-1" />
-              </Badge>
-            )}
-            {filters.verified && (
-              <Badge
-                variant="secondary"
-                className="h-6 text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                onClick={() => handleFilterChange("verified", undefined)}
-              >
-                Verified
-                <X className="h-3 w-3 ml-1" />
-              </Badge>
-            )}
-          </div>
         )}
       </div>
 
-      {/* Advanced Filters Panel */}
-      <Collapsible open={showFilters} onOpenChange={setShowFilters}>
-        <CollapsibleContent className="space-y-4">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 p-4 border rounded-lg bg-muted/30">
-            {/* Categories Filter */}
-            {facets?.categories && facets.categories.length > 0 && (
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">Categories</Label>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {facets.categories.map(({ value, count }) => (
-                    <div key={value} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`category-${value}`}
-                        checked={filters.categories?.includes(value) || false}
-                        onCheckedChange={(checked) => handleArrayFilterChange("categories", value, checked as boolean)}
-                      />
-                      <Label
-                        htmlFor={`category-${value}`}
-                        className="text-sm font-normal cursor-pointer flex-1 flex items-center justify-between"
-                      >
-                        <span className="capitalize">{value}</span>
-                        <span className="text-xs text-muted-foreground">({count})</span>
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+      {/* Active Filters */}
+      {selectedFilters.length > 0 && (
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          {selectedFilters.map((filter) => (
+            <Badge
+              key={filter}
+              variant="secondary"
+              className="cursor-pointer hover:bg-muted"
+              onClick={() => toggleFilter(filter)}
+            >
+              {filter}
+              <X className="h-3 w-3 ml-1" />
+            </Badge>
+          ))}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+          >
+            Clear all
+          </Button>
+        </div>
+      )}
 
-            {/* Difficulty Filter */}
-            {facets?.difficulty && facets.difficulty.length > 0 && (
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">Difficulty</Label>
-                <div className="space-y-2">
-                  {facets.difficulty.map(({ value, count }) => (
-                    <div key={value} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`difficulty-${value}`}
-                        checked={filters.difficulty?.includes(value as any) || false}
-                        onCheckedChange={(checked) => handleArrayFilterChange("difficulty", value, checked as boolean)}
-                      />
-                      <Label
-                        htmlFor={`difficulty-${value}`}
-                        className="text-sm font-normal cursor-pointer flex-1 flex items-center justify-between"
-                      >
-                        <span className="capitalize">{value}</span>
-                        <span className="text-xs text-muted-foreground">({count})</span>
-                      </Label>
+      {/* Search Dropdown */}
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <Card className="absolute top-full left-0 right-0 mt-2 z-20 border border-border bg-background shadow-lg">
+            <CardContent className="p-0">
+              <ScrollArea className="max-h-96">
+                <div className="p-4 space-y-4">
+                  {/* Recent Searches */}
+                  {recentSuggestions.length > 0 && !query && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium text-muted-foreground">Recent</span>
+                      </div>
+                      <div className="space-y-1">
+                        {recentSuggestions.map((suggestion) => (
+                          <button
+                            key={suggestion.id}
+                            onClick={() => handleSuggestionClick(suggestion)}
+                            className="w-full text-left px-3 py-2 rounded-md hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-foreground">{suggestion.text}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {suggestion.category}
+                              </Badge>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  )}
 
-            {/* Tags Filter */}
-            {facets?.tags && facets.tags.length > 0 && (
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">Popular Tags</Label>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {facets.tags.slice(0, 10).map(({ value, count }) => (
-                    <div key={value} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`tag-${value}`}
-                        checked={filters.tags?.includes(value) || false}
-                        onCheckedChange={(checked) => handleArrayFilterChange("tags", value, checked as boolean)}
-                      />
-                      <Label
-                        htmlFor={`tag-${value}`}
-                        className="text-sm font-normal cursor-pointer flex-1 flex items-center justify-between"
-                      >
-                        <span>{value}</span>
-                        <span className="text-xs text-muted-foreground">({count})</span>
-                      </Label>
+                  {/* Suggestions */}
+                  {filteredSuggestions.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Tag className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {query ? "Suggestions" : "Popular"}
+                        </span>
+                      </div>
+                      <div className="space-y-1">
+                        {filteredSuggestions.map((suggestion) => (
+                          <button
+                            key={suggestion.id}
+                            onClick={() => handleSuggestionClick(suggestion)}
+                            className="w-full text-left px-3 py-2 rounded-md hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-foreground">{suggestion.text}</span>
+                              <Badge variant={suggestion.type === "tag" ? "default" : "outline"} className="text-xs">
+                                {suggestion.category}
+                              </Badge>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  )}
 
-            {/* Quality Filters */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Quality</Label>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="featured"
-                    checked={filters.featured || false}
-                    onCheckedChange={(checked) => handleFilterChange("featured", checked ? true : undefined)}
-                  />
-                  <Label htmlFor="featured" className="text-sm font-normal cursor-pointer">
-                    Featured Content
-                  </Label>
+                  {/* No Results */}
+                  {query && filteredSuggestions.length === 0 && (
+                    <div className="text-center py-6">
+                      <p className="text-sm text-muted-foreground">No suggestions found for "{query}"</p>
+                      <Button variant="ghost" size="sm" onClick={() => handleSearch()} className="mt-2">
+                        Search anyway
+                      </Button>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="verified"
-                    checked={filters.verified || false}
-                    onCheckedChange={(checked) => handleFilterChange("verified", checked ? true : undefined)}
-                  />
-                  <Label htmlFor="verified" className="text-sm font-normal cursor-pointer">
-                    Verified by Community
-                  </Label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   )
 }

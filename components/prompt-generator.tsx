@@ -103,11 +103,11 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "Beginner":
-        return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400"
+        return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400"
       case "Intermediate":
-        return "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/20 dark:text-yellow-400"
+        return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400"
       case "Advanced":
-        return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400"
+        return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400"
       default:
         return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950/20 dark:text-gray-400"
     }
@@ -252,20 +252,26 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
   const addTag = (fieldId: string, tag: string) => {
     const trimmedTag = tag.trim()
     if (trimmedTag) {
-      const currentTags = (fieldValues[fieldId] as string[]) || []
+      const safeFieldValues = fieldValues ?? {};
+      const currentTags = (safeFieldValues[fieldId] as string[]) || []
       if (!currentTags.includes(trimmedTag)) {
-        updateFieldValue(fieldId, [...currentTags, trimmedTag])
+        if (typeof updateFieldValue === "function") {
+          updateFieldValue(fieldId, [...currentTags, trimmedTag])
+        }
       }
       setTagInputs((prev) => ({ ...prev, [fieldId]: "" }))
     }
   }
 
   const removeTag = (fieldId: string, tagToRemove: string) => {
-    const currentTags = (fieldValues[fieldId] as string[]) || []
-    updateFieldValue(
-      fieldId,
-      currentTags.filter((tag) => tag !== tagToRemove),
-    )
+    const safeFieldValues = fieldValues ?? {};
+    const currentTags = (safeFieldValues[fieldId] as string[]) || []
+    if (typeof updateFieldValue === "function") {
+      updateFieldValue(
+        fieldId,
+        currentTags.filter((tag) => tag !== tagToRemove),
+      )
+    }
   }
 
   const handleGenerate = async () => {
@@ -285,7 +291,9 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
 
     // Add a small delay for better UX
     setTimeout(() => {
-      validateAndGenerate()
+      if (typeof validateAndGenerate === "function") {
+        validateAndGenerate()
+      }
       setGenerationProgress(100)
       setTimeout(() => {
         setIsGenerating(false)
@@ -306,7 +314,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
     if (!selectedTemplate) return 0
     const requiredFields = selectedTemplate.fields.filter((field) => field.required)
     const completedFields = requiredFields.filter((field) => {
-      const value = fieldValues[field.id]
+      const value = (fieldValues ?? {})[field.id]
       return value && (Array.isArray(value) ? value.length > 0 : value.toString().trim() !== "")
     })
     return Math.round((completedFields.length / requiredFields.length) * 100)
@@ -325,8 +333,9 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
     ) || {}
 
   const renderField = (field: PromptField) => {
-    const value = fieldValues[field.id] || (field.type === "tags" || field.type === "multiselect" ? [] : "")
-    const hasError = !!errors[field.id]
+    const safeFieldValues = fieldValues ?? {};
+    const value = safeFieldValues[field.id] || (field.type === "tags" || field.type === "multiselect" ? [] : "")
+    const hasError = !!errors?.[field.id]
 
     const fieldWrapper = (children: React.ReactNode) => (
       <div key={field.id} className="space-y-3">
@@ -355,8 +364,15 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
             id={field.id}
             placeholder={field.placeholder}
             value={value as string}
-            onChange={(e) => updateFieldValue(field.id, e.target.value)}
-            className={cn("transition-colors", hasError && "border-red-500 focus-visible:ring-red-500")}
+            onChange={(e) => {
+              if (typeof updateFieldValue === "function") {
+                updateFieldValue(field.id, e.target.value)
+              }
+            }}
+            className={cn(
+              "transition-colors ",
+              hasError && "border-red-500 focus-visible:ring-red-500",
+            )}
           />,
         )
 
@@ -366,9 +382,13 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
             id={field.id}
             placeholder={field.placeholder}
             value={value as string}
-            onChange={(e) => updateFieldValue(field.id, e.target.value)}
+            onChange={(e) => {
+              if (typeof updateFieldValue === "function") {
+                updateFieldValue(field.id, e.target.value)
+              }
+            }}
             className={cn(
-              "min-h-[100px] resize-y transition-colors",
+              "min-h-[100px] resize-y transition-colors ",
               hasError && "border-red-500 focus-visible:ring-red-500",
             )}
             rows={4}
@@ -377,8 +397,12 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
 
       case "select":
         return fieldWrapper(
-          <Select value={value as string} onValueChange={(val) => updateFieldValue(field.id, val)}>
-            <SelectTrigger className={cn(hasError && "border-red-500")}>
+          <Select value={value as string} onValueChange={(val) => {
+            if (typeof updateFieldValue === "function") {
+              updateFieldValue(field.id, val)
+            }
+          }}>
+            <SelectTrigger className={cn("", hasError && "border-red-500")}>
               <SelectValue placeholder={field.placeholder} />
             </SelectTrigger>
             <SelectContent>
@@ -404,7 +428,9 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                       className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors"
                       onClick={() => {
                         const newValues = selectedValues.filter((v) => v !== val)
-                        updateFieldValue(field.id, newValues)
+                        if (typeof updateFieldValue === "function") {
+                          updateFieldValue(field.id, newValues)
+                        }
                       }}
                     />
                   </Badge>
@@ -415,11 +441,13 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
               value=""
               onValueChange={(val) => {
                 if (!selectedValues.includes(val)) {
-                  updateFieldValue(field.id, [...selectedValues, val])
+                  if (typeof updateFieldValue === "function") {
+                    updateFieldValue(field.id, [...selectedValues, val])
+                  }
                 }
               }}
             >
-              <SelectTrigger className={cn(hasError && "border-red-500")}>
+              <SelectTrigger className={cn("", hasError && "border-red-500")}>
                 <SelectValue placeholder={field.placeholder} />
               </SelectTrigger>
               <SelectContent>
@@ -465,7 +493,10 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                     addTag(field.id, inputValue)
                   }
                 }}
-                className={cn("flex-1", hasError && "border-red-500 focus-visible:ring-red-500")}
+                className={cn(
+                  "flex-1 ",
+                  hasError && "border-red-500 focus-visible:ring-red-500",
+                )}
               />
               <Button
                 type="button"
@@ -473,7 +504,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                 size="sm"
                 onClick={() => addTag(field.id, inputValue)}
                 disabled={!inputValue.trim()}
-                className="px-3"
+                className="px-3 shadow-soft"
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -513,13 +544,13 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
     return (
       <div className="space-y-6">
         {/* Filters */}
-        <Card>
+        <Card >
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="space-y-2 flex-1">
                 <label className="text-sm font-medium">Category</label>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
+                  <SelectTrigger >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -535,7 +566,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
               <div className="space-y-2 flex-1">
                 <label className="text-sm font-medium">Difficulty</label>
                 <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                  <SelectTrigger>
+                  <SelectTrigger className="">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -556,13 +587,21 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
           {filteredTemplates.map((template: PromptTemplate) => (
             <Card
               key={template.id}
-              className="group hover:shadow-lg transition-all duration-200 cursor-pointer border-2 hover:border-primary/20"
-              onClick={() => (onTemplateSelect ? onTemplateSelect(template) : selectTemplate(template))}
+              className="group card-hover transition-all duration-200 cursor-pointer "
+              onClick={() => {
+                if (onTemplateSelect) {
+                  onTemplateSelect(template)
+                } else if (typeof selectTemplate === "function") {
+                  selectTemplate(template)
+                }
+              }}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    {getTemplateIcon(template.icon)}
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-soft">
+                      {getTemplateIcon(template.icon)}
+                    </div>
                     <CardTitle className="text-lg group-hover:text-primary transition-colors">
                       {template.name}
                     </CardTitle>
@@ -615,7 +654,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                 setSelectedCategory("all")
                 setSelectedDifficulty("all")
               }}
-              className="mt-4"
+              className="mt-4 shadow-soft"
             >
               Clear Filters
             </Button>
@@ -629,7 +668,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2 bg-muted/50 backdrop-blur-sm">
           <TabsTrigger value="generator" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             <span className="hidden sm:inline">Generator</span>
@@ -643,7 +682,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
         {/* Generator Tab */}
         <TabsContent value="generator" className="space-y-6 mt-6">
           {/* Template Description Card */}
-          <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+          <Card >
             <CardHeader className="pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="space-y-2">
@@ -654,7 +693,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                   <CardDescription className="text-sm leading-relaxed">{selectedTemplate.description}</CardDescription>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {selectedTemplate.examples.length > 0 && (
+                  {selectedTemplate.examples.length > 0 && typeof loadExample === "function" && (
                     <Select onValueChange={(value) => loadExample(Number.parseInt(value))}>
                       <SelectTrigger className="w-[160px] h-9">
                         <SelectValue placeholder="Load Example" />
@@ -668,7 +707,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                       </SelectContent>
                     </Select>
                   )}
-                  <Button variant="outline" size="sm" onClick={resetForm} className="h-9 bg-transparent">
+                  <Button variant="outline" size="sm" onClick={resetForm} className="h-9 shadow-soft bg-transparent">
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Reset
                   </Button>
@@ -678,7 +717,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
           </Card>
 
           {/* Progress Indicator */}
-          <Card>
+          <Card >
             <CardContent className="p-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
@@ -692,7 +731,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
           </Card>
 
           {/* Form Fields */}
-          <Card>
+          <Card className="">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
@@ -755,7 +794,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                 onClick={handleGenerate}
                 disabled={isGenerating || getCompletionPercentage() < 100}
                 size="lg"
-                className="min-w-[200px] h-12 text-base"
+                className="min-w-[200px] h-12 text-base shadow-medium hover:shadow-large transition-all duration-200"
               >
                 {isGenerating ? (
                   <div className="flex items-center">
@@ -774,7 +813,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
 
           {/* Generated Prompt */}
           {generatedPrompt && (
-            <Card ref={promptRef} className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+            <Card ref={promptRef} className=" ">
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <CardTitle className="flex items-center gap-2">
@@ -782,7 +821,12 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                     Generated Prompt
                   </CardTitle>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleCopy(generatedPrompt)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCopy(generatedPrompt)}
+                      className="shadow-soft"
+                    >
                       {copiedField === "prompt" ? (
                         <>
                           <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
@@ -795,15 +839,15 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                         </>
                       )}
                     </Button>
-                    <Button variant="outline" size="sm" onClick={handleShare}>
+                    <Button variant="outline" size="sm" onClick={handleShare} className="shadow-soft bg-transparent">
                       <Share className="h-4 w-4 mr-2" />
                       Share
                     </Button>
-                    <Button variant="outline" size="sm" onClick={handleExport}>
+                    <Button variant="outline" size="sm" onClick={handleExport} className="shadow-soft bg-transparent">
                       <Download className="h-4 w-4 mr-2" />
                       Export
                     </Button>
-                    <Button size="sm" onClick={savePrompt}>
+                    <Button size="sm" onClick={savePrompt} className="shadow-soft">
                       <Save className="h-4 w-4 mr-2" />
                       Save
                     </Button>
@@ -812,7 +856,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[300px] w-full">
-                  <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border">
+                  <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg ">
                     <pre className="whitespace-pre-wrap text-sm leading-relaxed font-mono">{generatedPrompt}</pre>
                   </div>
                 </ScrollArea>
@@ -821,7 +865,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
           )}
 
           {/* Validation Errors */}
-          {Object.keys(errors).length > 0 && (
+          {Object.keys(errors as any).length > 0 && (
             <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20">
               <AlertCircle className="h-4 w-4 text-red-600" />
               <AlertDescription className="text-red-700 dark:text-red-400">
@@ -831,7 +875,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
           )}
 
           {/* Tips Card */}
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 ">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
                 <Lightbulb className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
@@ -852,7 +896,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
         {/* Preview Tab */}
         <TabsContent value="preview" className="space-y-6 mt-6">
           {generatedPrompt && (
-            <Card>
+            <Card >
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <CardTitle className="flex items-center gap-2">
@@ -860,7 +904,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                     Prompt Preview
                   </CardTitle>
                   <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => handleCopy(generatedPrompt)}>
+                    <Button variant="outline" onClick={() => handleCopy(generatedPrompt)} className="shadow-soft">
                       {copiedField === "prompt" ? (
                         <>
                           <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
@@ -873,15 +917,15 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                         </>
                       )}
                     </Button>
-                    <Button variant="outline" onClick={handleShare}>
+                    <Button variant="outline" onClick={handleShare} className="shadow-soft bg-transparent">
                       <Share className="h-4 w-4 mr-2" />
                       Share
                     </Button>
-                    <Button variant="outline" onClick={handleExport}>
+                    <Button variant="outline" onClick={handleExport} className="shadow-soft bg-transparent">
                       <Download className="h-4 w-4 mr-2" />
                       Export
                     </Button>
-                    <Button onClick={savePrompt}>
+                    <Button onClick={savePrompt} className="shadow-soft">
                       <Save className="h-4 w-4 mr-2" />
                       Save to History
                     </Button>
@@ -890,7 +934,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="bg-muted/30 p-6 rounded-lg border">
+                  <div className=" p-6 rounded-lg ">
                     <pre className="whitespace-pre-wrap text-sm leading-relaxed">{generatedPrompt}</pre>
                   </div>
                   <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">

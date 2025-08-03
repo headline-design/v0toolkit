@@ -9,8 +9,58 @@ import { Separator } from "@/components/ui/separator"
 import { PromptGenerator } from "@/components/prompt-generator"
 import { AssistantPanel } from "@/components/assistant-panel"
 import { usePromptGenerator } from "@/lib/hooks/use-prompt-generator"
-import { ArrowLeft, HelpCircle, Sparkles, Menu, X } from "lucide-react"
+import { ArrowLeft, HelpCircle, Sparkles, Menu, X, InfoIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage, BreadcrumbLink, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+
+import * as React from "react"
+import { Plus } from "lucide-react"
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  SidebarSeparator,
+} from "@/components/ui/sidebar"
+
+function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  return (
+    <Sidebar {...props}>
+      <SidebarHeader className="border-sidebar-border h-16 border-b">
+        <div className="p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <HelpCircle className="h-5 w-5" />
+            <h2 className="font-semibold">Assistant</h2>
+          </div>
+
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <AssistantPanel isOpen={true} onToggle={() => { }} isMobile={false} />
+        <SidebarSeparator className="mx-0" />
+
+      </SidebarContent>
+      <SidebarFooter className="hidden">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton>
+              <InfoIcon />
+              <span>Learn More</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+  )
+}
+
 
 export default function PromptGeneratorEditorPage() {
   const router = useRouter()
@@ -89,142 +139,47 @@ export default function PromptGeneratorEditorPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      {/* Mobile Header */}
-      <div className="lg:hidden border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-20">
-        <div className="p-4 space-y-3">
-          {/* Navigation */}
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" size="sm" onClick={handleBack} className="h-8 px-2">
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Back
-            </Button>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsAssistantOpen(!isAssistantOpen)}
-                className={cn("h-8 px-3", isAssistantOpen && "bg-primary text-primary-foreground")}
-              >
-                <HelpCircle className="h-4 w-4 mr-1" />
-                {isAssistantOpen ? "Hide" : "Help"}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="h-8 w-8 p-0"
-              >
-                {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
 
-          {/* Template Info */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 min-w-0">
-              <Badge variant="outline" className="text-xs">
-                {selectedTemplate.category}
-              </Badge>
-              <span className="text-sm font-medium truncate">{selectedTemplate.name}</span>
-            </div>
-          </div>
+    <>
+      <SidebarProvider style={
+        {
+          "--sidebar-width": "350px",
+        } as React.CSSProperties
+      }>
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="#">
+                    Building Your Application
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <SidebarTrigger className="-mr-1 ml-auto rotate-180" />
+          </header>
+          {/* Main Content Layout */}
+          <div className="flex-1 flex overflow-hidden">
+            {/* Main Generator Content */}
 
-          {/* Mobile Menu Dropdown */}
-          {isMobileMenuOpen && (
-            <div className="absolute top-full left-0 right-0 bg-background border-b shadow-lg z-10">
-              <div className="p-4 space-y-3">
-                <div className="text-sm font-medium">Template Details</div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Difficulty:</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {selectedTemplate.difficulty}
-                    </Badge>
-                  </div>
-                </div>
-                <Separator />
-                <div className="text-xs text-muted-foreground">{selectedTemplate.description}</div>
+            <div className="flex-1 min-w-0 overflow-auto">
+              <div className="p-4 lg:p-6">
+                <PromptGenerator hook={promptGeneratorHook} onTemplateSelect={handleBack} />
               </div>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Desktop Header */}
-      <div className="hidden lg:block border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
-        <div className="p-6 pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={handleBack} className="h-9">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Templates
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">{selectedTemplate.category}</Badge>
-                  <Badge
-                    variant={
-                      selectedTemplate.difficulty === "Beginner"
-                        ? "default"
-                        : selectedTemplate.difficulty === "Intermediate"
-                          ? "secondary"
-                          : "destructive"
-                    }
-                  >
-                    {selectedTemplate.difficulty}
-                  </Badge>
-                </div>
-                <div className="text-lg font-semibold">{selectedTemplate.name}</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsAssistantOpen(!isAssistantOpen)}
-                className={cn(isAssistantOpen && "bg-primary text-primary-foreground")}
-              >
-                <HelpCircle className="h-4 w-4 mr-2" />
-                {isAssistantOpen ? "Hide Assistant" : "Show Assistant"}
-              </Button>
-            </div>
+
           </div>
-        </div>
-      </div>
-
-      {/* Main Content Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Main Generator Content */}
-        <div className="flex-1 min-w-0 overflow-auto">
-          <div className="p-4 lg:p-6">
-            <PromptGenerator hook={promptGeneratorHook} onTemplateSelect={handleBack} />
-          </div>
-        </div>
-
-        {/* Desktop Assistant Panel */}
-        <div className="hidden lg:block">
-          <AssistantPanel
-            isOpen={isAssistantOpen}
-            onToggle={() => setIsAssistantOpen(!isAssistantOpen)}
-            isMobile={false}
-          />
-        </div>
-      </div>
-
-      {/* Mobile Assistant Panel Overlay */}
-      {isAssistantOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-          <div className="absolute inset-x-0 bottom-0 h-[90vh] bg-background border-t rounded-t-xl shadow-2xl">
-            <AssistantPanel
-              isOpen={isAssistantOpen}
-              onToggle={() => setIsAssistantOpen(!isAssistantOpen)}
-              isMobile={true}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+        </SidebarInset>
+        <AppSidebar side="right" />
+      </SidebarProvider>
+    </>
   )
 }
+
+

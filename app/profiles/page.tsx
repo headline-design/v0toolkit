@@ -181,7 +181,7 @@ export default function V0ProfilesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="min-h-screen ">
         <div className="container mx-auto p-6">
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center space-y-4">
@@ -200,16 +200,13 @@ export default function V0ProfilesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen ">
       <div className="container mx-auto p-6 space-y-8">
         {/* Header Section */}
         <div className="space-y-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg">
-                  <Users className="h-6 w-6" />
-                </div>
                 <div>
                   <h1 className="text-3xl font-bold tracking-tight">V0 Profiles</h1>
                   <p className="text-muted-foreground">Personalized AI assistants for every workflow</p>
@@ -225,7 +222,7 @@ export default function V0ProfilesPage() {
               <Button
                 onClick={() => handleCreateProfile()}
                 size="lg"
-                className="h-12 px-8 shadow-lg hover:shadow-xl transition-all duration-200"
+                className="h-12 px-8"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Create Profile

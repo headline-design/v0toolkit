@@ -1,217 +1,184 @@
 "use client"
 
-import React from "react"
+import type React from "react"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { Badge } from "@/components/ui/badge"
-import { Palette, MessageSquare, Code2, Building, CheckCircle, Layers, Wand2, Users, Sparkles } from "lucide-react"
+import { Menu, Code2, Users, BookOpen, Zap, Settings, Home, ChevronRight } from "lucide-react"
 
-interface SidebarLayoutProps {
-  children: any
+interface SidebarItem {
+  title: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  badge?: string
+  children?: SidebarItem[]
 }
 
-const navigationItems = [
+const sidebarItems: SidebarItem[] = [
   {
-    title: "Prompt Generator",
-    url: "/tools/prompt-generator",
-    icon: Wand2,
-    description: "Generate sophisticated AI prompts",
-    badge: "Core",
+    title: "Home",
+    href: "/",
+    icon: Home,
   },
   {
-    title: "V0 Profiles",
-    url: "/tools/v0-profiles",
-    icon: Users,
-    description: "Personalized AI assistants",
+    title: "Prompt Generator",
+    href: "/prompt-generator",
+    icon: Code2,
     badge: "New",
   },
   {
-    title: "Patterns",
-    url: "/tools/patterns",
-    icon: Palette,
-    description: "UI patterns and components",
-  },
-  {
-    title: "Prompts",
-    url: "/tools/prompts",
-    icon: MessageSquare,
-    description: "AI prompts and templates",
-  },
-  {
-    title: "Examples",
-    url: "/tools/examples",
-    icon: Code2,
-    description: "Code examples and demos",
-  },
-  {
-    title: "Architecture",
-    url: "/tools/architecture",
-    icon: Building,
-    description: "System design patterns",
+    title: "V0 Profiles",
+    href: "/profiles",
+    icon: Users,
+    children: [
+      {
+        title: "Browse Profiles",
+        href: "/profiles",
+        icon: Users,
+      },
+      {
+        title: "Create Profile",
+        href: "/profiles/create",
+        icon: Users,
+      },
+    ],
   },
   {
     title: "Best Practices",
-    url: "/tools/best-practices",
-    icon: CheckCircle,
-    description: "Development guidelines",
+    href: "/patterns",
+    icon: BookOpen,
   },
   {
-    title: "Structure",
-    url: "/tools/structure",
-    icon: Layers,
-    description: "File organization",
+    title: "Templates",
+    href: "/templates",
+    icon: Zap,
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: Settings,
   },
 ]
 
-export function SidebarLayout({ children }: SidebarLayoutProps) {
+interface SidebarLayoutProps {
+  children: React.ReactNode
+}
+
+function SidebarContent() {
   const pathname = usePathname()
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
 
-  const deSlugify = (text: string) => {
-    return text.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
+  const toggleExpanded = (title: string) => {
+    setExpandedItems((prev) => (prev.includes(title) ? prev.filter((item) => item !== title) : [...prev, title]))
   }
 
-  // Generate breadcrumb items from pathname
-  const generateBreadcrumbs = () => {
-    const segments = pathname.split("/").filter(Boolean)
-    const breadcrumbs = []
+  const renderSidebarItem = (item: SidebarItem, level = 0) => {
+    const isActive = pathname === item.href
+    const isExpanded = expandedItems.includes(item.title)
+    const hasChildren = item.children && item.children.length > 0
 
-    // Always start with Tools
-    breadcrumbs.push({
-      label: "Tools",
-      href: "/tools",
-      isLast: segments.length === 1,
-    })
+    return (
+      <div key={item.title}>
+        <div className="relative">
+          {hasChildren ? (
+            <button
+              onClick={() => toggleExpanded(item.title)}
+              className={cn(
+                "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                "hover:bg-muted/50",
+                isActive && "bg-muted text-foreground",
+                !isActive && "text-muted-foreground hover:text-foreground",
+                level > 0 && "ml-4",
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <item.icon className="h-4 w-4" />
+                <span>{item.title}</span>
+                {item.badge && (
+                  <Badge variant="secondary" className="text-xs">
+                    {item.badge}
+                  </Badge>
+                )}
+              </div>
+              <ChevronRight className={cn("h-4 w-4 transition-transform", isExpanded && "rotate-90")} />
+            </button>
+          ) : (
+            <Link
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                "hover:bg-muted/50",
+                isActive && "bg-muted text-foreground",
+                !isActive && "text-muted-foreground hover:text-foreground",
+                level > 0 && "ml-4",
+              )}
+            >
+              <item.icon className="h-4 w-4" />
+              <span>{item.title}</span>
+              {item.badge && (
+                <Badge variant="secondary" className="text-xs ml-auto">
+                  {item.badge}
+                </Badge>
+              )}
+            </Link>
+          )}
+        </div>
 
-    // Build path segments
-    let currentPath = ""
-    for (let i = 1; i < segments.length; i++) {
-      currentPath += `/${segments[i]}`
-      const fullPath = `/tools${currentPath}`
-      const isLast = i === segments.length - 1
-
-      breadcrumbs.push({
-        label: deSlugify(segments[i]),
-        href: fullPath,
-        isLast,
-      })
-    }
-
-    return breadcrumbs
+        {hasChildren && isExpanded && (
+          <div className="mt-1 space-y-1">{item.children?.map((child) => renderSidebarItem(child, level + 1))}</div>
+        )}
+      </div>
+    )
   }
-
-  const breadcrumbs = generateBreadcrumbs()
 
   return (
-    <SidebarProvider>
-      <Sidebar side="left" className="border-r-2">
-        <SidebarHeader className="border-b-2 border-sidebar-border bg-gradient-to-r from-sidebar-background to-sidebar-background/80">
-          <div className="flex h-14 items-center px-6">
-            <Link href="/tools" className="flex items-center space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md">
-                <Sparkles className="h-4 w-4" />
-              </div>
-              <span className="font-bold text-lg">V0 Toolkit</span>
-            </Link>
+    <div className="flex flex-col h-full">
+      <div className="p-4 border-b border-border">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+            <Code2 className="h-4 w-4 text-primary-foreground" />
           </div>
-        </SidebarHeader>
-        <SidebarContent className="bg-gradient-to-b from-sidebar-background to-sidebar-background/95">
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium px-6 py-3">
-              Tools & Resources
-            </SidebarGroupLabel>
-            <SidebarGroupContent className="px-3">
-              <SidebarMenu className="space-y-1">
-                {navigationItems.map((item) => {
-                  // Check if current path starts with this item's URL
-                  const isActive = pathname === item.url || pathname.startsWith(item.url + "/")
-                  return (
-                    <SidebarMenuItem key={item.url}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive}
-                        className="h-11 px-3 rounded-lg transition-all duration-200"
-                      >
-                        <Link href={item.url} className="flex items-center gap-3 w-full">
-                          <item.icon className="h-4 w-4 flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <span className="font-medium">{item.title}</span>
-                            {item.description && (
-                              <div className="text-xs text-sidebar-foreground/60 truncate">{item.description}</div>
-                            )}
-                          </div>
-                          {item.badge && (
-                            <Badge
-                              variant={isActive ? "secondary" : "outline"}
-                              className="text-xs px-2 py-0.5 flex-shrink-0"
-                            >
-                              {item.badge}
-                            </Badge>
-                          )}
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-        <SidebarRail />
-      </Sidebar>
+          <span className="font-semibold text-foreground">V0 Toolkit</span>
+        </Link>
+      </div>
 
-      <SidebarInset>
-        <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 flex shrink-0 items-center gap-2 border-b-2 p-4 z-10">
-          <SidebarTrigger className="-ml-1 h-8 w-8" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              {breadcrumbs.map((crumb, index) => (
-                <React.Fragment key={crumb.href}>
-                  <BreadcrumbItem>
-                    {crumb.isLast ? (
-                      <BreadcrumbPage className="font-medium">{crumb.label}</BreadcrumbPage>
-                    ) : (
-                      <BreadcrumbLink asChild>
-                        <Link href={crumb.href} className="font-medium hover:text-primary transition-colors">
-                          {crumb.label}
-                        </Link>
-                      </BreadcrumbLink>
-                    )}
-                  </BreadcrumbItem>
-                  {!crumb.isLast && <BreadcrumbSeparator className="hidden md:block" />}
-                </React.Fragment>
-              ))}
-            </BreadcrumbList>
-          </Breadcrumb>
-        </header>
-        <main className="flex-1 overflow-auto bg-gradient-to-br from-background via-background to-muted/10">
-          {children}
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+      <ScrollArea className="flex-1 p-4">
+        <nav className="space-y-2">{sidebarItems.map((item) => renderSidebarItem(item))}</nav>
+      </ScrollArea>
+    </div>
+  )
+}
+
+export function SidebarLayout({ children }: SidebarLayoutProps) {
+  return (
+    <div className="flex h-screen bg-background">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex w-64 flex-col border-r border-border bg-background">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile Sidebar */}
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-50">
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-64 p-0">
+          <SidebarContent />
+        </SheetContent>
+      </Sheet>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 overflow-auto">{children}</main>
+      </div>
+    </div>
   )
 }

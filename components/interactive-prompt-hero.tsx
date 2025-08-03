@@ -1,9 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Copy, CheckCircle, InfoIcon } from "lucide-react"
+import { Copy, CheckCircle, Code2 } from "lucide-react"
 
 // Interactive prompt highlighting data
 const promptSegments = [
@@ -15,7 +14,7 @@ const promptSegments = [
     text: "dev relations expert",
     highlight: true,
     tooltip: "Establishes specific expertise and credibility",
-    color: "bg-blue-100 text-blue-800 border-blue-200",
+    category: "expertise",
   },
   {
     text: " (specializing in ",
@@ -25,7 +24,7 @@ const promptSegments = [
     text: "gen-ai coding platforms",
     highlight: true,
     tooltip: "Defines the specialized domain knowledge",
-    color: "bg-purple-100 text-purple-800 border-purple-200",
+    category: "specialization",
   },
   {
     text: ") who built the documentation website for ",
@@ -34,48 +33,48 @@ const promptSegments = [
   {
     text: "Cursor",
     highlight: true,
-    tooltip: "References a credible, well-known company",
-    color: "bg-green-100 text-green-800 border-green-200",
+    tooltip: "References credible, well-known companies",
+    category: "credibility",
   },
   {
     text: " and then worked with ",
     highlight: false,
   },
   {
-    text: "Loveable, Bolt, V0",
+    text: "Loveable and Bolt and V0",
     highlight: true,
-    tooltip: "Additional credibility through multiple company references",
-    color: "bg-green-100 text-green-800 border-green-200",
+    tooltip: "Multiple company references strengthen credibility",
+    category: "credibility",
   },
   {
     text: " on ",
     highlight: false,
   },
   {
-    text: "best-practices, demo apps",
+    text: "best-practices, demo apps, etc",
     highlight: true,
     tooltip: "Specific areas of expertise and past work",
-    color: "bg-orange-100 text-orange-800 border-orange-200",
+    category: "experience",
   },
   {
     text: ". We are building a ",
     highlight: false,
   },
   {
-    text: "V0-focused toolkit",
+    text: "V0-focused toolkit with useful tools, prompts, and best-practices for V0",
     highlight: true,
-    tooltip: "Clear project context and scope",
-    color: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    tooltip: "Clear project context and comprehensive scope",
+    category: "context",
   },
   {
-    text: ". I want you to ",
+    text: ". I want you to build out the ",
     highlight: false,
   },
   {
-    text: "build out technical framework, UI design",
+    text: "technical framework and UI design",
     highlight: true,
     tooltip: "Specific, actionable deliverables",
-    color: "bg-red-100 text-red-800 border-red-200",
+    category: "deliverables",
   },
   {
     text: " for our V0-focused toolkit.",
@@ -83,9 +82,42 @@ const promptSegments = [
   },
 ]
 
-export function InteractivePromptHero() {
+const legendItems = [
+  {
+    category: "expertise",
+    color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+    label: "Expertise",
+  },
+  {
+    category: "specialization",
+    color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+    label: "Specialization",
+  },
+  {
+    category: "credibility",
+    color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    label: "Credibility",
+  },
+  {
+    category: "experience",
+    color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+    label: "Experience",
+  },
+  {
+    category: "context",
+    color: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
+    label: "Context",
+  },
+  {
+    category: "deliverables",
+    color: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+    label: "Deliverables",
+  },
+]
+
+export default function InteractivePromptHero() {
   const [copiedExample, setCopiedExample] = useState(false)
-  const [hoveredSegment, setHoveredSegment] = useState<number | null>(null)
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null)
 
   const fullPrompt = promptSegments.map((segment) => segment.text).join("")
 
@@ -99,87 +131,99 @@ export function InteractivePromptHero() {
     }
   }
 
+  const getSegmentStyle = (category: string) => {
+    const item = legendItems.find((item) => item.category === category)
+    return item ? item.color : ""
+  }
+
   return (
-    <Card className="relative overflow-hidden border border-primary/20 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      <CardContent className="relative p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <InfoIcon className="h-4 w-4" />
-            <span className="text-sm text-muted-foreground">This prompt built V0 Toolkit</span>
+    <div className="py-16">
+      <div className="max-w-4xl mx-auto px-6">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-muted rounded-full text-sm font-medium text-muted-foreground mb-4">
+            <Code2 className="h-4 w-4" />
+            Interactive Prompt Engineering
           </div>
-          <Button onClick={handleCopyExample} variant="outline" size="sm">
-            {copiedExample ? (
-              <>
-                <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4 mr-2" />
-                Copy
-              </>
-            )}
-          </Button>
+          <h1 className="text-4xl font-bold text-foreground mb-4">The Prompt That Built V0 Toolkit</h1>
         </div>
 
-        {/* Interactive Prompt */}
-        <div className="relative">
-          <div className="bg-white/80 backdrop-blur-sm border border-primary/10 rounded-lg p-4 font-mono text-sm leading-relaxed">
-            {promptSegments.map((segment, index) => (
-              <span
-                key={index}
-                className={`relative transition-all duration-200 ${
-                  segment.highlight
-                    ? `${segment.color} px-1 py-0.5 rounded cursor-pointer border ${
-                        hoveredSegment === index ? "shadow-md scale-105" : ""
-                      }`
-                    : ""
-                }`}
-                onMouseEnter={() => segment.highlight && setHoveredSegment(index)}
-                onMouseLeave={() => setHoveredSegment(null)}
-              >
-                {segment.text}
-                {segment.highlight && hoveredSegment === index && (
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
-                    <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
-                      {segment.tooltip}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
-                    </div>
-                  </div>
-                )}
-              </span>
+        {/* Code Block */}
+        <div className="bg-card border rounded-lg shadow-sm overflow-hidden mb-8">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 bg-muted border-b">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <span className="text-muted-foreground text-sm font-mono">system-prompt.txt</span>
+            </div>
+            <Button onClick={handleCopyExample} variant="ghost" size="sm" className="h-8 px-3 text-xs">
+              {copiedExample ? (
+                <>
+                  <CheckCircle className="h-3 w-3 mr-1.5 text-green-600" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3 w-3 mr-1.5" />
+                  Copy
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Code Content */}
+          <div className="p-4">
+            <div className="flex">
+              <div className="text-muted-foreground text-sm mr-4 select-none font-mono">
+                <span>1</span>
+              </div>
+              <div className="flex-1 font-mono text-sm leading-6">
+                {promptSegments.map((segment, index) => (
+                  <span
+                    key={index}
+                    className={`${
+                      segment.highlight
+                        ? `px-1 py-0.5 rounded cursor-pointer font-medium transition-colors duration-200 ${getSegmentStyle(segment.category)}`
+                        : "text-foreground"
+                    }`}
+                    onMouseEnter={() => segment.highlight && setHoveredCategory(segment.category)}
+                    onMouseLeave={() => setHoveredCategory(null)}
+                  >
+                    {segment.text}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Legend */}
+        <div className="bg-muted/50 rounded-lg p-6">
+          <div className="flex flex-wrap gap-4 justify-center mb-4">
+            {legendItems.map((item) => (
+              <div key={item.category} className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded ${item.color.split(" ")[0]}`} />
+                <span className="text-sm font-medium text-foreground">{item.label}</span>
+              </div>
             ))}
           </div>
 
-          {/* Legend */}
-          <div className="mt-3 flex flex-wrap gap-3 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-blue-100 border border-blue-200" />
-              <span className="text-muted-foreground">Expertise</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-purple-100 border border-purple-200" />
-              <span className="text-muted-foreground">Specialization</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-green-100 border border-green-200" />
-              <span className="text-muted-foreground">Credibility</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-orange-100 border border-orange-200" />
-              <span className="text-muted-foreground">Experience</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-indigo-100 border border-indigo-200" />
-              <span className="text-muted-foreground">Context</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-red-100 border border-red-200" />
-              <span className="text-muted-foreground">Deliverables</span>
-            </div>
+          {/* Explanation */}
+          <div className="text-center min-h-[2rem] flex items-center justify-center">
+            {hoveredCategory ? (
+              <p className="text-foreground text-sm max-w-lg">
+                {promptSegments.find((segment) => segment.category === hoveredCategory)?.tooltip}
+              </p>
+            ) : (
+              <p className="text-muted-foreground text-sm">Hover over highlighted sections to see explanations</p>
+            )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

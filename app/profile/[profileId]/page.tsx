@@ -282,9 +282,9 @@ export default function ProfilePage() {
   const selectedTask = selectedTaskId ? allTasks.find((t) => t.id === selectedTaskId) : null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+    <div className="min-h-screen ">
       {/* Header */}
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="border-b ">
         <div className="container mx-auto p-6">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" onClick={() => router.push("/profiles")} className="h-9">
@@ -484,7 +484,7 @@ export default function ProfilePage() {
                       onClick={handleComposePrompt}
                       disabled={
                         isComposing ||
-                        (selectedTask &&
+                        (!!selectedTask &&
                           selectedTask.variables?.some((v) => v.required && !taskVariables[v.id]?.toString().trim()))
                       }
                       className="w-full"
