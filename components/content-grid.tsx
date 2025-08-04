@@ -143,13 +143,13 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
   const getTypeIcon = (type: ContentItem["type"]) => {
     switch (type) {
       case "prompt":
-        return <Code2 className="h-4 w-4" />
+        return <Code2 className="h-3 w-3" />
       case "profile":
-        return <Users className="h-4 w-4" />
+        return <Users className="h-3 w-3" />
       case "pattern":
-        return <BookOpen className="h-4 w-4" />
+        return <BookOpen className="h-3 w-3" />
       case "template":
-        return <Zap className="h-4 w-4" />
+        return <Zap className="h-3 w-3" />
     }
   }
 
@@ -184,45 +184,47 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
   return (
     <div className={className}>
       {/* Header */}
-      <div className="flex flex-col gap-4 mb-6">
+      <div className="flex flex-col gap-3 mb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Content Library</h2>
-            <p className="text-muted-foreground">Browse prompts, profiles, patterns, and templates</p>
+            <h2 className="text-xl font-bold text-foreground">Content Library</h2>
+            <p className="text-muted-foreground text-sm">Browse prompts, profiles, patterns, and templates</p>
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant={viewMode === "grid" ? "default" : "outline"}
-              size="icon"
+              size="sm"
               onClick={() => setViewMode("grid")}
+              className="h-7 w-7 p-0"
             >
-              <Grid3X3 className="h-4 w-4" />
+              <Grid3X3 className="h-3 w-3" />
             </Button>
             <Button
               variant={viewMode === "list" ? "default" : "outline"}
-              size="icon"
+              size="sm"
               onClick={() => setViewMode("list")}
+              className="h-7 w-7 p-0"
             >
-              <List className="h-4 w-4" />
+              <List className="h-3 w-3" />
             </Button>
           </div>
         </div>
 
         {/* Search and Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
             <Input
               placeholder="Search content..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-8 h-8"
             />
           </div>
 
           <div className="flex gap-2">
             <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-24 h-8">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
@@ -235,7 +237,7 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
             </Select>
 
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-32 h-8">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -249,7 +251,7 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
             </Select>
 
             <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-              <SelectTrigger className="w-36">
+              <SelectTrigger className="w-28 h-8">
                 <SelectValue placeholder="Difficulty" />
               </SelectTrigger>
               <SelectContent>
@@ -261,7 +263,7 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-24 h-8">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -275,31 +277,31 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
       </div>
 
       {/* Results Count */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <p className="text-sm text-muted-foreground">
           {filteredAndSortedItems.length} {filteredAndSortedItems.length === 1 ? "item" : "items"} found
         </p>
       </div>
 
       {/* Content Grid/List */}
-      <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
+      <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
         {filteredAndSortedItems.map((item) => (
           <Card
             key={item.id}
-            className={`transition-all duration-200 hover:shadow-md ${viewMode === "list" ? "flex flex-row" : ""}`}
+            className={`transition-shadow hover:shadow-md ${viewMode === "list" ? "flex flex-row" : ""}`}
           >
-            <CardHeader className={viewMode === "list" ? "flex-1" : ""}>
+            <CardHeader className={`pb-2 ${viewMode === "list" ? "flex-1" : ""}`}>
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-1">
                   {getTypeIcon(item.type)}
-                  <Badge variant="outline" className="text-xs capitalize">
+                  <Badge variant="outline" className="text-xs h-4 px-1 capitalize">
                     {item.type}
                   </Badge>
-                  <Badge className={`text-xs capitalize ${getDifficultyColor(item.difficulty)}`}>
+                  <Badge className={`text-xs h-4 px-1 capitalize ${getDifficultyColor(item.difficulty)}`}>
                     {item.difficulty}
                   </Badge>
                   {item.featured && (
-                    <Badge variant="default" className="text-xs">
+                    <Badge variant="default" className="text-xs h-4 px-1">
                       <Star className="h-3 w-3 mr-1" />
                       Featured
                     </Badge>
@@ -307,24 +309,24 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
                 </div>
               </div>
 
-              <CardTitle className="text-lg leading-tight">{item.title}</CardTitle>
-              <CardDescription className="text-sm leading-relaxed">{item.description}</CardDescription>
+              <CardTitle className="text-sm leading-tight">{item.title}</CardTitle>
+              <CardDescription className="text-xs leading-relaxed">{item.description}</CardDescription>
 
-              <div className="flex flex-wrap gap-1 mt-2">
+              <div className="flex flex-wrap gap-1 mt-1">
                 {item.tags.slice(0, 3).map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-xs">
+                  <Badge key={tag} variant="secondary" className="text-xs h-4 px-1">
                     {tag}
                   </Badge>
                 ))}
                 {item.tags.length > 3 && (
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs h-4 px-1">
                     +{item.tags.length - 3}
                   </Badge>
                 )}
               </div>
             </CardHeader>
 
-            <CardContent className={`space-y-3 ${viewMode === "list" ? "flex flex-col justify-between w-48" : ""}`}>
+            <CardContent className={`space-y-2 ${viewMode === "list" ? "flex flex-col justify-between w-40" : ""}`}>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
@@ -335,12 +337,17 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
 
               <div className="flex gap-2">
                 {item.code && (
-                  <Button size="sm" variant="outline" onClick={() => handleCopy(item.code!)} className="flex-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleCopy(item.code!)}
+                    className="flex-1 h-6 text-xs"
+                  >
                     <Copy className="h-3 w-3 mr-1" />
                     Copy
                   </Button>
                 )}
-                <Button size="sm" className="flex-1">
+                <Button size="sm" className="flex-1 h-6 text-xs">
                   <ExternalLink className="h-3 w-3 mr-1" />
                   View
                 </Button>
@@ -352,10 +359,10 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
 
       {/* Empty State */}
       {filteredAndSortedItems.length === 0 && (
-        <div className="text-center py-12">
-          <Filter className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No content found</h3>
-          <p className="text-muted-foreground mb-4">Try adjusting your search criteria or filters.</p>
+        <div className="text-center py-8">
+          <Filter className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+          <h3 className="font-medium mb-2">No content found</h3>
+          <p className="text-muted-foreground mb-3 text-sm">Try adjusting your search criteria or filters.</p>
           <Button
             variant="outline"
             onClick={() => {
@@ -364,6 +371,8 @@ export function ContentGrid({ items = sampleContent, className }: ContentGridPro
               setSelectedCategory("all")
               setSelectedDifficulty("all")
             }}
+            size="sm"
+            className="h-8"
           >
             Clear Filters
           </Button>

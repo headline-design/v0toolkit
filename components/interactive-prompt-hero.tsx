@@ -137,38 +137,38 @@ export default function InteractivePromptHero() {
   }
 
   return (
-    <div className="py-16">
-      <div className="max-w-4xl mx-auto px-6">
+    <div className="py-12">
+      <div className="max-w-3xl mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-muted rounded-full text-sm font-medium text-muted-foreground mb-4">
-            <Code2 className="h-4 w-4" />
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 px-2 py-1 bg-muted rounded-full text-sm font-medium text-muted-foreground mb-3">
+            <Code2 className="h-3 w-3" />
             Interactive Prompt Engineering
           </div>
-          <h1 className="text-4xl font-bold text-foreground mb-4">The Prompt That Built V0 Toolkit</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-3">The Prompt That Built V0 Toolkit</h1>
         </div>
 
         {/* Code Block */}
-        <div className="bg-card border rounded-lg shadow-sm overflow-hidden mb-8">
+        <div className="bg-card border rounded-lg overflow-hidden mb-6">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-muted border-b">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          <div className="flex items-center justify-between px-3 py-2 bg-muted border-b">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
               </div>
               <span className="text-muted-foreground text-sm font-mono">system-prompt.txt</span>
             </div>
-            <Button onClick={handleCopyExample} variant="ghost" size="sm" className="h-8 px-3 text-xs">
+            <Button onClick={handleCopyExample} variant="ghost" size="sm" className="h-6 px-2 text-xs">
               {copiedExample ? (
                 <>
-                  <CheckCircle className="h-3 w-3 mr-1.5 text-green-600" />
+                  <CheckCircle className="h-3 w-3 mr-1 text-green-600" />
                   Copied
                 </>
               ) : (
                 <>
-                  <Copy className="h-3 w-3 mr-1.5" />
+                  <Copy className="h-3 w-3 mr-1" />
                   Copy
                 </>
               )}
@@ -176,9 +176,9 @@ export default function InteractivePromptHero() {
           </div>
 
           {/* Code Content */}
-          <div className="p-4">
+          <div className="p-3">
             <div className="flex">
-              <div className="text-muted-foreground text-sm mr-4 select-none font-mono">
+              <div className="text-muted-foreground text-sm mr-3 select-none font-mono">
                 <span>1</span>
               </div>
               <div className="flex-1 font-mono text-sm leading-6">
@@ -202,18 +202,18 @@ export default function InteractivePromptHero() {
         </div>
 
         {/* Legend */}
-        <div className="bg-muted/50 rounded-lg p-6">
-          <div className="flex flex-wrap gap-4 justify-center mb-4">
+        <div className="bg-muted/50 rounded-lg p-4">
+          <div className="flex flex-wrap gap-3 justify-center mb-3">
             {legendItems.map((item) => (
               <div key={item.category} className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded ${item.color.split(" ")[0]}`} />
+                <div className={`w-2 h-2 rounded ${item.color.split(" ")[0]}`} />
                 <span className="text-sm font-medium text-foreground">{item.label}</span>
               </div>
             ))}
           </div>
 
           {/* Explanation */}
-          <div className="text-center min-h-[2rem] flex items-center justify-center">
+          <div className="text-center min-h-[1.5rem] flex items-center justify-center">
             {hoveredCategory ? (
               <p className="text-foreground text-sm max-w-lg">
                 {promptSegments.find((segment) => segment.category === hoveredCategory)?.tooltip}

@@ -43,7 +43,7 @@ export default function ProfilePage() {
 
   const [profile, setProfile] = useState<V0Profile | null>(null)
   const [activeTab, setActiveTab] = useState("compose")
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null) // Updated default value to be a non-empty string
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [taskVariables, setTaskVariables] = useState<Record<string, any>>({})
   const [composedPrompt, setComposedPrompt] = useState<ComposedPrompt | null>(null)
   const [composedHistory, setComposedHistory] = useState<ComposedPrompt[]>([])
@@ -235,14 +235,14 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-4">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center space-y-4">
-            <div className="w-12 h-12 mx-auto bg-muted rounded-full flex items-center justify-center">
-              <User className="h-6 w-6 text-muted-foreground animate-pulse" />
+          <div className="text-center space-y-3">
+            <div className="w-10 h-10 mx-auto bg-muted rounded-lg flex items-center justify-center">
+              <User className="h-5 w-5 text-muted-foreground animate-pulse" />
             </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold">Loading Profile...</h3>
+            <div className="space-y-1">
+              <h3 className="font-medium">Loading Profile...</h3>
               <p className="text-sm text-muted-foreground">Setting up your AI assistant</p>
             </div>
           </div>
@@ -253,10 +253,12 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center space-y-4">
-          <h3 className="text-lg font-semibold">Profile not found</h3>
-          <Button onClick={() => router.push("/profiles")}>Back to Profiles</Button>
+      <div className="container mx-auto p-4">
+        <div className="text-center space-y-3">
+          <h3 className="font-medium">Profile not found</h3>
+          <Button onClick={() => router.push("/profiles")} size="sm" className="h-8">
+            Back to Profiles
+          </Button>
         </div>
       </div>
     )
@@ -266,18 +268,20 @@ export default function ProfilePage() {
   const selectedTask = selectedTaskId ? allTasks.find((t) => t.id === selectedTaskId) : null
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="border-b ">
-        <div className="container mx-auto p-6">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => router.push("/profiles")} className="h-9">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+      <div className="border-b">
+        <div className="container mx-auto p-4">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => router.push("/profiles")} className="h-8">
+              <ArrowLeft className="h-3 w-3 mr-2" />
               Back to Profiles
             </Button>
-            <div className="h-6 w-px bg-border" />
-            <div className="flex items-center gap-3">
-              <Badge variant="outline">{profile.category}</Badge>
+            <div className="h-4 w-px bg-border" />
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs h-5 px-2">
+                {profile.category}
+              </Badge>
               <span className="text-sm text-muted-foreground">•</span>
               <span className="text-sm text-muted-foreground">{profile.usageCount || 0} uses</span>
             </div>
@@ -294,15 +298,14 @@ export default function ProfilePage() {
                   setProfile(updatedProfile)
                   saveProfileWithToast(updatedProfile, "Profile updated")
                 }}
-                trigger={
-                  <Button variant="outline" size="sm">
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit
-                  </Button>
-                }
-              />
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
+              >
+                <Button variant="outline" size="sm" className="h-8 bg-transparent">
+                  <Edit className="h-3 w-3 mr-2" />
+                  Edit
+                </Button>
+              </ProfileEditDialog>
+              <Button variant="outline" size="sm" className="h-8 bg-transparent">
+                <Settings className="h-3 w-3 mr-2" />
                 Settings
               </Button>
             </div>
@@ -310,50 +313,50 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="container mx-auto p-6 space-y-8">
-        {/* Profile Header - Social Media Style */}
+      <div className="container mx-auto p-4 space-y-6">
+        {/* Profile Header */}
         <Card className="overflow-hidden">
           {/* Cover Photo */}
-          <div className="h-32 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20" />
+          <div className="h-20 bg-muted" />
 
-          <CardContent className="relative p-6">
+          <CardContent className="relative p-4">
             {/* Avatar */}
-            <div className="absolute -top-16 left-6">
-              <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
+            <div className="absolute -top-10 left-4">
+              <Avatar className="h-16 w-16 border-4 border-background">
                 <AvatarImage src={`https://avatar.vercel.sh/${profile.id}?size=400`} />
-                <AvatarFallback className="text-white font-bold text-xl bg-gradient-to-br from-primary to-primary/80">
+                <AvatarFallback className="text-white font-bold bg-foreground">
                   {getInitials(profile.name)}
                 </AvatarFallback>
               </Avatar>
             </div>
 
             {/* Profile Info */}
-            <div className="pt-10 space-y-4">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold">{profile.name}</h1>
-                <p className="text-lg text-muted-foreground">{profile.description}</p>
+            <div className="pt-8 space-y-3">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold">{profile.name}</h1>
+                <p className="text-muted-foreground">{profile.description}</p>
               </div>
 
               {/* Stats */}
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
+                  <Calendar className="h-3 w-3" />
                   <span>Created {profile.createdAt.toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4" />
+                  <Star className="h-3 w-3" />
                   <span>{profile.usageCount || 0} total uses</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Zap className="h-4 w-4" />
+                  <Zap className="h-3 w-3" />
                   <span>{profile.traits.filter((t) => t.isActive).length} active traits</span>
                 </div>
               </div>
 
               {/* Tags */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1">
                 {profile.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary">
+                  <Badge key={tag} variant="secondary" className="text-xs h-5 px-2">
                     {tag}
                   </Badge>
                 ))}
@@ -363,45 +366,45 @@ export default function ProfilePage() {
         </Card>
 
         {/* Main Content Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="compose" className="flex items-center gap-2">
-              <Wand2 className="h-5 w-5" />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3 h-9">
+            <TabsTrigger value="compose" className="flex items-center gap-2 text-sm">
+              <Wand2 className="h-3 w-3" />
               Compose Prompt
             </TabsTrigger>
-            <TabsTrigger value="setup" className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
+            <TabsTrigger value="setup" className="flex items-center gap-2 text-sm">
+              <Settings className="h-3 w-3" />
               Profile Setup
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <History className="h-5 w-5" />
+            <TabsTrigger value="history" className="flex items-center gap-2 text-sm">
+              <History className="h-3 w-3" />
               History ({composedHistory.length})
             </TabsTrigger>
           </TabsList>
 
           {/* Compose Tab */}
-          <TabsContent value="compose" className="space-y-6">
-            <div className="grid gap-6 lg:grid-cols-3">
+          <TabsContent value="compose" className="space-y-4">
+            <div className="grid gap-4 lg:grid-cols-3">
               {/* Task Selection */}
-              <div className="lg:col-span-1 space-y-6">
+              <div className="lg:col-span-1 space-y-4">
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Play className="h-5 w-5" />
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Play className="h-4 w-4" />
                       Select Task
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm">
                       Choose what you want {profile.name} to do. These tasks are designed for starting new V0 threads.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3">
                     <div className="space-y-2">
-                      <Label>Task Type (Optional)</Label>
+                      <Label className="text-sm">Task Type (Optional)</Label>
                       <Select
                         value={selectedTaskId || "none"}
                         onValueChange={(value) => setSelectedTaskId(value === "none" ? null : value)}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="h-8">
                           <SelectValue placeholder="Choose a task or leave blank for general use" />
                         </SelectTrigger>
                         <SelectContent>
@@ -409,8 +412,8 @@ export default function ProfilePage() {
                           {allTasks.map((task) => (
                             <SelectItem key={task.id} value={task.id}>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium">{task.name}</span>
-                                <Badge variant="outline" className="text-xs">
+                                <span className="font-medium text-sm">{task.name}</span>
+                                <Badge variant="outline" className="text-xs h-4 px-1">
                                   {task.category}
                                 </Badge>
                               </div>
@@ -421,19 +424,19 @@ export default function ProfilePage() {
                     </div>
 
                     {selectedTask && (
-                      <div className="p-3 bg-muted/50 rounded-lg space-y-2">
-                        <div className="font-medium">{selectedTask.name}</div>
-                        <div className="text-sm text-muted-foreground">{selectedTask.description}</div>
+                      <div className="p-2 bg-muted/50 rounded-lg space-y-1">
+                        <div className="font-medium text-sm">{selectedTask.name}</div>
+                        <div className="text-xs text-muted-foreground">{selectedTask.description}</div>
                       </div>
                     )}
 
                     {/* Task Variables */}
                     {selectedTask && selectedTask.variables && (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <div className="text-sm font-medium">Task Configuration</div>
                         {selectedTask.variables.map((variable) => (
-                          <div key={variable.id} className="space-y-2">
-                            <Label htmlFor={variable.id}>
+                          <div key={variable.id} className="space-y-1">
+                            <Label htmlFor={variable.id} className="text-sm">
                               {variable.label}
                               {variable.required && <span className="text-destructive">*</span>}
                             </Label>
@@ -443,15 +446,15 @@ export default function ProfilePage() {
                                 placeholder={variable.placeholder}
                                 value={taskVariables[variable.id] || ""}
                                 onChange={(e) => handleVariableChange(variable.id, e.target.value)}
-                                rows={5}
-                                className="min-h-[120px]"
+                                rows={4}
+                                className="min-h-[80px] text-sm"
                               />
                             ) : variable.type === "select" ? (
                               <Select
                                 value={taskVariables[variable.id] || ""}
                                 onValueChange={(value) => handleVariableChange(variable.id, value)}
                               >
-                                <SelectTrigger>
+                                <SelectTrigger className="h-8">
                                   <SelectValue placeholder={`Select ${variable.label.toLowerCase()}`} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -468,6 +471,7 @@ export default function ProfilePage() {
                                 placeholder={variable.placeholder}
                                 value={taskVariables[variable.id] || ""}
                                 onChange={(e) => handleVariableChange(variable.id, e.target.value)}
+                                className="h-8"
                               />
                             )}
                           </div>
@@ -482,17 +486,17 @@ export default function ProfilePage() {
                         (!!selectedTask &&
                           selectedTask.variables?.some((v) => v.required && !taskVariables[v.id]?.toString().trim()))
                       }
-                      className="w-full"
-                      size="lg"
+                      className="w-full h-8"
+                      size="sm"
                     >
                       {isComposing ? (
                         <div className="flex items-center">
-                          <div className="w-4 h-4 mr-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          <div className="w-3 h-3 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin" />
                           Composing...
                         </div>
                       ) : (
                         <div className="flex items-center">
-                          <Wand2 className="h-4 w-4 mr-2" />
+                          <Wand2 className="h-3 w-3 mr-2" />
                           Compose Prompt
                         </div>
                       )}
@@ -505,14 +509,14 @@ export default function ProfilePage() {
               <div className="lg:col-span-2">
                 {composedPrompt ? (
                   <Card>
-                    <CardHeader>
+                    <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <CardTitle className="flex items-center gap-2">
-                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          <CardTitle className="flex items-center gap-2 text-lg">
+                            <CheckCircle className="h-4 w-4 text-green-500" />
                             Composed Prompt
                           </CardTitle>
-                          <CardDescription>
+                          <CardDescription className="text-sm">
                             Ready to use in V0 • ~{composedPrompt.estimatedTokens} tokens
                           </CardDescription>
                         </div>
@@ -521,24 +525,25 @@ export default function ProfilePage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleCopyPrompt(composedPrompt.fullPrompt)}
+                            className="h-7 text-xs"
                           >
-                            <Copy className="h-4 w-4 mr-2" />
+                            <Copy className="h-3 w-3 mr-1" />
                             Copy
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <Share className="h-4 w-4 mr-2" />
+                          <Button variant="outline" size="sm" className="h-7 text-xs bg-transparent">
+                            <Share className="h-3 w-3 mr-1" />
                             Share
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-2" />
+                          <Button variant="outline" size="sm" className="h-7 text-xs bg-transparent">
+                            <Download className="h-3 w-3 mr-1" />
                             Export
                           </Button>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-4">
-                        <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+                      <div className="space-y-3">
+                        <ScrollArea className="h-[300px] w-full rounded-md border p-3">
                           <div className="whitespace-pre-wrap text-sm leading-relaxed">{composedPrompt.fullPrompt}</div>
                         </ScrollArea>
 
@@ -551,14 +556,14 @@ export default function ProfilePage() {
                   </Card>
                 ) : (
                   <Card>
-                    <CardContent className="p-12 text-center">
-                      <div className="space-y-4">
-                        <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
-                          <Wand2 className="h-8 w-8 text-muted-foreground" />
+                    <CardContent className="p-8 text-center">
+                      <div className="space-y-3">
+                        <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center">
+                          <Wand2 className="h-6 w-6 text-muted-foreground" />
                         </div>
-                        <div className="space-y-2">
-                          <h3 className="text-lg font-semibold">Ready to compose</h3>
-                          <p className="text-muted-foreground">
+                        <div className="space-y-1">
+                          <h3 className="font-medium">Ready to compose</h3>
+                          <p className="text-sm text-muted-foreground">
                             Select a task and configure the parameters, then click "Compose Prompt" to generate your
                             personalized V0 prompt.
                           </p>
@@ -572,22 +577,22 @@ export default function ProfilePage() {
           </TabsContent>
 
           {/* Setup Tab */}
-          <TabsContent value="setup" className="space-y-6">
+          <TabsContent value="setup" className="space-y-4">
             {/* Base Prompt Configuration */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <FileText className="h-4 w-4" />
                   Base Prompt Foundation
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Select or update the generated prompt that serves as the foundation for {profile.name}'s personality
                   and expertise.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <div className="space-y-2">
-                  <Label>Base Prompt Source</Label>
+                  <Label className="text-sm">Base Prompt Source</Label>
                   <Select
                     value={profile.basePromptId || "custom"}
                     onValueChange={(value) => {
@@ -606,7 +611,7 @@ export default function ProfilePage() {
                       }
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-8">
                       <SelectValue placeholder="Select base prompt source..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -614,7 +619,7 @@ export default function ProfilePage() {
                       {v0ProfileService.getAvailableBasePrompts().map((prompt) => (
                         <SelectItem key={prompt.id} value={prompt.id}>
                           <div className="flex flex-col">
-                            <span className="font-medium">{prompt.category || "Untitled"}</span>
+                            <span className="font-medium text-sm">{prompt.category || "Untitled"}</span>
                             <span className="text-xs text-muted-foreground truncate max-w-[300px]">
                               {prompt.prompt ? prompt.prompt.substring(0, 80) + "..." : "No content"}
                             </span>
@@ -627,7 +632,9 @@ export default function ProfilePage() {
 
                 {!profile.basePromptId && (
                   <div className="space-y-2">
-                    <Label htmlFor="basePrompt">Custom Base Prompt</Label>
+                    <Label htmlFor="basePrompt" className="text-sm">
+                      Custom Base Prompt
+                    </Label>
                     <Textarea
                       id="basePrompt"
                       placeholder="Enter your custom base prompt that defines this AI assistant's core personality and expertise..."
@@ -637,16 +644,16 @@ export default function ProfilePage() {
                         setProfile(updatedProfile)
                       }}
                       onBlur={() => saveProfileWithToast(profile)}
-                      rows={6}
-                      className="min-h-[150px]"
+                      rows={5}
+                      className="min-h-[120px] text-sm"
                     />
                   </div>
                 )}
 
                 {profile.basePromptId && (
-                  <div className="p-4 bg-muted/50 rounded-lg">
+                  <div className="p-3 bg-muted/50 rounded-lg">
                     <div className="text-sm font-medium mb-2">Selected Generated Prompt</div>
-                    <ScrollArea className="h-[120px]">
+                    <ScrollArea className="h-[100px]">
                       <p className="text-sm text-muted-foreground leading-relaxed">
                         {v0ProfileService.getAvailableBasePrompts().find((p) => p.id === profile.basePromptId)
                           ?.prompt || "Prompt not found"}
@@ -659,17 +666,21 @@ export default function ProfilePage() {
 
             {/* Profile Details */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <User className="h-4 w-4" />
                   Profile Details
                 </CardTitle>
-                <CardDescription>Update your AI assistant's basic information and appearance.</CardDescription>
+                <CardDescription className="text-sm">
+                  Update your AI assistant's basic information and appearance.
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
+              <CardContent className="space-y-3">
+                <div className="grid gap-3 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="profileName">Assistant Name</Label>
+                    <Label htmlFor="profileName" className="text-sm">
+                      Assistant Name
+                    </Label>
                     <Input
                       id="profileName"
                       placeholder="e.g., Bob, Alice, DevBot..."
@@ -679,10 +690,13 @@ export default function ProfilePage() {
                         setProfile(updatedProfile)
                       }}
                       onBlur={() => saveProfileWithToast(profile, "Profile name updated")}
+                      className="h-8"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="profileCategory">Category</Label>
+                    <Label htmlFor="profileCategory" className="text-sm">
+                      Category
+                    </Label>
                     <Select
                       value={profile.category}
                       onValueChange={(value) => {
@@ -691,7 +705,7 @@ export default function ProfilePage() {
                         saveProfileWithToast(updatedProfile, "Category updated")
                       }}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="h-8">
                         <SelectValue placeholder="Select category..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -707,7 +721,9 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="profileDescription">Description</Label>
+                  <Label htmlFor="profileDescription" className="text-sm">
+                    Description
+                  </Label>
                   <Textarea
                     id="profileDescription"
                     placeholder="Describe what this AI assistant specializes in and how it helps you..."
@@ -718,14 +734,15 @@ export default function ProfilePage() {
                     }}
                     onBlur={() => saveProfileWithToast(profile, "Description updated")}
                     rows={3}
+                    className="text-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Tags</Label>
-                  <div className="flex flex-wrap gap-2 mb-2">
+                  <Label className="text-sm">Tags</Label>
+                  <div className="flex flex-wrap gap-1 mb-2">
                     {profile.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
+                      <Badge key={index} variant="secondary" className="text-xs h-5 px-2">
                         {tag}
                         <button
                           onClick={() => {
@@ -754,6 +771,7 @@ export default function ProfilePage() {
                           e.currentTarget.value = ""
                         }
                       }}
+                      className="h-8"
                     />
                     <Button
                       variant="outline"
@@ -770,6 +788,7 @@ export default function ProfilePage() {
                           input.value = ""
                         }
                       }}
+                      className="h-8"
                     >
                       Add
                     </Button>
@@ -780,14 +799,14 @@ export default function ProfilePage() {
 
             {/* Traits Management */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Zap className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Zap className="h-4 w-4" />
                       Personality Traits
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm">
                       Add traits that modify how {profile.name} behaves and responds. These are layered on top of the
                       base prompt.
                     </CardDescription>
@@ -810,25 +829,28 @@ export default function ProfilePage() {
                       setProfile(updatedProfile)
                       saveProfileWithToast(updatedProfile, "Traits updated")
                     }}
+                    className="h-7"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-3 w-3 mr-1" />
                     Add Trait
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
                 {profile.traits.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Zap className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No traits added yet. Click "Add Trait" to customize {profile.name}'s personality.</p>
+                  <div className="text-center py-6 text-muted-foreground">
+                    <Zap className="h-8 w-8 mx-auto mb-3 opacity-50" />
+                    <p className="text-sm">
+                      No traits added yet. Click "Add Trait" to customize {profile.name}'s personality.
+                    </p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {profile.traits.map((trait, index) => (
-                      <Card key={trait.id} className="p-4">
-                        <div className="space-y-4">
+                      <Card key={trait.id} className="p-3">
+                        <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -840,11 +862,12 @@ export default function ProfilePage() {
                                   setProfile(updatedProfile)
                                   saveProfileWithToast(updatedProfile, "Traits updated")
                                 }}
+                                className="h-6 w-6 p-0"
                               >
                                 {trait.isActive ? (
-                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                  <CheckCircle className="h-3 w-3 text-green-500" />
                                 ) : (
-                                  <div className="h-4 w-4 border-2 border-muted-foreground rounded-full" />
+                                  <div className="h-3 w-3 border-2 border-muted-foreground rounded-full" />
                                 )}
                               </Button>
                               <div className="space-y-1">
@@ -858,7 +881,7 @@ export default function ProfilePage() {
                                     setProfile(updatedProfile)
                                   }}
                                   onBlur={() => saveProfileWithToast(profile, "Traits updated")}
-                                  className="font-medium"
+                                  className="font-medium h-7 text-sm"
                                 />
                               </div>
                             </div>
@@ -874,7 +897,7 @@ export default function ProfilePage() {
                                   saveProfileWithToast(updatedProfile, "Traits updated")
                                 }}
                               >
-                                <SelectTrigger className="w-32">
+                                <SelectTrigger className="w-24 h-7">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -896,8 +919,9 @@ export default function ProfilePage() {
                                   setProfile(updatedProfile)
                                   saveProfileWithToast(updatedProfile, "Traits updated")
                                 }}
+                                className="h-6 w-6 p-0"
                               >
-                                <X className="h-4 w-4 text-destructive" />
+                                <X className="h-3 w-3 text-destructive" />
                               </Button>
                             </div>
                           </div>
@@ -914,7 +938,7 @@ export default function ProfilePage() {
                             }}
                             onBlur={() => saveProfileWithToast(profile, "Traits updated")}
                             rows={2}
-                            className="text-sm"
+                            className="text-xs"
                           />
 
                           <Textarea
@@ -928,12 +952,12 @@ export default function ProfilePage() {
                               setProfile(updatedProfile)
                             }}
                             onBlur={() => saveProfileWithToast(profile, "Traits updated")}
-                            rows={3}
-                            className="font-mono text-sm"
+                            rows={2}
+                            className="font-mono text-xs"
                           />
 
-                          <div className="flex items-center gap-4 text-sm">
-                            <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3 text-xs">
+                            <div className="flex items-center gap-1">
                               <Label className="text-xs">Position:</Label>
                               <Select
                                 value={trait.insertionPoint}
@@ -946,7 +970,7 @@ export default function ProfilePage() {
                                   saveProfileWithToast(updatedProfile, "Traits updated")
                                 }}
                               >
-                                <SelectTrigger className="w-32">
+                                <SelectTrigger className="w-24 h-6">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -956,7 +980,7 @@ export default function ProfilePage() {
                                 </SelectContent>
                               </Select>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                               <Label className="text-xs">Priority:</Label>
                               <Input
                                 type="number"
@@ -971,7 +995,7 @@ export default function ProfilePage() {
                                   setProfile(updatedProfile)
                                 }}
                                 onBlur={() => saveProfileWithToast(profile, "Traits updated")}
-                                className="w-16"
+                                className="w-12 h-6 text-xs"
                               />
                             </div>
                           </div>
@@ -985,14 +1009,14 @@ export default function ProfilePage() {
 
             {/* Custom Tasks Management */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Settings className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Settings className="h-4 w-4" />
                       Custom Tasks
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm">
                       Create specialized tasks for {profile.name}. These appear alongside the core Create/Refine/Analyze
                       tasks.
                     </CardDescription>
@@ -1025,28 +1049,29 @@ export default function ProfilePage() {
                       setProfile(updatedProfile)
                       saveProfileWithToast(updatedProfile, "Tasks updated")
                     }}
+                    className="h-7"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-3 w-3 mr-1" />
                     Add Task
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
                 {profile.tasks.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>
+                  <div className="text-center py-6 text-muted-foreground">
+                    <Settings className="h-8 w-8 mx-auto mb-3 opacity-50" />
+                    <p className="text-sm">
                       No custom tasks created yet. Add specialized tasks for {profile.name} to handle specific
                       workflows.
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {profile.tasks.map((task, index) => (
-                      <Card key={task.id} className="p-4">
-                        <div className="space-y-4">
+                      <Card key={task.id} className="p-3">
+                        <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -1058,11 +1083,12 @@ export default function ProfilePage() {
                                   setProfile(updatedProfile)
                                   saveProfileWithToast(updatedProfile, "Tasks updated")
                                 }}
+                                className="h-6 w-6 p-0"
                               >
                                 {task.isActive ? (
-                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                  <CheckCircle className="h-3 w-3 text-green-500" />
                                 ) : (
-                                  <div className="h-4 w-4 border-2 border-muted-foreground rounded-full" />
+                                  <div className="h-3 w-3 border-2 border-muted-foreground rounded-full" />
                                 )}
                               </Button>
                               <div className="space-y-1">
@@ -1076,7 +1102,7 @@ export default function ProfilePage() {
                                     setProfile(updatedProfile)
                                   }}
                                   onBlur={() => saveProfileWithToast(profile, "Tasks updated")}
-                                  className="font-medium"
+                                  className="font-medium h-7 text-sm"
                                 />
                               </div>
                             </div>
@@ -1092,7 +1118,7 @@ export default function ProfilePage() {
                                 }}
                                 onBlur={() => saveProfileWithToast(profile, "Tasks updated")}
                                 placeholder="Category"
-                                className="w-32"
+                                className="w-24 h-7 text-xs"
                               />
                               <Button
                                 variant="ghost"
@@ -1105,8 +1131,9 @@ export default function ProfilePage() {
                                   setProfile(updatedProfile)
                                   saveProfileWithToast(updatedProfile, "Tasks updated")
                                 }}
+                                className="h-6 w-6 p-0"
                               >
-                                <X className="h-4 w-4 text-destructive" />
+                                <X className="h-3 w-3 text-destructive" />
                               </Button>
                             </div>
                           </div>
@@ -1123,11 +1150,11 @@ export default function ProfilePage() {
                             }}
                             onBlur={() => saveProfileWithToast(profile, "Tasks updated")}
                             rows={2}
-                            className="text-sm"
+                            className="text-xs"
                           />
 
                           <div className="space-y-2">
-                            <Label className="text-sm font-medium">Task Prompt Template</Label>
+                            <Label className="text-xs font-medium">Task Prompt Template</Label>
                             <Textarea
                               placeholder="Today your job is to {variable_name}. Use {variable_name} syntax for user inputs..."
                               value={task.prompt}
@@ -1139,8 +1166,8 @@ export default function ProfilePage() {
                                 setProfile(updatedProfile)
                               }}
                               onBlur={() => saveProfileWithToast(profile, "Tasks updated")}
-                              rows={4}
-                              className="font-mono text-sm"
+                              rows={3}
+                              className="font-mono text-xs"
                             />
                             <p className="text-xs text-muted-foreground">
                               Use {"{variable_name}"} syntax to create input fields. Variables will be automatically
@@ -1157,45 +1184,45 @@ export default function ProfilePage() {
           </TabsContent>
 
           {/* History Tab */}
-          <TabsContent value="history" className="space-y-6">
+          <TabsContent value="history" className="space-y-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <History className="h-5 w-5" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <History className="h-4 w-4" />
                   Prompt History
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   View all prompts you've composed with {profile.name}. Click any prompt to copy it.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {composedHistory.length === 0 ? (
-                  <div className="text-center py-12 space-y-4">
-                    <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
-                      <History className="h-8 w-8 text-muted-foreground" />
+                  <div className="text-center py-8 space-y-3">
+                    <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center">
+                      <History className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold">No prompts yet</h3>
-                      <p className="text-muted-foreground">
+                    <div className="space-y-1">
+                      <h3 className="font-medium">No prompts yet</h3>
+                      <p className="text-sm text-muted-foreground">
                         Compose your first prompt with {profile.name} to see it appear here.
                       </p>
                     </div>
-                    <Button onClick={() => setActiveTab("compose")}>
-                      <Wand2 className="h-4 w-4 mr-2" />
+                    <Button onClick={() => setActiveTab("compose")} size="sm" className="h-8">
+                      <Wand2 className="h-3 w-3 mr-2" />
                       Compose First Prompt
                     </Button>
                   </div>
                 ) : (
-                  <ScrollArea className="h-[600px]">
-                    <div className="space-y-4">
+                  <ScrollArea className="h-[500px]">
+                    <div className="space-y-3">
                       {composedHistory.map((prompt, index) => (
                         <Card
                           key={index}
                           className="cursor-pointer hover:shadow-md transition-shadow"
                           onClick={() => handleCopyPrompt(prompt.fullPrompt)}
                         >
-                          <CardContent className="p-4">
-                            <div className="space-y-3">
+                          <CardContent className="p-3">
+                            <div className="space-y-2">
                               <div className="flex items-start justify-between">
                                 <div className="space-y-1">
                                   <div className="text-sm font-medium">
@@ -1205,11 +1232,11 @@ export default function ProfilePage() {
                                     {prompt.generatedAt.toLocaleString()} • ~{prompt.estimatedTokens} tokens
                                   </div>
                                 </div>
-                                <Button variant="ghost" size="sm">
-                                  <Copy className="h-4 w-4" />
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <Copy className="h-3 w-3" />
                                 </Button>
                               </div>
-                              <div className="text-sm text-muted-foreground line-clamp-3">{prompt.fullPrompt}</div>
+                              <div className="text-xs text-muted-foreground line-clamp-2">{prompt.fullPrompt}</div>
                             </div>
                           </CardContent>
                         </Card>

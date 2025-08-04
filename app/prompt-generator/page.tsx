@@ -28,13 +28,16 @@ import {
   ChevronRight,
   Copy,
   Plus,
+  CheckCircle,
 } from "lucide-react"
 import { promptGeneratorService } from "@/lib/services/prompt-generator-service"
 import { useGeneratedPrompts } from "@/lib/hooks/use-prompt-generator"
 import type { PromptTemplate } from "@/lib/types/prompt-generator"
+import { useToast } from "@/hooks/use-toast"
 
 export default function PromptGeneratorPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const { prompts: recentPrompts } = useGeneratedPrompts()
   const [templates, setTemplates] = useState<PromptTemplate[]>([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -86,11 +89,11 @@ export default function PromptGeneratorPage() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "Beginner":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400"
+        return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400"
       case "Intermediate":
-        return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400"
+        return "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/20 dark:text-yellow-400"
       case "Advanced":
-        return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400"
+        return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400"
       default:
         return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950/20 dark:text-gray-400"
     }
@@ -99,13 +102,13 @@ export default function PromptGeneratorPage() {
   const getTemplateIcon = (iconName?: string) => {
     switch (iconName) {
       case "UserCog":
-        return <UserCog className="h-4 w-4" />
+        return <UserCog className="h-3 w-3" />
       case "FileCode":
-        return <FileCode className="h-4 w-4" />
+        return <FileCode className="h-3 w-3" />
       case "Palette":
-        return <Palette className="h-4 w-4" />
+        return <Palette className="h-3 w-3" />
       default:
-        return <Wand2 className="h-4 w-4" />
+        return <Wand2 className="h-3 w-3" />
     }
   }
 
@@ -116,8 +119,19 @@ export default function PromptGeneratorPage() {
   const handleCopyPrompt = async (prompt: string) => {
     try {
       await navigator.clipboard.writeText(prompt)
+      toast({
+        title: "Copied!",
+        description: "Prompt copied to clipboard",
+        duration: 2000,
+      })
     } catch (error) {
       console.error("Failed to copy prompt:", error)
+      toast({
+        title: "Error",
+        description: "Failed to copy prompt",
+        variant: "destructive",
+        duration: 3000,
+      })
     }
   }
 
@@ -125,15 +139,15 @@ export default function PromptGeneratorPage() {
   if (recentPrompts.length === 0) {
     return (
       <div className="min-h-screen">
-        <div className="container mx-auto p-6 space-y-8">
+        <div className="container mx-auto p-4 space-y-8">
           {/* Header Section */}
-          <div className="text-center space-y-6">
-            <div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-              <Wand2 className="h-10 w-10 text-primary" />
+          <div className="text-center space-y-6 py-8">
+            <div className="w-16 h-16 mx-auto bg-foreground rounded-lg flex items-center justify-center">
+              <Wand2 className="h-8 w-8 text-background" />
             </div>
-            <div className="space-y-4">
+            <div className="space-y-2">
               <h1 className="text-3xl font-bold tracking-tight">V0 Prompt Generator</h1>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
                 Create sophisticated AI prompts using professional templates designed for V0 and modern development
                 workflows. Configure V0's expertise, personality, and response style with expert-crafted templates.
               </p>
@@ -148,27 +162,27 @@ export default function PromptGeneratorPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">
-              <Card className="text-center p-6 border-2">
-                <div className="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                  <Target className="h-6 w-6 text-blue-600" />
+              <Card className="text-center p-6 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4">
+                  <Target className="h-6 w-6" />
                 </div>
                 <h3 className="font-semibold mb-2">1. Choose Template</h3>
                 <p className="text-sm text-muted-foreground">
                   Select from expert-crafted templates designed for different V0 use cases and expertise levels
                 </p>
               </Card>
-              <Card className="text-center p-6 border-2">
-                <div className="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <Wand2 className="h-6 w-6 text-green-600" />
+              <Card className="text-center p-6 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4">
+                  <Wand2 className="h-6 w-6" />
                 </div>
                 <h3 className="font-semibold mb-2">2. Configure Settings</h3>
                 <p className="text-sm text-muted-foreground">
                   Fill in the template fields to customize V0's expertise, personality, and response style
                 </p>
               </Card>
-              <Card className="text-center p-6 border-2">
-                <div className="w-12 h-12 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                  <Copy className="h-6 w-6 text-purple-600" />
+              <Card className="text-center p-6 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4">
+                  <Copy className="h-6 w-6" />
                 </div>
                 <h3 className="font-semibold mb-2">3. Copy & Use</h3>
                 <p className="text-sm text-muted-foreground">
@@ -186,42 +200,37 @@ export default function PromptGeneratorPage() {
                 <p className="text-muted-foreground">Try our most popular template or browse all options</p>
               </div>
 
-              <Card className="relative overflow-hidden border-2">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10" />
-                <CardContent className="relative p-8">
+              <Card className="relative overflow-hidden">
+                <CardContent className="relative p-6">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 text-primary">
-                          <Star className="h-5 w-5 fill-current" />
+                        <div className="flex items-center gap-2">
+                          <Star className="h-4 w-4 fill-current" />
                           <span className="font-semibold">Featured Template</span>
                         </div>
-                        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                        <Badge variant="secondary" className="text-xs h-5 px-2">
                           Most Popular
                         </Badge>
                       </div>
-                      <h3 className="text-2xl font-bold">{templates[0].name}</h3>
-                      <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">
-                        {templates[0].description}
-                      </p>
+                      <h3 className="text-xl font-bold">{templates[0].name}</h3>
+                      <p className="text-muted-foreground max-w-2xl">{templates[0].description}</p>
                       <div className="flex items-center gap-3">
-                        <Badge variant="outline" className="border-primary/30">
+                        <Badge variant="outline" className="text-xs h-5 px-2">
                           {templates[0].category}
                         </Badge>
-                        <Badge className={getDifficultyColor(templates[0].difficulty)}>{templates[0].difficulty}</Badge>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Users className="h-4 w-4" />
+                        <Badge className={`text-xs h-5 px-2 ${getDifficultyColor(templates[0].difficulty)}`}>
+                          {templates[0].difficulty}
+                        </Badge>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Users className="h-3 w-3" />
                           <span>{templates[0].examples.length} examples</span>
                         </div>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => handleTemplateSelect(templates[0])}
-                      size="lg"
-                      className="shrink-0 h-12 px-8 shadow-lg hover:shadow-xl transition-all duration-200"
-                    >
+                    <Button onClick={() => handleTemplateSelect(templates[0])} size="sm" className="shrink-0 h-8 px-6">
                       Try This Template
-                      <ArrowRight className="h-4 w-4 ml-2" />
+                      <ArrowRight className="h-3 w-3 ml-2" />
                     </Button>
                   </div>
                 </CardContent>
@@ -234,18 +243,18 @@ export default function PromptGeneratorPage() {
                   {templates.slice(1, 4).map((template) => (
                     <Card
                       key={template.id}
-                      className="cursor-pointer hover:shadow-md transition-all duration-200 border-2 hover:border-primary/50"
+                      className="cursor-pointer hover:shadow-md transition-shadow"
                       onClick={() => handleTemplateSelect(template)}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
                               {getTemplateIcon(template.icon)}
                             </div>
                             <div>
-                              <h4 className="font-medium">{template.name}</h4>
-                              <p className="text-sm text-muted-foreground line-clamp-1">{template.description}</p>
+                              <h4 className="font-medium text-sm">{template.name}</h4>
+                              <p className="text-xs text-muted-foreground line-clamp-1">{template.description}</p>
                             </div>
                           </div>
                           <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -260,14 +269,14 @@ export default function PromptGeneratorPage() {
               <div className="text-center mt-8">
                 <Button
                   variant="outline"
-                  size="lg"
+                  size="sm"
                   onClick={() => {
                     const element = document.getElementById("all-templates")
                     element?.scrollIntoView({ behavior: "smooth" })
                   }}
-                  className="h-12 px-8"
+                  className="h-8 px-6"
                 >
-                  <BookOpen className="h-4 w-4 mr-2" />
+                  <BookOpen className="h-3 w-3 mr-2" />
                   Browse All {templates.length} Templates
                 </Button>
               </div>
@@ -276,17 +285,31 @@ export default function PromptGeneratorPage() {
 
           {/* Tips Card */}
           <div className="max-w-2xl mx-auto">
-            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-2">
+            <Card className="bg-muted/50">
               <CardContent className="p-6">
                 <div className="flex items-start gap-3">
-                  <Lightbulb className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Lightbulb className="h-4 w-4" />
+                  </div>
                   <div className="space-y-2">
-                    <h4 className="font-medium text-blue-900 dark:text-blue-100">Pro Tips</h4>
-                    <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                      <li>• Be specific about your project context for better results</li>
-                      <li>• Use examples to guide V0's understanding of your needs</li>
-                      <li>• Save generated prompts to build V0 Profiles later</li>
-                      <li>• Experiment with different templates for various use cases</li>
+                    <h4 className="font-medium">Pro Tips</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                        Be specific about your project context for better results
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                        Use examples to guide V0's understanding of your needs
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                        Save generated prompts to build V0 Profiles later
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                        Experiment with different templates for various use cases
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -300,35 +323,35 @@ export default function PromptGeneratorPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto p-6 space-y-8">
+      <div className="container mx-auto p-4 space-y-6">
         {/* Header Section */}
-        <div className="space-y-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
+        <div className="space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
                 <div>
-                  <h1 className="text-3xl font-bold tracking-tight">V0 Prompt Generator</h1>
+                  <h1 className="text-2xl font-bold tracking-tight">V0 Prompt Generator</h1>
                   <p className="text-muted-foreground">Professional templates for sophisticated AI prompts</p>
                 </div>
               </div>
-              <p className="text-lg text-muted-foreground max-w-3xl leading-relaxed">
+              <p className="text-muted-foreground max-w-3xl">
                 Create sophisticated AI prompts using professional templates designed for V0 and modern development
                 workflows. Configure V0's expertise, personality, and response style with expert-crafted templates.
               </p>
             </div>
 
             {/* Quick Stats */}
-            <div className="flex flex-wrap gap-6 lg:flex-col lg:items-end">
+            <div className="flex flex-wrap gap-4 lg:flex-col lg:items-end">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <BookOpen className="h-4 w-4 text-primary" />
+                <BookOpen className="h-4 w-4" />
                 <span className="font-medium">{templates.length} expert templates</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <History className="h-4 w-4 text-primary" />
+                <History className="h-4 w-4" />
                 <span className="font-medium">{recentPrompts.length} prompts generated</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <TrendingUp className="h-4 w-4 text-primary" />
+                <TrendingUp className="h-4 w-4" />
                 <span className="font-medium">94% success rate</span>
               </div>
             </div>
@@ -336,42 +359,37 @@ export default function PromptGeneratorPage() {
 
           {/* Featured Template Highlight */}
           {templates.length > 0 && (
-            <Card className="relative overflow-hidden border-2">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10" />
-              <CardContent className="relative p-8">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2 text-primary">
-                        <Star className="h-5 w-5 fill-current" />
-                        <span className="font-semibold">Featured Template</span>
+            <Card className="relative overflow-hidden">
+              <CardContent className="relative p-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        <Star className="h-4 w-4 fill-current" />
+                        <span className="font-semibold text-sm">Featured Template</span>
                       </div>
-                      <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                      <Badge variant="secondary" className="text-xs h-5 px-2">
                         Most Popular
                       </Badge>
                     </div>
-                    <h3 className="text-2xl font-bold">{templates[0].name}</h3>
-                    <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">
-                      {templates[0].description}
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="border-primary/30">
+                    <h3 className="text-lg font-bold">{templates[0].name}</h3>
+                    <p className="text-sm text-muted-foreground max-w-2xl">{templates[0].description}</p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs h-5 px-2">
                         {templates[0].category}
                       </Badge>
-                      <Badge className={getDifficultyColor(templates[0].difficulty)}>{templates[0].difficulty}</Badge>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Users className="h-4 w-4" />
+                      <Badge className={`text-xs h-5 px-2 ${getDifficultyColor(templates[0].difficulty)}`}>
+                        {templates[0].difficulty}
+                      </Badge>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Users className="h-3 w-3" />
                         <span>{templates[0].examples.length} examples</span>
                       </div>
                     </div>
                   </div>
-                  <Button
-                    onClick={() => handleTemplateSelect(templates[0])}
-                    size="lg"
-                    className="shrink-0 h-12 px-8 shadow-lg hover:shadow-xl transition-all duration-200"
-                  >
+                  <Button onClick={() => handleTemplateSelect(templates[0])} size="sm" className="shrink-0 h-8 px-6">
                     Try This Template
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    <ArrowRight className="h-3 w-3 ml-2" />
                   </Button>
                 </div>
               </CardContent>
@@ -379,52 +397,57 @@ export default function PromptGeneratorPage() {
           )}
         </div>
 
-        <Tabs defaultValue="templates" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2 h-12 bg-muted/50 backdrop-blur-sm">
-            <TabsTrigger value="templates" className="flex items-center gap-2 text-base">
-              <Target className="h-4 w-4" />
+        <Tabs defaultValue="templates" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2 h-9">
+            <TabsTrigger value="templates" className="flex items-center gap-2 text-sm">
+              <Target className="h-3 w-3" />
               Browse Templates
             </TabsTrigger>
-            <TabsTrigger value="recent" className="flex items-center gap-2 text-base">
-              <History className="h-4 w-4" />
+            <TabsTrigger value="recent" className="flex items-center gap-2 text-sm">
+              <History className="h-3 w-3" />
               Recent Prompts ({recentPrompts.length})
             </TabsTrigger>
           </TabsList>
 
           {/* Templates Tab */}
-          <TabsContent value="templates" className="space-y-8" id="all-templates">
+          <TabsContent value="templates" className="space-y-6" id="all-templates">
             {/* Search and Filters */}
-            <Card className="border-2">
-              <CardContent className="p-6">
-                <div className="space-y-6">
+            <Card>
+              <CardContent className="p-4">
+                <div className="space-y-4">
                   {/* Search Bar */}
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Search templates by name, description, or tags..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-12 h-14 text-base transition-colors border-2 focus:border-primary"
+                      className="pl-9 h-9"
                     />
                     {searchQuery && (
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setSearchQuery("")}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-3 w-3" />
                       </Button>
                     )}
                   </div>
 
                   {/* Filter Toggle */}
                   <div className="flex items-center justify-between">
-                    <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
-                      <Filter className="h-4 w-4" />
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowFilters(!showFilters)}
+                      size="sm"
+                      className="gap-2 h-7"
+                    >
+                      <Filter className="h-3 w-3" />
                       Filters
                       {activeFiltersCount > 0 && (
-                        <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 text-xs">
+                        <Badge variant="secondary" className="ml-1 h-4 w-4 rounded-full p-0 text-xs">
                           {activeFiltersCount}
                         </Badge>
                       )}
@@ -439,7 +462,7 @@ export default function PromptGeneratorPage() {
                           setSelectedCategory("all")
                           setSelectedDifficulty("all")
                         }}
-                        className="text-muted-foreground hover:text-foreground"
+                        className="text-muted-foreground hover:text-foreground h-7 text-xs"
                       >
                         Clear all filters
                       </Button>
@@ -448,11 +471,11 @@ export default function PromptGeneratorPage() {
 
                   {/* Filters */}
                   {showFilters && (
-                    <div className="grid gap-4 md:grid-cols-3 p-4 bg-muted/30 rounded-lg border">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Category</label>
+                    <div className="grid gap-3 md:grid-cols-3 p-4 bg-muted/50 rounded-lg">
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium">Category</label>
                         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-8">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -465,10 +488,10 @@ export default function PromptGeneratorPage() {
                         </Select>
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Difficulty</label>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium">Difficulty</label>
                         <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-8">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -481,10 +504,10 @@ export default function PromptGeneratorPage() {
                         </Select>
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Sort By</label>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium">Sort By</label>
                         <Select value={sortBy} onValueChange={setSortBy}>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-8">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -500,9 +523,9 @@ export default function PromptGeneratorPage() {
                   {/* Active Filters Display */}
                   {activeFiltersCount > 0 && (
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-medium text-muted-foreground">Active filters:</span>
+                      <span className="text-xs font-medium text-muted-foreground">Active filters:</span>
                       {searchQuery && (
-                        <Badge variant="secondary" className="gap-1">
+                        <Badge variant="secondary" className="gap-1 text-xs h-5">
                           Search: "{searchQuery}"
                           <button onClick={() => setSearchQuery("")} className="ml-1 hover:text-destructive">
                             ×
@@ -510,7 +533,7 @@ export default function PromptGeneratorPage() {
                         </Badge>
                       )}
                       {selectedCategory !== "all" && (
-                        <Badge variant="secondary" className="gap-1">
+                        <Badge variant="secondary" className="gap-1 text-xs h-5">
                           {selectedCategory}
                           <button onClick={() => setSelectedCategory("all")} className="ml-1 hover:text-destructive">
                             ×
@@ -518,7 +541,7 @@ export default function PromptGeneratorPage() {
                         </Badge>
                       )}
                       {selectedDifficulty !== "all" && (
-                        <Badge variant="secondary" className="gap-1">
+                        <Badge variant="secondary" className="gap-1 text-xs h-5">
                           {selectedDifficulty}
                           <button onClick={() => setSelectedDifficulty("all")} className="ml-1 hover:text-destructive">
                             ×
@@ -532,58 +555,56 @@ export default function PromptGeneratorPage() {
             </Card>
 
             {/* Templates Grid */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredTemplates.map((template) => (
                 <Card
                   key={template.id}
-                  className="group cursor-pointer transition-all duration-300 hover:shadow-lg border-2 hover:border-primary/50 bg-background/60 backdrop-blur-sm"
+                  className="cursor-pointer transition-shadow hover:shadow-md"
                   onClick={() => handleTemplateSelect(template)}
                 >
-                  <CardHeader className="pb-4">
+                  <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-sm">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
                           {getTemplateIcon(template.icon)}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-1 mb-2">
-                            {template.name}
-                          </CardTitle>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="outline" className="text-xs border-primary/30">
+                          <CardTitle className="text-sm line-clamp-1 mb-1">{template.name}</CardTitle>
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <Badge variant="outline" className="text-xs h-4 px-1">
                               {template.category}
                             </Badge>
-                            <Badge className={`text-xs border ${getDifficultyColor(template.difficulty)}`}>
+                            <Badge className={`text-xs h-4 px-1 ${getDifficultyColor(template.difficulty)}`}>
                               {template.difficulty}
                             </Badge>
                           </div>
                         </div>
                       </div>
-                      <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+                      <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     </div>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
-                    <CardDescription className="text-sm leading-relaxed line-clamp-3">
+                  <CardContent className="space-y-3">
+                    <CardDescription className="text-xs leading-relaxed line-clamp-2">
                       {template.description}
                     </CardDescription>
 
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1">
                       {template.tags.slice(0, 3).map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
+                        <Badge key={tag} variant="secondary" className="text-xs h-4 px-1">
                           {tag}
                         </Badge>
                       ))}
                       {template.tags.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{template.tags.length - 3} more
+                        <Badge variant="secondary" className="text-xs h-4 px-1">
+                          +{template.tags.length - 3}
                         </Badge>
                       )}
                     </div>
 
                     {/* Examples indicator */}
-                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
                       <div className="flex items-center gap-1">
                         <BookOpen className="h-3 w-3" />
                         <span>
@@ -602,15 +623,15 @@ export default function PromptGeneratorPage() {
 
             {/* No Results State */}
             {filteredTemplates.length === 0 && (
-              <Card className="border-2 border-dashed bg-background/40 backdrop-blur-sm">
-                <CardContent className="p-12 text-center">
-                  <div className="space-y-6">
-                    <div className="w-20 h-20 mx-auto bg-muted/50 rounded-full flex items-center justify-center">
-                      <Search className="h-10 w-10 text-muted-foreground" />
+              <Card className="border-dashed">
+                <CardContent className="p-8 text-center">
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center">
+                      <Search className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-semibold">No templates found</h3>
-                      <p className="text-muted-foreground max-w-md mx-auto">
+                    <div className="space-y-1">
+                      <h3 className="font-medium">No templates found</h3>
+                      <p className="text-sm text-muted-foreground max-w-md mx-auto">
                         Try adjusting your search criteria or filters to find what you're looking for.
                       </p>
                     </div>
@@ -621,7 +642,8 @@ export default function PromptGeneratorPage() {
                         setSelectedCategory("all")
                         setSelectedDifficulty("all")
                       }}
-                      className="h-10"
+                      size="sm"
+                      className="h-8"
                     >
                       Clear all filters
                     </Button>
@@ -632,16 +654,13 @@ export default function PromptGeneratorPage() {
           </TabsContent>
 
           {/* Recent Prompts Tab */}
-          <TabsContent value="recent" className="space-y-8">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <TabsContent value="recent" className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {recentPrompts.slice(0, 12).map((prompt) => (
-                <Card
-                  key={prompt.id}
-                  className="transition-all duration-300 border-2 hover:shadow-lg bg-background/60 backdrop-blur-sm"
-                >
-                  <CardContent className="p-6 space-y-4">
+                <Card key={prompt.id} className="transition-shadow hover:shadow-md">
+                  <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs h-5 px-2">
                         {prompt.category}
                       </Badge>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -650,10 +669,8 @@ export default function PromptGeneratorPage() {
                       </div>
                     </div>
 
-                    <div className="bg-muted/30 p-4 rounded-lg border-0">
-                      <pre className="text-xs font-mono leading-relaxed whitespace-pre-wrap line-clamp-6">
-                        {prompt.prompt}
-                      </pre>
+                    <div className="bg-muted p-3 rounded text-xs">
+                      <pre className="font-mono leading-relaxed whitespace-pre-wrap line-clamp-4">{prompt.prompt}</pre>
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -664,7 +681,7 @@ export default function PromptGeneratorPage() {
                           e.stopPropagation()
                           handleCopyPrompt(prompt.prompt)
                         }}
-                        className="h-8"
+                        className="h-7 text-xs px-3"
                       >
                         <Copy className="h-3 w-3 mr-1" />
                         Copy
@@ -673,7 +690,7 @@ export default function PromptGeneratorPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => router.push(`/profiles/create?prompt=${prompt.id}`)}
-                        className="h-8"
+                        className="h-7 text-xs px-3"
                       >
                         <Plus className="h-3 w-3 mr-1" />
                         Create Profile

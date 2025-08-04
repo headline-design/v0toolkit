@@ -106,13 +106,13 @@ export default function CreateProfilePage() {
   const getProfileIcon = (iconName?: string) => {
     switch (iconName) {
       case "UserCog":
-        return <UserCog className="h-4 w-4" />
+        return <UserCog className="h-3 w-3" />
       case "Palette":
-        return <Palette className="h-4 w-4" />
+        return <Palette className="h-3 w-3" />
       case "FileCode":
-        return <FileCode className="h-4 w-4" />
+        return <FileCode className="h-3 w-3" />
       default:
-        return <Users className="h-4 w-4" />
+        return <Users className="h-3 w-3" />
     }
   }
 
@@ -198,14 +198,14 @@ export default function CreateProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-4">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center space-y-4">
-            <div className="w-12 h-12 mx-auto bg-muted rounded-full flex items-center justify-center">
-              <Plus className="h-6 w-6 text-muted-foreground animate-pulse" />
+          <div className="text-center space-y-3">
+            <div className="w-10 h-10 mx-auto bg-muted rounded-lg flex items-center justify-center">
+              <Plus className="h-5 w-5 text-muted-foreground animate-pulse" />
             </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold">Loading Profile Creation...</h3>
+            <div className="space-y-1">
+              <h3 className="font-medium">Loading Profile Creation...</h3>
               <p className="text-sm text-muted-foreground">Setting up your options</p>
             </div>
           </div>
@@ -215,23 +215,23 @@ export default function CreateProfilePage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className="container mx-auto p-4 space-y-6">
       {/* Header */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/profiles")} className="h-9">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={() => router.push("/profiles")} className="h-8">
+            <ArrowLeft className="h-3 w-3 mr-2" />
             Back to Profiles
           </Button>
-          <div className="h-6 w-px bg-border" />
+          <div className="h-4 w-px bg-border" />
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Plus className="h-6 w-6 text-primary" />
+            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <div className="p-1 bg-muted rounded-lg">
+                <Plus className="h-4 w-4" />
               </div>
               Create V0 Profile
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-muted-foreground">
               Create a personalized AI assistant by building on your generated prompts or starting from templates.
             </p>
           </div>
@@ -239,31 +239,31 @@ export default function CreateProfilePage() {
 
         {/* Progress Steps */}
         <Card>
-          <CardContent className="p-6">
-            <div className="space-y-4">
+          <CardContent className="p-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium">Setup Progress</span>
                 <span className="text-muted-foreground">{getCompletionPercentage()}% complete</span>
               </div>
-              <Progress value={getCompletionPercentage()} className="h-2" />
-              <div className="grid grid-cols-3 gap-4 text-xs">
+              <Progress value={getCompletionPercentage()} className="h-1" />
+              <div className="grid grid-cols-3 gap-3 text-xs">
                 <div
                   className={cn(
                     "flex items-center gap-2 p-2 rounded-lg transition-colors",
                     (activeTab === "generated" && selectedGeneratedPrompt) ||
                       (activeTab === "template" && selectedTemplate) ||
                       activeTab === "scratch"
-                      ? "bg-primary/10 text-primary"
+                      ? "bg-muted text-foreground"
                       : "bg-muted/50 text-muted-foreground",
                   )}
                 >
                   <div
                     className={cn(
-                      "w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold",
+                      "w-3 h-3 rounded-full flex items-center justify-center text-xs font-bold",
                       (activeTab === "generated" && selectedGeneratedPrompt) ||
                         (activeTab === "template" && selectedTemplate) ||
                         activeTab === "scratch"
-                        ? "bg-primary text-primary-foreground"
+                        ? "bg-foreground text-background"
                         : "bg-muted-foreground text-background",
                     )}
                   >
@@ -274,13 +274,13 @@ export default function CreateProfilePage() {
                 <div
                   className={cn(
                     "flex items-center gap-2 p-2 rounded-lg transition-colors",
-                    profileName.trim() ? "bg-primary/10 text-primary" : "bg-muted/50 text-muted-foreground",
+                    profileName.trim() ? "bg-muted text-foreground" : "bg-muted/50 text-muted-foreground",
                   )}
                 >
                   <div
                     className={cn(
-                      "w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold",
-                      profileName.trim() ? "bg-primary text-primary-foreground" : "bg-muted-foreground text-background",
+                      "w-3 h-3 rounded-full flex items-center justify-center text-xs font-bold",
+                      profileName.trim() ? "bg-foreground text-background" : "bg-muted-foreground text-background",
                     )}
                   >
                     2
@@ -290,13 +290,13 @@ export default function CreateProfilePage() {
                 <div
                   className={cn(
                     "flex items-center gap-2 p-2 rounded-lg transition-colors",
-                    canProceed() ? "bg-primary/10 text-primary" : "bg-muted/50 text-muted-foreground",
+                    canProceed() ? "bg-muted text-foreground" : "bg-muted/50 text-muted-foreground",
                   )}
                 >
                   <div
                     className={cn(
-                      "w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold",
-                      canProceed() ? "bg-primary text-primary-foreground" : "bg-muted-foreground text-background",
+                      "w-3 h-3 rounded-full flex items-center justify-center text-xs font-bold",
+                      canProceed() ? "bg-foreground text-background" : "bg-muted-foreground text-background",
                     )}
                   >
                     3
@@ -309,25 +309,28 @@ export default function CreateProfilePage() {
         </Card>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3">
         {/* Profile Configuration */}
-        <div className="lg:col-span-1 space-y-6">
-          <Card className="sticky top-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
+        <div className="lg:col-span-1 space-y-4">
+          <Card className="sticky top-4">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Settings className="h-4 w-4" />
                 Profile Details
               </CardTitle>
-              <CardDescription>Configure your new V0 profile</CardDescription>
+              <CardDescription className="text-sm">Configure your new V0 profile</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="profileName">Profile Name *</Label>
+                <Label htmlFor="profileName" className="text-sm">
+                  Profile Name *
+                </Label>
                 <Input
                   id="profileName"
                   placeholder="e.g., Bob, Alice, DevRel Expert..."
                   value={profileName}
                   onChange={(e) => setProfileName(e.target.value)}
+                  className="h-8"
                 />
                 <p className="text-xs text-muted-foreground">
                   This will be the name of your AI assistant (e.g., "Your name is Bob...")
@@ -335,26 +338,29 @@ export default function CreateProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="profileDescription">Description</Label>
+                <Label htmlFor="profileDescription" className="text-sm">
+                  Description
+                </Label>
                 <Textarea
                   id="profileDescription"
                   placeholder="Describe what this profile is for..."
                   value={profileDescription}
                   onChange={(e) => setProfileDescription(e.target.value)}
                   rows={3}
+                  className="text-sm"
                 />
               </div>
 
               {/* Avatar Preview */}
               {profileName && (
                 <div className="space-y-2">
-                  <Label>Avatar Preview</Label>
-                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                    <Avatar className="h-12 w-12 border-2 border-background shadow-lg">
+                  <Label className="text-sm">Avatar Preview</Label>
+                  <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+                    <Avatar className="h-8 w-8">
                       <AvatarImage
                         src={`https://avatar.vercel.sh/preview-${profileName.toLowerCase().replace(/\s+/g, "-")}?size=400`}
                       />
-                      <AvatarFallback className="text-white font-bold text-sm bg-gradient-to-br from-primary to-primary/80">
+                      <AvatarFallback className="text-xs font-medium">
                         {profileName
                           .split(" ")
                           .map((word) => word[0])
@@ -363,16 +369,16 @@ export default function CreateProfilePage() {
                           .slice(0, 2)}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="text-sm text-muted-foreground">Your profile will have a unique gradient avatar</div>
+                    <div className="text-xs text-muted-foreground">Your profile will have a unique avatar</div>
                   </div>
                 </div>
               )}
 
               {/* Preview */}
               {profileName && (
-                <div className="p-4 bg-muted/50 rounded-lg space-y-2">
-                  <div className="text-sm font-medium">Preview:</div>
-                  <div className="text-sm text-muted-foreground">
+                <div className="p-3 bg-muted/50 rounded-lg space-y-1">
+                  <div className="text-xs font-medium">Preview:</div>
+                  <div className="text-xs text-muted-foreground">
                     "Your name is {profileName}.{" "}
                     {selectedGeneratedPrompt
                       ? selectedGeneratedPrompt.prompt.slice(0, 100) + "..."
@@ -384,26 +390,31 @@ export default function CreateProfilePage() {
                 </div>
               )}
 
-              <Button onClick={handleCreateProfile} disabled={isCreating || !canProceed()} className="w-full" size="lg">
+              <Button
+                onClick={handleCreateProfile}
+                disabled={isCreating || !canProceed()}
+                className="w-full h-8"
+                size="sm"
+              >
                 {isCreating ? (
                   <div className="flex items-center">
-                    <div className="w-4 h-4 mr-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <div className="w-3 h-3 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     Creating Profile...
                   </div>
                 ) : (
                   <div className="flex items-center">
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-3 w-3 mr-2" />
                     Create Profile
                   </div>
                 )}
               </Button>
 
               {!canProceed() && (
-                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-amber-800">
+                <div className="flex items-start gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <AlertCircle className="h-3 w-3 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-xs text-yellow-800">
                     <p className="font-medium mb-1">Complete these steps:</p>
-                    <ul className="text-xs space-y-1">
+                    <ul className="text-xs space-y-0.5">
                       {!(
                         (activeTab === "generated" && selectedGeneratedPrompt) ||
                         (activeTab === "template" && selectedTemplate) ||
@@ -420,55 +431,55 @@ export default function CreateProfilePage() {
 
         {/* Base Selection */}
         <div className="lg:col-span-2">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="generated" className="flex items-center gap-2">
-                <Wand2 className="h-4 w-4" />
-                Generated Prompts ({generatedPrompts.length})
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="space-y-4">
+            <TabsList className="grid w-full grid-cols-3 h-9">
+              <TabsTrigger value="generated" className="flex items-center gap-2 text-xs">
+                <Wand2 className="h-3 w-3" />
+                Generated ({generatedPrompts.length})
               </TabsTrigger>
-              <TabsTrigger value="template" className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
+              <TabsTrigger value="template" className="flex items-center gap-2 text-xs">
+                <Sparkles className="h-3 w-3" />
                 Templates ({templates.length})
               </TabsTrigger>
-              <TabsTrigger value="scratch" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
+              <TabsTrigger value="scratch" className="flex items-center gap-2 text-xs">
+                <FileText className="h-3 w-3" />
                 From Scratch
               </TabsTrigger>
             </TabsList>
 
             {/* Generated Prompts Tab */}
-            <TabsContent value="generated" className="space-y-6">
+            <TabsContent value="generated" className="space-y-4">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Wand2 className="h-5 w-5" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Wand2 className="h-4 w-4" />
                     Build on Generated Prompts
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     Select a prompt you've generated to use as the foundation for your V0 profile. Your profile will
                     build on top of this prompt with additional traits and tasks.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   {generatedPrompts.length === 0 ? (
-                    <div className="text-center py-12 space-y-4">
-                      <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
-                        <Wand2 className="h-8 w-8 text-muted-foreground" />
+                    <div className="text-center py-8 space-y-3">
+                      <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center">
+                        <Wand2 className="h-6 w-6 text-muted-foreground" />
                       </div>
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-semibold">No generated prompts yet</h3>
-                        <p className="text-muted-foreground max-w-md mx-auto">
+                      <div className="space-y-1">
+                        <h3 className="font-medium">No generated prompts yet</h3>
+                        <p className="text-sm text-muted-foreground max-w-md mx-auto">
                           Create some prompts using the Prompt Generator first, then come back to build profiles on top
                           of them.
                         </p>
                       </div>
-                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Button onClick={() => router.push("/prompt-generator")}>
-                          <Wand2 className="h-4 w-4 mr-2" />
+                      <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                        <Button onClick={() => router.push("/prompt-generator")} size="sm" className="h-8">
+                          <Wand2 className="h-3 w-3 mr-2" />
                           Go to Prompt Generator
                         </Button>
-                        <Button variant="outline" onClick={() => setActiveTab("template")}>
-                          <Sparkles className="h-4 w-4 mr-2" />
+                        <Button variant="outline" onClick={() => setActiveTab("template")} size="sm" className="h-8">
+                          <Sparkles className="h-3 w-3 mr-2" />
                           Use Templates Instead
                         </Button>
                       </div>
@@ -476,20 +487,20 @@ export default function CreateProfilePage() {
                   ) : (
                     <>
                       {/* Search and Filters */}
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <div className="relative">
-                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                           <Input
                             placeholder="Search generated prompts..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10"
+                            className="pl-8 h-8 text-sm"
                           />
                         </div>
 
-                        <div className="flex gap-4">
+                        <div className="flex gap-3">
                           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                            <SelectTrigger className="w-[200px]">
+                            <SelectTrigger className="w-[160px] h-8">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -504,25 +515,25 @@ export default function CreateProfilePage() {
                       </div>
 
                       {/* Generated Prompts List */}
-                      <ScrollArea className="h-[500px]">
-                        <div className="space-y-3">
+                      <ScrollArea className="h-[400px]">
+                        <div className="space-y-2">
                           {filteredGeneratedPrompts.map((prompt) => (
                             <Card
                               key={prompt.id}
                               className={cn(
-                                "cursor-pointer transition-all duration-200 hover:shadow-md",
+                                "cursor-pointer transition-shadow hover:shadow-md",
                                 selectedGeneratedPrompt?.id === prompt.id
-                                  ? "border-primary bg-primary/5"
-                                  : "hover:border-primary/50",
+                                  ? "border-foreground bg-muted/50"
+                                  : "hover:border-muted-foreground",
                               )}
                               onClick={() => setSelectedGeneratedPrompt(prompt)}
                             >
-                              <CardContent className="p-4">
-                                <div className="space-y-3">
+                              <CardContent className="p-3">
+                                <div className="space-y-2">
                                   <div className="flex items-start justify-between">
                                     <div className="space-y-1 flex-1">
                                       <div className="flex items-center gap-2">
-                                        <Badge variant="outline" className="text-xs">
+                                        <Badge variant="outline" className="text-xs h-4 px-1">
                                           {prompt.category}
                                         </Badge>
                                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -530,10 +541,10 @@ export default function CreateProfilePage() {
                                           {prompt.createdAt.toLocaleDateString()}
                                         </div>
                                       </div>
-                                      <div className="text-sm text-muted-foreground line-clamp-3">{prompt.prompt}</div>
+                                      <div className="text-xs text-muted-foreground line-clamp-2">{prompt.prompt}</div>
                                     </div>
                                     {selectedGeneratedPrompt?.id === prompt.id && (
-                                      <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 ml-2" />
+                                      <CheckCircle className="h-4 w-4 text-foreground flex-shrink-0 ml-2" />
                                     )}
                                   </div>
 
@@ -541,12 +552,12 @@ export default function CreateProfilePage() {
                                   {prompt.tags && prompt.tags.length > 0 && (
                                     <div className="flex flex-wrap gap-1">
                                       {prompt.tags.slice(0, 3).map((tag) => (
-                                        <Badge key={tag} variant="secondary" className="text-xs">
+                                        <Badge key={tag} variant="secondary" className="text-xs h-4 px-1">
                                           {tag}
                                         </Badge>
                                       ))}
                                       {prompt.tags.length > 3 && (
-                                        <Badge variant="secondary" className="text-xs">
+                                        <Badge variant="secondary" className="text-xs h-4 px-1">
                                           +{prompt.tags.length - 3} more
                                         </Badge>
                                       )}
@@ -565,38 +576,38 @@ export default function CreateProfilePage() {
             </TabsContent>
 
             {/* Templates Tab */}
-            <TabsContent value="template" className="space-y-6">
+            <TabsContent value="template" className="space-y-4">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Sparkles className="h-4 w-4" />
                     Start from Template
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     Choose from pre-built profile templates with suggested traits and tasks.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid gap-3 md:grid-cols-2">
                     {templates.map((template) => (
                       <Card
                         key={template.id}
                         className={cn(
-                          "cursor-pointer transition-all duration-200 hover:shadow-md",
+                          "cursor-pointer transition-shadow hover:shadow-md",
                           selectedTemplate?.id === template.id
-                            ? "border-primary bg-primary/5"
-                            : "hover:border-primary/50",
+                            ? "border-foreground bg-muted/50"
+                            : "hover:border-muted-foreground",
                         )}
                         onClick={() => setSelectedTemplate(template)}
                       >
-                        <CardHeader className="pb-3">
+                        <CardHeader className="pb-2">
                           <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 bg-primary/10 rounded-lg">{getProfileIcon(template.icon)}</div>
+                            <div className="flex items-center gap-2">
+                              <div className="p-1 bg-muted rounded-lg">{getProfileIcon(template.icon)}</div>
                               <div>
-                                <CardTitle className="text-base">{template.name}</CardTitle>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge variant="outline" className="text-xs">
+                                <CardTitle className="text-sm">{template.name}</CardTitle>
+                                <div className="flex items-center gap-1 mt-1">
+                                  <Badge variant="outline" className="text-xs h-4 px-1">
                                     {template.category}
                                   </Badge>
                                   <Badge
@@ -607,7 +618,7 @@ export default function CreateProfilePage() {
                                           ? "secondary"
                                           : "destructive"
                                     }
-                                    className="text-xs"
+                                    className="text-xs h-4 px-1"
                                   >
                                     {template.difficulty}
                                   </Badge>
@@ -615,15 +626,15 @@ export default function CreateProfilePage() {
                               </div>
                             </div>
                             {selectedTemplate?.id === template.id && (
-                              <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                              <CheckCircle className="h-4 w-4 text-foreground flex-shrink-0" />
                             )}
                           </div>
                         </CardHeader>
-                        <CardContent className="space-y-3">
-                          <CardDescription className="text-sm line-clamp-2">{template.description}</CardDescription>
+                        <CardContent className="space-y-2">
+                          <CardDescription className="text-xs line-clamp-2">{template.description}</CardDescription>
 
                           <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
                               <div className="flex items-center gap-1">
                                 <Zap className="h-3 w-3" />
                                 <span>{template.suggestedTraits.length} traits</span>
@@ -637,12 +648,12 @@ export default function CreateProfilePage() {
 
                           <div className="flex flex-wrap gap-1">
                             {template.tags.slice(0, 3).map((tag) => (
-                              <Badge key={tag} variant="outline" className="text-xs">
+                              <Badge key={tag} variant="outline" className="text-xs h-4 px-1">
                                 {tag}
                               </Badge>
                             ))}
                             {template.tags.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs h-4 px-1">
                                 +{template.tags.length - 3}
                               </Badge>
                             )}
@@ -656,28 +667,30 @@ export default function CreateProfilePage() {
             </TabsContent>
 
             {/* From Scratch Tab */}
-            <TabsContent value="scratch" className="space-y-6">
+            <TabsContent value="scratch" className="space-y-4">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <FileText className="h-4 w-4" />
                     Create from Scratch
                   </CardTitle>
-                  <CardDescription>Start with a blank profile and build everything from the ground up.</CardDescription>
+                  <CardDescription className="text-sm">
+                    Start with a blank profile and build everything from the ground up.
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-6 bg-muted/30 rounded-lg text-center space-y-4">
-                    <div className="w-16 h-16 mx-auto bg-background rounded-full flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
-                      <FileText className="h-8 w-8 text-muted-foreground" />
+                <CardContent className="space-y-3">
+                  <div className="p-4 bg-muted/30 rounded-lg text-center space-y-3">
+                    <div className="w-12 h-12 mx-auto bg-background rounded-lg flex items-center justify-center border border-dashed border-muted-foreground/30">
+                      <FileText className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="font-semibold">Blank Canvas</h3>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="space-y-1">
+                      <h3 className="font-medium">Blank Canvas</h3>
+                      <p className="text-xs text-muted-foreground">
                         Create a completely custom profile with your own base prompt, traits, and tasks. Perfect for
                         specialized use cases or when you want full control.
                       </p>
                     </div>
-                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
                       <AlertCircle className="h-3 w-3" />
                       <span>You'll be able to customize everything after creation</span>
                     </div>

@@ -107,24 +107,24 @@ export function AdvancedSearch({
   )
 
   return (
-    <div className={cn("relative w-full max-w-2xl", className)}>
+    <div className={cn("relative w-full max-w-xl", className)}>
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="pl-10 pr-10 h-12 text-base bg-background border-border"
+          className="pl-8 pr-8 h-9 text-sm bg-background border-border"
         />
         {query && (
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setQuery("")}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted"
+            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-5 w-5 p-0 hover:bg-muted"
           >
             <X className="h-3 w-3" />
           </Button>
@@ -133,13 +133,13 @@ export function AdvancedSearch({
 
       {/* Active Filters */}
       {selectedFilters.length > 0 && (
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
-          <Filter className="h-4 w-4 text-muted-foreground" />
+        <div className="flex items-center gap-2 mt-2 flex-wrap">
+          <Filter className="h-3 w-3 text-muted-foreground" />
           {selectedFilters.map((filter) => (
             <Badge
               key={filter}
               variant="secondary"
-              className="cursor-pointer hover:bg-muted"
+              className="cursor-pointer hover:bg-muted text-xs h-5 px-2"
               onClick={() => toggleFilter(filter)}
             >
               {filter}
@@ -150,7 +150,7 @@ export function AdvancedSearch({
             variant="ghost"
             size="sm"
             onClick={clearFilters}
-            className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+            className="h-5 px-2 text-xs text-muted-foreground hover:text-foreground"
           >
             Clear all
           </Button>
@@ -161,15 +161,15 @@ export function AdvancedSearch({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <Card className="absolute top-full left-0 right-0 mt-2 z-20 border border-border bg-background shadow-lg">
+          <Card className="absolute top-full left-0 right-0 mt-2 z-20 border border-border bg-background">
             <CardContent className="p-0">
-              <ScrollArea className="max-h-96">
-                <div className="p-4 space-y-4">
+              <ScrollArea className="max-h-80">
+                <div className="p-3 space-y-3">
                   {/* Recent Searches */}
                   {recentSuggestions.length > 0 && !query && (
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <Clock className="h-3 w-3 text-muted-foreground" />
                         <span className="text-sm font-medium text-muted-foreground">Recent</span>
                       </div>
                       <div className="space-y-1">
@@ -177,11 +177,11 @@ export function AdvancedSearch({
                           <button
                             key={suggestion.id}
                             onClick={() => handleSuggestionClick(suggestion)}
-                            className="w-full text-left px-3 py-2 rounded-md hover:bg-muted/50 transition-colors"
+                            className="w-full text-left px-2 py-1 rounded-md hover:bg-muted/50 transition-colors"
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm text-foreground">{suggestion.text}</span>
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs h-4 px-1">
                                 {suggestion.category}
                               </Badge>
                             </div>
@@ -195,7 +195,7 @@ export function AdvancedSearch({
                   {filteredSuggestions.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <Tag className="h-4 w-4 text-muted-foreground" />
+                        <Tag className="h-3 w-3 text-muted-foreground" />
                         <span className="text-sm font-medium text-muted-foreground">
                           {query ? "Suggestions" : "Popular"}
                         </span>
@@ -205,11 +205,14 @@ export function AdvancedSearch({
                           <button
                             key={suggestion.id}
                             onClick={() => handleSuggestionClick(suggestion)}
-                            className="w-full text-left px-3 py-2 rounded-md hover:bg-muted/50 transition-colors"
+                            className="w-full text-left px-2 py-1 rounded-md hover:bg-muted/50 transition-colors"
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm text-foreground">{suggestion.text}</span>
-                              <Badge variant={suggestion.type === "tag" ? "default" : "outline"} className="text-xs">
+                              <Badge
+                                variant={suggestion.type === "tag" ? "default" : "outline"}
+                                className="text-xs h-4 px-1"
+                              >
                                 {suggestion.category}
                               </Badge>
                             </div>
@@ -221,9 +224,9 @@ export function AdvancedSearch({
 
                   {/* No Results */}
                   {query && filteredSuggestions.length === 0 && (
-                    <div className="text-center py-6">
+                    <div className="text-center py-4">
                       <p className="text-sm text-muted-foreground">No suggestions found for "{query}"</p>
-                      <Button variant="ghost" size="sm" onClick={() => handleSearch()} className="mt-2">
+                      <Button variant="ghost" size="sm" onClick={() => handleSearch()} className="mt-2 h-6 text-xs">
                         Search anyway
                       </Button>
                     </div>

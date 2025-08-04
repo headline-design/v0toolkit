@@ -1,98 +1,52 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { Menu, X, Code2, Users, Home } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ThemeToggle } from "./theme-toggle"
+import { Bot, FileText, Layers3, Palette } from "lucide-react"
 
 const navigation = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Prompt Generator", href: "/prompt-generator", icon: Code2 },
-  { name: "Profiles", href: "/profiles", icon: Users },
+  { name: "Slate", href: "/slate", icon: Palette },
+  { name: "Profiles", href: "/profiles", icon: FileText },
+  { name: "Prompt Generator", href: "/prompt-generator", icon: Layers3 },
 ]
 
 export function Navigation() {
-  const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background ">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Code2 className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-semibold">V0 Toolkit</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
-                  )}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.name}</span>
-                </Link>
-              )
-            })}
-          </div>
-
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            <ThemeToggle />
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-2">
-            <ThemeToggle />
-            <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden border-t">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+    <nav className="border-b bg-background/95 backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-12 items-center justify-between">
+          <div className="flex items-center space-x-6">
+            <Link href="/" className="flex items-center space-x-2">
+              <Bot className="h-5 w-5" />
+              <span className="text-sm font-semibold">v0 Toolkit</span>
+            </Link>
+            <div className="flex space-x-4">
               {navigation.map((item) => {
-                const isActive = pathname === item.href
+                const Icon = item.icon
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={() => setIsOpen(false)}
                     className={cn(
-                      "flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium",
-                      isActive
-                        ? "bg-accent text-accent-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
+                      "flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-md transition-colors",
+                      pathname === item.href
+                        ? "bg-muted text-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
                     )}
                   >
-                    <item.icon className="w-5 h-5" />
+                    <Icon className="h-3 w-3" />
                     <span>{item.name}</span>
                   </Link>
                 )
               })}
-              
             </div>
           </div>
-        )}
+          <ThemeToggle />
+        </div>
       </div>
     </nav>
   )

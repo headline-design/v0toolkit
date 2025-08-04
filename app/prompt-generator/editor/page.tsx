@@ -37,11 +37,11 @@ import {
 function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
-      <SidebarHeader className="border-sidebar-border h-16 border-b">
-        <div className="p-4 flex items-center justify-between">
+      <SidebarHeader className="border-sidebar-border h-12 border-b">
+        <div className="p-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <HelpCircle className="h-5 w-5" />
-            <h2 className="font-semibold">Assistant</h2>
+            <HelpCircle className="h-4 w-4" />
+            <h2 className="font-medium text-sm">Assistant</h2>
           </div>
         </div>
       </SidebarHeader>
@@ -94,23 +94,23 @@ export default function PromptGeneratorEditorPage() {
   // Show loading state while templates are loading or template is being selected
   if (isLoading || !selectedTemplate) {
     return (
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-4">
         <div className="flex items-center justify-center min-h-[60vh]">
           <Card className="w-full max-w-md">
-            <CardContent className="p-8 text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-muted rounded-full flex items-center justify-center">
-                <Sparkles className="h-6 w-6 text-muted-foreground animate-pulse" />
+            <CardContent className="p-6 text-center space-y-3">
+              <div className="w-10 h-10 mx-auto bg-muted rounded-lg flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-muted-foreground animate-pulse" />
               </div>
-              <div className="space-y-2">
-                <h3 className="font-semibold">Loading Template...</h3>
+              <div className="space-y-1">
+                <h3 className="font-medium">Loading Template...</h3>
                 <p className="text-sm text-muted-foreground">
                   {templateId
                     ? "Preparing your selected template"
                     : "Please select a template to start generating prompts"}
                 </p>
               </div>
-              <Button onClick={() => router.push("/prompt-generator")} className="w-full">
-                <ArrowLeft className="h-4 w-4 mr-2" />
+              <Button onClick={() => router.push("/prompt-generator")} className="w-full h-8" size="sm">
+                <ArrowLeft className="h-3 w-3 mr-2" />
                 {templateId ? "Back to Templates" : "Select a Template"}
               </Button>
             </CardContent>
@@ -128,18 +128,18 @@ export default function PromptGeneratorEditorPage() {
     <SidebarProvider
       style={
         {
-          "--sidebar-width": "350px",
+          "--sidebar-width": "300px",
         } as React.CSSProperties
       }
     >
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <div className="flex items-center gap-4 flex-1">
-            <Button variant="ghost" size="sm" onClick={handleBack} className="h-9">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+          <div className="flex items-center gap-3 flex-1">
+            <Button variant="ghost" size="sm" onClick={handleBack} className="h-7">
+              <ArrowLeft className="h-3 w-3 mr-2" />
               Back
             </Button>
-            <div className="h-6 w-px bg-border" />
+            <div className="h-4 w-px bg-border" />
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -157,19 +157,19 @@ export default function PromptGeneratorEditorPage() {
 
         {/* Template Info Banner */}
         <div className="border-b bg-muted/30">
-          <div className="container mx-auto p-4">
+          <div className="container mx-auto p-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Target className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-muted rounded-lg flex items-center justify-center">
+                  <Target className="h-3 w-3" />
                 </div>
                 <div>
-                  <h2 className="font-semibold">{selectedTemplate.name}</h2>
-                  <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
+                  <h2 className="font-medium text-sm">{selectedTemplate.name}</h2>
+                  <p className="text-xs text-muted-foreground">{selectedTemplate.description}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs flex-shrink-0">
+                <Badge variant="outline" className="text-xs h-5 px-2">
                   {selectedTemplate.category}
                 </Badge>
                 <Badge
@@ -180,7 +180,7 @@ export default function PromptGeneratorEditorPage() {
                         ? "secondary"
                         : "destructive"
                   }
-                  className="text-xs flex-shrink-0"
+                  className="text-xs h-5 px-2"
                 >
                   {selectedTemplate.difficulty}
                 </Badge>
@@ -197,11 +197,11 @@ export default function PromptGeneratorEditorPage() {
 
         {/* Main Content Layout */}
         <div className="flex-1 min-w-0 overflow-auto">
-          <div className="p-4 lg:p-6 space-y-6">
+          <div className="p-4 space-y-4">
             {/* Quick Tips */}
-            <Alert className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200">
-              <Lightbulb className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800 dark:text-blue-200">
+            <Alert className="bg-blue-50 border-blue-200">
+              <Lightbulb className="h-3 w-3 text-blue-600" />
+              <AlertDescription className="text-blue-800 text-sm">
                 <strong>Quick Tips:</strong> Fill in all required fields to generate your prompt. Use the examples
                 dropdown to load pre-configured settings, and check the assistant panel for help and guidance.
               </AlertDescription>

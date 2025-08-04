@@ -33,6 +33,7 @@ import {
   ChevronRight,
   Clock,
   Target,
+  Activity,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -44,9 +45,11 @@ import {
 import { v0ProfileService } from "@/lib/services/v0-profile-service"
 import type { V0Profile, ProfileTemplate } from "@/lib/types/v0-profile"
 import { ProfileEditDialog } from "@/components/profile-edit-dialog"
+import { useToast } from "@/hooks/use-toast"
 
 export default function V0ProfilesPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [profiles, setProfiles] = useState<V0Profile[]>([])
   const [templates, setTemplates] = useState<ProfileTemplate[]>([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -105,13 +108,13 @@ export default function V0ProfilesPage() {
   const getProfileIcon = (iconName?: string) => {
     switch (iconName) {
       case "UserCog":
-        return <UserCog className="h-4 w-4" />
+        return <UserCog className="h-3 w-3" />
       case "Palette":
-        return <Palette className="h-4 w-4" />
+        return <Palette className="h-3 w-3" />
       case "FileCode":
-        return <FileCode className="h-4 w-4" />
+        return <FileCode className="h-3 w-3" />
       default:
-        return <Users className="h-4 w-4" />
+        return <Users className="h-3 w-3" />
     }
   }
 
@@ -121,10 +124,6 @@ export default function V0ProfilesPage() {
     } else {
       router.push("/profiles/create")
     }
-  }
-
-  const handleEditProfile = (profile: V0Profile) => {
-    // This will be handled by the ProfileEditDialog component
   }
 
   const handleUseProfile = (profileId: string) => {
@@ -137,24 +136,52 @@ export default function V0ProfilesPage() {
 
   const handleDeleteProfile = async (profileId: string) => {
     if (confirm("Are you sure you want to delete this profile?")) {
-      v0ProfileService.deleteProfile(profileId)
-      setProfiles(profiles.filter((p) => p.id !== profileId))
+      try {
+        v0ProfileService.deleteProfile(profileId)
+        setProfiles(profiles.filter((p) => p.id !== profileId))
+        toast({
+          title: "Profile Deleted",
+          description: "Profile has been successfully deleted",
+          duration: 3000,
+        })
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete profile",
+          variant: "destructive",
+          duration: 3000,
+        })
+      }
     }
   }
 
   const handleDuplicateProfile = (profile: V0Profile) => {
-    const duplicatedProfile: V0Profile = {
-      ...profile,
-      id: `profile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name: `${profile.name} Copy`,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      usageCount: 0,
-      lastUsed: undefined,
-    }
+    try {
+      const duplicatedProfile: V0Profile = {
+        ...profile,
+        id: `profile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: `${profile.name} Copy`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        usageCount: 0,
+        lastUsed: undefined,
+      }
 
-    v0ProfileService.saveProfile(duplicatedProfile)
-    setProfiles([...profiles, duplicatedProfile])
+      v0ProfileService.saveProfile(duplicatedProfile)
+      setProfiles([duplicatedProfile, ...profiles])
+      toast({
+        title: "Profile Duplicated",
+        description: `${duplicatedProfile.name} has been created`,
+        duration: 3000,
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to duplicate profile",
+        variant: "destructive",
+        duration: 3000,
+      })
+    }
   }
 
   const getInitials = (name: string) => {
@@ -171,15 +198,15 @@ export default function V0ProfilesPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen">
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto p-4">
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
-                <Users className="h-8 w-8 text-muted-foreground animate-pulse" />
+              <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center">
+                <Users className="h-6 w-6 text-muted-foreground animate-pulse" />
               </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold">Loading V0 Profiles...</h3>
-                <p className="text-muted-foreground">Setting up your personalized AI assistants</p>
+              <div className="space-y-1">
+                <h3 className="text-lg font-medium">Loading V0 Profiles...</h3>
+                <p className="text-sm text-muted-foreground">Setting up your personalized AI assistants</p>
               </div>
             </div>
           </div>
@@ -192,11 +219,11 @@ export default function V0ProfilesPage() {
   if (profiles.length === 0) {
     return (
       <div className="min-h-screen">
-        <div className="container mx-auto p-6 space-y-8">
+        <div className="container mx-auto p-4 space-y-8">
           {/* Header */}
-          <div className="text-center space-y-4">
-            <div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-              <Users className="h-10 w-10 text-primary" />
+          <div className="text-center space-y-6 py-8">
+            <div className="w-16 h-16 mx-auto bg-foreground rounded-lg flex items-center justify-center">
+              <Users className="h-8 w-8 text-background" />
             </div>
             <div className="space-y-2">
               <h1 className="text-3xl font-bold tracking-tight">Welcome to V0 Profiles</h1>
@@ -209,27 +236,27 @@ export default function V0ProfilesPage() {
           {/* Onboarding Steps */}
           <div className="max-w-4xl mx-auto">
             <div className="grid gap-6 md:grid-cols-3">
-              <Card className="text-center p-6">
-                <div className="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                  <Target className="h-6 w-6 text-blue-600" />
+              <Card className="text-center p-6 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4">
+                  <Target className="h-6 w-6" />
                 </div>
                 <h3 className="font-semibold mb-2">1. Choose Your Base</h3>
                 <p className="text-sm text-muted-foreground">
                   Start with a generated prompt from our Prompt Generator or use a pre-built template
                 </p>
               </Card>
-              <Card className="text-center p-6">
-                <div className="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <Settings className="h-6 w-6 text-green-600" />
+              <Card className="text-center p-6 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4">
+                  <Settings className="h-6 w-6" />
                 </div>
                 <h3 className="font-semibold mb-2">2. Customize Traits</h3>
                 <p className="text-sm text-muted-foreground">
                   Add personality traits and specialized knowledge to make your assistant unique
                 </p>
               </Card>
-              <Card className="text-center p-6">
-                <div className="w-12 h-12 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                  <Zap className="h-6 w-6 text-purple-600" />
+              <Card className="text-center p-6 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4">
+                  <Zap className="h-6 w-6" />
                 </div>
                 <h3 className="font-semibold mb-2">3. Start Using</h3>
                 <p className="text-sm text-muted-foreground">
@@ -242,18 +269,18 @@ export default function V0ProfilesPage() {
           {/* Quick Start Options */}
           <div className="max-w-2xl mx-auto space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-semibold mb-2">Get Started</h2>
+              <h2 className="text-2xl font-semibold mb-2">Get Started</h2>
               <p className="text-muted-foreground">Choose how you'd like to create your first profile</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <Card
-                className="cursor-pointer hover:shadow-md transition-all duration-200 border-2 hover:border-primary/50"
+                className="cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => router.push("/prompt-generator")}
               >
                 <CardContent className="p-6 text-center space-y-4">
-                  <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                    <Sparkles className="h-6 w-6 text-primary" />
+                  <div className="w-12 h-12 mx-auto bg-foreground rounded-lg flex items-center justify-center">
+                    <Sparkles className="h-6 w-6 text-background" />
                   </div>
                   <div className="space-y-2">
                     <h3 className="font-semibold">Generate a Prompt First</h3>
@@ -261,20 +288,17 @@ export default function V0ProfilesPage() {
                       Create a specialized prompt using our generator, then build a profile on top of it
                     </p>
                   </div>
-                  <Button className="w-full">
+                  <Button className="w-full h-8">
                     Start with Prompt Generator
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    <ArrowRight className="h-3 w-3 ml-2" />
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card
-                className="cursor-pointer hover:shadow-md transition-all duration-200 border-2 hover:border-primary/50"
-                onClick={() => handleCreateProfile()}
-              >
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleCreateProfile()}>
                 <CardContent className="p-6 text-center space-y-4">
-                  <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                    <Users className="h-6 w-6 text-primary" />
+                  <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center">
+                    <Users className="h-6 w-6" />
                   </div>
                   <div className="space-y-2">
                     <h3 className="font-semibold">Use a Template</h3>
@@ -282,9 +306,9 @@ export default function V0ProfilesPage() {
                       Start with a pre-built template designed for common V0 workflows
                     </p>
                   </div>
-                  <Button variant="outline" className="w-full bg-transparent">
+                  <Button variant="outline" className="w-full h-8 bg-transparent">
                     Browse Templates
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    <ArrowRight className="h-3 w-3 ml-2" />
                   </Button>
                 </CardContent>
               </Card>
@@ -297,18 +321,18 @@ export default function V0ProfilesPage() {
                 {templates.slice(0, 2).map((template) => (
                   <Card
                     key={template.id}
-                    className="cursor-pointer hover:shadow-md transition-all duration-200"
+                    className="cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => handleCreateProfile(template)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
                             {getProfileIcon(template.icon)}
                           </div>
                           <div>
-                            <h4 className="font-medium">{template.name}</h4>
-                            <p className="text-sm text-muted-foreground">{template.description}</p>
+                            <h4 className="font-medium text-sm">{template.name}</h4>
+                            <p className="text-xs text-muted-foreground">{template.description}</p>
                           </div>
                         </div>
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -326,26 +350,26 @@ export default function V0ProfilesPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto p-6 space-y-8">
+      <div className="container mx-auto p-4 space-y-6">
         {/* Header Section */}
-        <div className="space-y-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-3">
+        <div className="space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <div>
-                  <h1 className="text-3xl font-bold tracking-tight">V0 Profiles</h1>
+                  <h1 className="text-2xl font-bold tracking-tight">V0 Profiles</h1>
                   <p className="text-muted-foreground">Personalized AI assistants for every workflow</p>
                 </div>
               </div>
-              <p className="text-lg text-muted-foreground max-w-3xl leading-relaxed">
+              <p className="text-muted-foreground max-w-3xl">
                 Create and manage personalized AI assistants based on expert templates. Each profile can have custom
                 traits, tasks, and specialized knowledge for different V0 use cases.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Button onClick={() => handleCreateProfile()} size="lg" className="h-12 px-8">
-                <Plus className="h-4 w-4 mr-2" />
+            <div className="flex items-center gap-2">
+              <Button onClick={() => handleCreateProfile()} size="sm" className="h-8 px-6">
+                <Plus className="h-3 w-3 mr-2" />
                 Create Profile
               </Button>
             </div>
@@ -353,81 +377,106 @@ export default function V0ProfilesPage() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="border-2">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-primary mb-1">{profiles.length}</div>
-                <div className="text-sm text-muted-foreground">Total Profiles</div>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
+                    <Users className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="text-2xl font-bold mb-1">{profiles.length}</div>
+                <div className="text-xs text-muted-foreground">Total Profiles</div>
               </CardContent>
             </Card>
-            <Card className="border-2">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-primary mb-1">{profiles.filter((p) => p.isActive).length}</div>
-                <div className="text-sm text-muted-foreground">Active Profiles</div>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
+                    <Activity className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="text-2xl font-bold mb-1">{profiles.filter((p) => p.isActive).length}</div>
+                <div className="text-xs text-muted-foreground">Active Profiles</div>
               </CardContent>
             </Card>
-            <Card className="border-2">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-primary mb-1">{templates.length}</div>
-                <div className="text-sm text-muted-foreground">Templates Available</div>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="text-2xl font-bold mb-1">{templates.length}</div>
+                <div className="text-xs text-muted-foreground">Templates Available</div>
               </CardContent>
             </Card>
-            <Card className="border-2">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-primary mb-1">
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
+                    <TrendingUp className="h-4 w-4" />
+                  </div>
+                </div>
+                <div className="text-2xl font-bold mb-1">
                   {profiles.reduce((sum, p) => sum + (p.usageCount || 0), 0)}
                 </div>
-                <div className="text-sm text-muted-foreground">Total Uses</div>
+                <div className="text-xs text-muted-foreground">Total Uses</div>
               </CardContent>
             </Card>
           </div>
         </div>
 
-        <Tabs defaultValue="profiles" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2 h-12">
-            <TabsTrigger value="profiles" className="flex items-center gap-2 text-base">
-              <Users className="h-4 w-4" />
+        <Tabs defaultValue="profiles" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2 h-9">
+            <TabsTrigger value="profiles" className="flex items-center gap-2 text-sm">
+              <Users className="h-3 w-3" />
               My Profiles ({profiles.length})
             </TabsTrigger>
-            <TabsTrigger value="templates" className="flex items-center gap-2 text-base">
-              <Sparkles className="h-4 w-4" />
+            <TabsTrigger value="templates" className="flex items-center gap-2 text-sm">
+              <Sparkles className="h-3 w-3" />
               Templates ({templates.length})
             </TabsTrigger>
           </TabsList>
 
           {/* My Profiles Tab */}
-          <TabsContent value="profiles" className="space-y-8">
+          <TabsContent value="profiles" className="space-y-6">
             {/* Search and Filters */}
-            <Card className="border-2">
-              <CardContent className="p-6">
-                <div className="space-y-6">
+            <Card>
+              <CardContent className="p-4">
+                <div className="space-y-4">
                   {/* Search Bar */}
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Search profiles by name, description, or tags..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-12 h-14 text-base border-2 focus:border-primary transition-colors"
+                      className="pl-9 h-9"
                     />
                     {searchQuery && (
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setSearchQuery("")}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-3 w-3" />
                       </Button>
                     )}
                   </div>
 
                   {/* Filter Toggle */}
                   <div className="flex items-center justify-between">
-                    <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
-                      <Filter className="h-4 w-4" />
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowFilters(!showFilters)}
+                      size="sm"
+                      className="gap-2 h-7"
+                    >
+                      <Filter className="h-3 w-3" />
                       Filters
                       {activeFiltersCount > 0 && (
-                        <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 text-xs">
+                        <Badge variant="secondary" className="ml-1 h-4 w-4 rounded-full p-0 text-xs">
                           {activeFiltersCount}
                         </Badge>
                       )}
@@ -441,7 +490,7 @@ export default function V0ProfilesPage() {
                           setSearchQuery("")
                           setSelectedCategory("all")
                         }}
-                        className="text-muted-foreground hover:text-foreground"
+                        className="text-muted-foreground hover:text-foreground h-7 text-xs"
                       >
                         Clear all filters
                       </Button>
@@ -450,11 +499,11 @@ export default function V0ProfilesPage() {
 
                   {/* Filters */}
                   {showFilters && (
-                    <div className="grid gap-4 md:grid-cols-2 p-4 bg-muted/30 rounded-lg border">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Category</label>
+                    <div className="grid gap-3 md:grid-cols-2 p-4 bg-muted/50 rounded-lg">
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium">Category</label>
                         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-8">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -467,10 +516,10 @@ export default function V0ProfilesPage() {
                         </Select>
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Sort By</label>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium">Sort By</label>
                         <Select value={sortBy} onValueChange={setSortBy}>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-8">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -489,26 +538,27 @@ export default function V0ProfilesPage() {
 
             {/* Profiles Grid */}
             {filteredProfiles.length === 0 ? (
-              <Card className="border-2 border-dashed">
-                <CardContent className="p-12 text-center">
-                  <div className="space-y-6">
-                    <div className="w-20 h-20 mx-auto bg-muted rounded-full flex items-center justify-center">
-                      <Users className="h-10 w-10 text-muted-foreground" />
+              <Card className="border-dashed">
+                <CardContent className="p-8 text-center">
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center">
+                      <Users className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-semibold">No profiles found</h3>
-                      <p className="text-muted-foreground max-w-md mx-auto">
+                    <div className="space-y-1">
+                      <h3 className="font-medium">No profiles found</h3>
+                      <p className="text-sm text-muted-foreground max-w-md mx-auto">
                         Try adjusting your search criteria or filters to find what you're looking for.
                       </p>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
                       <Button
                         variant="outline"
                         onClick={() => {
                           setSearchQuery("")
                           setSelectedCategory("all")
                         }}
-                        className="h-12 px-8"
+                        size="sm"
+                        className="h-8 px-6"
                       >
                         Clear Filters
                       </Button>
@@ -517,38 +567,31 @@ export default function V0ProfilesPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {filteredProfiles.map((profile) => (
-                  <Card
-                    key={profile.id}
-                    className="group cursor-pointer border-2 hover:border-primary/30 transition-all duration-300 hover:shadow-lg"
-                  >
-                    <CardHeader className="pb-4">
+                  <Card key={profile.id} className="cursor-pointer transition-shadow hover:shadow-md">
+                    <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <Avatar className="h-12 w-12 border-2 border-background shadow-lg">
+                          <Avatar className="h-10 w-10">
                             <AvatarImage src={`https://avatar.vercel.sh/${profile.id}?size=400`} />
-                            <AvatarFallback className="text-white font-bold text-sm bg-gradient-to-br from-primary to-primary/80">
-                              {getInitials(profile.name)}
-                            </AvatarFallback>
+                            <AvatarFallback className="text-xs font-medium">{getInitials(profile.name)}</AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 flex-1">
-                            <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-1 mb-2">
-                              {profile.name}
-                            </CardTitle>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <Badge variant="outline" className="text-xs border-primary/30">
+                            <CardTitle className="text-sm line-clamp-1 mb-1">{profile.name}</CardTitle>
+                            <div className="flex items-center gap-1 flex-wrap">
+                              <Badge variant="outline" className="text-xs h-4 px-1">
                                 {profile.category}
                               </Badge>
                               {!profile.isActive && (
-                                <Badge variant="secondary" className="text-xs">
+                                <Badge variant="secondary" className="text-xs h-4 px-1">
                                   Inactive
                                 </Badge>
                               )}
                               {profile.usageCount && profile.usageCount > 50 && (
                                 <Badge
                                   variant="secondary"
-                                  className="text-xs bg-amber-100 text-amber-700 border-amber-200"
+                                  className="text-xs h-4 px-1 bg-yellow-50 text-yellow-700 border-yellow-200"
                                 >
                                   <Crown className="h-3 w-3 mr-1" />
                                   Popular
@@ -563,18 +606,18 @@ export default function V0ProfilesPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
-                              <MoreHorizontal className="h-4 w-4" />
+                              <MoreHorizontal className="h-3 w-3" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuContent align="end" className="w-40">
                             <DropdownMenuItem onClick={() => handleViewProfile(profile.id)}>
-                              <Eye className="h-4 w-4 mr-2" />
+                              <Eye className="h-3 w-3 mr-2" />
                               View Details
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleUseProfile(profile.id)}>
-                              <Play className="h-4 w-4 mr-2" />
+                              <Play className="h-3 w-3 mr-2" />
                               Use Profile
                             </DropdownMenuItem>
                             <ProfileEditDialog
@@ -584,13 +627,13 @@ export default function V0ProfilesPage() {
                               }}
                               trigger={
                                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                  <Edit className="h-4 w-4 mr-2" />
+                                  <Edit className="h-3 w-3 mr-2" />
                                   Edit
                                 </DropdownMenuItem>
                               }
                             />
                             <DropdownMenuItem onClick={() => handleDuplicateProfile(profile)}>
-                              <Copy className="h-4 w-4 mr-2" />
+                              <Copy className="h-3 w-3 mr-2" />
                               Duplicate
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -598,7 +641,7 @@ export default function V0ProfilesPage() {
                               onClick={() => handleDeleteProfile(profile.id)}
                               className="text-destructive focus:text-destructive"
                             >
-                              <Trash2 className="h-4 w-4 mr-2" />
+                              <Trash2 className="h-3 w-3 mr-2" />
                               Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -606,25 +649,25 @@ export default function V0ProfilesPage() {
                       </div>
                     </CardHeader>
 
-                    <CardContent className="space-y-4" onClick={() => handleViewProfile(profile.id)}>
-                      <CardDescription className="text-sm leading-relaxed line-clamp-2">
+                    <CardContent className="space-y-3" onClick={() => handleViewProfile(profile.id)}>
+                      <CardDescription className="text-xs leading-relaxed line-clamp-2">
                         {profile.description}
                       </CardDescription>
 
                       {/* Stats */}
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
                           <div className="flex items-center gap-1">
-                            <Zap className="h-3 w-3 text-primary" />
+                            <Zap className="h-3 w-3" />
                             <span>{profile.traits.filter((t) => t.isActive).length} traits</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Settings className="h-3 w-3 text-primary" />
+                            <Settings className="h-3 w-3" />
                             <span>{profile.tasks.filter((t) => t.isActive).length} tasks</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
-                          <TrendingUp className="h-3 w-3 text-primary" />
+                          <TrendingUp className="h-3 w-3" />
                           <span>{profile.usageCount || 0} uses</span>
                         </div>
                       </div>
@@ -632,13 +675,13 @@ export default function V0ProfilesPage() {
                       {/* Tags */}
                       <div className="flex flex-wrap gap-1">
                         {profile.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
+                          <Badge key={tag} variant="secondary" className="text-xs h-4 px-1">
                             {tag}
                           </Badge>
                         ))}
                         {profile.tags.length > 3 && (
-                          <Badge variant="secondary" className="text-xs">
-                            +{profile.tags.length - 3} more
+                          <Badge variant="secondary" className="text-xs h-4 px-1">
+                            +{profile.tags.length - 3}
                           </Badge>
                         )}
                       </div>
@@ -651,7 +694,7 @@ export default function V0ProfilesPage() {
                             e.stopPropagation()
                             handleUseProfile(profile.id)
                           }}
-                          className="flex-1 h-9"
+                          className="flex-1 h-7 text-xs"
                         >
                           <Play className="h-3 w-3 mr-1" />
                           Use
@@ -663,7 +706,7 @@ export default function V0ProfilesPage() {
                             e.stopPropagation()
                             handleViewProfile(profile.id)
                           }}
-                          className="flex-1 h-9"
+                          className="flex-1 h-7 text-xs"
                         >
                           <Eye className="h-3 w-3 mr-1" />
                           View
@@ -685,26 +728,24 @@ export default function V0ProfilesPage() {
           </TabsContent>
 
           {/* Templates Tab */}
-          <TabsContent value="templates" className="space-y-8">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <TabsContent value="templates" className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {templates.map((template) => (
                 <Card
                   key={template.id}
-                  className="group cursor-pointer border-2 hover:border-primary/30 transition-all duration-300 hover:shadow-lg"
+                  className="cursor-pointer transition-shadow hover:shadow-md"
                   onClick={() => handleCreateProfile(template)}
                 >
-                  <CardHeader className="pb-4">
+                  <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-sm">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
                           {getProfileIcon(template.icon)}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-1 mb-2">
-                            {template.name}
-                          </CardTitle>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="outline" className="text-xs border-primary/30">
+                          <CardTitle className="text-sm line-clamp-1 mb-1">{template.name}</CardTitle>
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <Badge variant="outline" className="text-xs h-4 px-1">
                               {template.category}
                             </Badge>
                             <Badge
@@ -715,31 +756,31 @@ export default function V0ProfilesPage() {
                                     ? "secondary"
                                     : "destructive"
                               }
-                              className="text-xs"
+                              className="text-xs h-4 px-1"
                             >
                               {template.difficulty}
                             </Badge>
                           </div>
                         </div>
                       </div>
-                      <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+                      <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     </div>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
-                    <CardDescription className="text-sm leading-relaxed line-clamp-3">
+                  <CardContent className="space-y-3">
+                    <CardDescription className="text-xs leading-relaxed line-clamp-2">
                       {template.description}
                     </CardDescription>
 
                     {/* Template Stats */}
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1">
-                          <Zap className="h-3 w-3 text-primary" />
+                          <Zap className="h-3 w-3" />
                           <span>{template.suggestedTraits.length} traits</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Settings className="h-3 w-3 text-primary" />
+                          <Settings className="h-3 w-3" />
                           <span>{template.suggestedTasks.length} tasks</span>
                         </div>
                       </div>
@@ -748,18 +789,18 @@ export default function V0ProfilesPage() {
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1">
                       {template.tags.slice(0, 4).map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
+                        <Badge key={tag} variant="secondary" className="text-xs h-4 px-1">
                           {tag}
                         </Badge>
                       ))}
                       {template.tags.length > 4 && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs h-4 px-1">
                           +{template.tags.length - 4}
                         </Badge>
                       )}
                     </div>
 
-                    <Button className="w-full h-9 group-hover:shadow-md transition-all duration-200" size="sm">
+                    <Button className="w-full h-7 text-xs" size="sm">
                       <Plus className="h-3 w-3 mr-2" />
                       Create from Template
                     </Button>
