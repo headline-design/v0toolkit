@@ -206,3 +206,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+div:has(> svg) {
+  flex-shrink: 0;
+}

@@ -58,10 +58,14 @@ import {
   Clock,
   BookOpen,
   HelpCircle,
+  FolderOpen,
+  Play,
+  Rocket,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { usePromptGenerator } from "@/lib/hooks/use-prompt-generator"
 import type { PromptField, PromptTemplate } from "@/lib/types/prompt-generator"
+import { getProjectTypeSuggestions, getAllProjectTypes } from "@/lib/data/project-suggestions"
 
 interface PromptGeneratorProps {
   hook?: ReturnType<typeof usePromptGenerator>
@@ -79,6 +83,8 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all")
   const [showPreview, setShowPreview] = useState(false)
   const promptRef = useRef<HTMLDivElement>(null)
+  const [fieldCompletion, setFieldCompletion] = useState<Record<string, boolean>>({})
+  const [selectedProjectType, setSelectedProjectType] = useState<string>("")
 
   // Use passed hook or create a new one (fallback for standalone usage)
   const {
@@ -151,6 +157,8 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
         return <MessageSquare className="h-3 w-3" />
       case "Folder":
         return <Folder className="h-3 w-3" />
+      case "FolderOpen":
+        return <FolderOpen className="h-3 w-3" />
       case "Code":
         return <Code className="h-3 w-3" />
       case "Layers":
@@ -175,6 +183,12 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
         return <Eye className="h-3 w-3" />
       case "MousePointer":
         return <MousePointer className="h-3 w-3" />
+      case "Play":
+        return <Play className="h-3 w-3" />
+      case "Rocket":
+        return <Rocket className="h-3 w-3" />
+      case "Lightbulb":
+        return <Lightbulb className="h-3 w-3" />
       default:
         return <Settings className="h-3 w-3" />
     }
@@ -319,10 +333,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
   const getCompletionPercentage = () => {
     if (!selectedTemplate) return 0
     const requiredFields = selectedTemplate.fields.filter((field) => field.required)
-    const completedFields = requiredFields.filter((field) => {
-      const value = (fieldValues ?? {})[field.id]
-      return value && (Array.isArray(value) ? value.length > 0 : value.toString().trim() !== "")
-    })
+    const completedFields = requiredFields.filter((field) => fieldCompletion[field.id] === true)
     return Math.round((completedFields.length / requiredFields.length) * 100)
   }
 
@@ -343,41 +354,57 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
     const value = safeFieldValues[field.id] || (field.type === "tags" || field.type === "multiselect" ? [] : "")
     const hasError = !!errors?.[field.id]
 
-    const fieldWrapper = (children: React.ReactNode) => (
-      <TooltipProvider key={field.id}>
-        <div className="space-y-2">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Label htmlFor={field.id} className="flex items-center gap-2 text-sm font-medium">
-                {field.icon && getFieldIcon(field.icon)}
-                {field.label}
-                {field.required && <span className="text-red-500 text-xs">*</span>}
-              </Label>
-              {field.description && field.description.length > 50 && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-sm">{field.description}</p>
-                  </TooltipContent>
-                </Tooltip>
+    const fieldWrapper = (children: React.ReactNode) => {
+      const isComplete = fieldCompletion[field.id] !== false
+      const isRequired = field.required
+
+      return (
+        <TooltipProvider key={field.id}>
+          <div className="space-y-3 p-4 border rounded-lg bg-card">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor={field.id} className="flex items-center gap-2 text-sm font-medium">
+                  {field.icon && getFieldIcon(field.icon)}
+                  {field.label}
+                  {field.required && <span className="text-red-500 text-xs">*</span>}
+                  {isRequired && (
+                    <div className={cn("w-2 h-2 rounded-full", isComplete ? "bg-green-500" : "bg-red-500")} />
+                  )}
+                </Label>
+                {field.description && field.description.length > 80 && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm">
+                      <p className="text-sm">{field.description}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
+              {field.description && (
+                <p className="text-xs text-muted-foreground leading-relaxed">{field.description}</p>
               )}
             </div>
-            {field.description && field.description.length <= 50 && (
-              <p className="text-xs text-muted-foreground leading-relaxed">{field.description}</p>
-            )}
-          </div>
-          {children}
-          {hasError && (
-            <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 p-2 rounded-md">
-              <AlertCircle className="h-3 w-3 flex-shrink-0" />
-              <span>{errors[field.id]}</span>
+            <div className="space-y-2">
+              {children}
+              {hasError && (
+                <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 p-2 rounded-md">
+                  <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                  <span>{errors[field.id]}</span>
+                </div>
+              )}
+              {!hasError && isRequired && !isComplete && (
+                <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 p-2 rounded-md">
+                  <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+                  <span>This field is required</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </TooltipProvider>
-    )
+          </div>
+        </TooltipProvider>
+      )
+    }
 
     switch (field.type) {
       case "text":
@@ -391,7 +418,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                 updateFieldValue(field.id, e.target.value)
               }
             }}
-            className={cn("transition-colors h-8", hasError && "border-red-500 focus-visible:ring-red-500")}
+            className={cn("transition-colors h-9", hasError && "border-red-500 focus-visible:ring-red-500")}
           />,
         )
 
@@ -407,10 +434,10 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
               }
             }}
             className={cn(
-              "min-h-[80px] resize-y transition-colors text-sm",
+              "min-h-[100px] resize-y transition-colors text-sm",
               hasError && "border-red-500 focus-visible:ring-red-500",
             )}
-            rows={3}
+            rows={4}
           />,
         )
 
@@ -422,9 +449,12 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
               if (typeof updateFieldValue === "function") {
                 updateFieldValue(field.id, val)
               }
+              if (field.id === "projectType") {
+                setSelectedProjectType(val)
+              }
             }}
           >
-            <SelectTrigger className={cn("h-8", hasError && "border-red-500")}>
+            <SelectTrigger className={cn("h-9", hasError && "border-red-500")}>
               <SelectValue placeholder={field.placeholder} />
             </SelectTrigger>
             <SelectContent>
@@ -440,11 +470,11 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
       case "multiselect":
         const selectedValues = (value as string[]) || []
         return fieldWrapper(
-          <div className="space-y-2">
+          <div className="space-y-3">
             {selectedValues.length > 0 && (
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-2">
                 {selectedValues.map((val) => (
-                  <Badge key={val} variant="secondary" className="flex items-center gap-1 text-xs h-5 px-2">
+                  <Badge key={val} variant="secondary" className="flex items-center gap-1 text-xs h-6 px-2">
                     {val}
                     <X
                       className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors"
@@ -469,7 +499,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                 }
               }}
             >
-              <SelectTrigger className={cn("h-8", hasError && "border-red-500")}>
+              <SelectTrigger className={cn("h-9", hasError && "border-red-500")}>
                 <SelectValue placeholder={field.placeholder} />
               </SelectTrigger>
               <SelectContent>
@@ -490,11 +520,11 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
         const inputValue = tagInputs[field.id] || ""
 
         return fieldWrapper(
-          <div className="space-y-2">
+          <div className="space-y-3">
             {tags.length > 0 && (
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="flex items-center gap-1 text-xs h-5 px-2">
+                  <Badge key={tag} variant="secondary" className="flex items-center gap-1 text-xs h-6 px-2">
                     {tag}
                     <X
                       className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors"
@@ -515,7 +545,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                     addTag(field.id, inputValue)
                   }
                 }}
-                className={cn("flex-1 h-8", hasError && "border-red-500 focus-visible:ring-red-500")}
+                className={cn("flex-1 h-9", hasError && "border-red-500 focus-visible:ring-red-500")}
               />
               <Button
                 type="button"
@@ -523,25 +553,25 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                 size="sm"
                 onClick={() => addTag(field.id, inputValue)}
                 disabled={!inputValue.trim()}
-                className="h-8 px-2"
+                className="h-9 px-3"
               >
                 <Plus className="h-3 w-3" />
               </Button>
             </div>
             {field.suggestions && field.suggestions.length > 0 && (
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Suggestions:</p>
-                <div className="flex flex-wrap gap-1">
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-medium">Suggestions:</p>
+                <div className="flex flex-wrap gap-2">
                   {field.suggestions
                     .filter((suggestion) => !tags.includes(suggestion))
-                    .slice(0, 8)
+                    .slice(0, 12)
                     .map((suggestion) => (
                       <Button
                         key={suggestion}
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="h-5 text-xs px-2 hover:bg-muted"
+                        className="h-6 text-xs px-2 hover:bg-muted border border-dashed border-muted-foreground/30"
                         onClick={() => addTag(field.id, suggestion)}
                       >
                         + {suggestion}
@@ -722,6 +752,60 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
   }
 
   // Show generator interface when template is selected
+  const updateFieldSuggestions = (projectTypeName: string) => {
+    if (!selectedTemplate) return
+
+    const projectType = getAllProjectTypes().find((p) => p.name === projectTypeName)
+    if (!projectType) return
+
+    const suggestions = getProjectTypeSuggestions(projectType.id)
+    if (!suggestions) return
+
+    // Update template fields with project-specific suggestions
+    selectedTemplate.fields.forEach((field) => {
+      switch (field.id) {
+        case "workHistory":
+          field.suggestions = suggestions.workHistory
+          break
+        case "primaryCompany":
+          field.options = suggestions.primaryCompanies
+          break
+        case "additionalCompanies":
+          field.options = suggestions.additionalCompanies
+          break
+        case "features":
+          field.suggestions = suggestions.features
+          break
+        case "deliverables":
+          field.suggestions = suggestions.deliverables
+          break
+      }
+    })
+  }
+
+  const [fieldSuggestionsUpdated, setFieldSuggestionsUpdated] = useState(false)
+
+  useEffect(() => {
+    if (selectedProjectType && !fieldSuggestionsUpdated) {
+      updateFieldSuggestions(selectedProjectType)
+      setFieldSuggestionsUpdated(true)
+    }
+  }, [selectedProjectType, fieldSuggestionsUpdated])
+
+  useEffect(() => {
+    if (!selectedTemplate || !fieldValues) return
+
+    const completion: Record<string, boolean> = {}
+    selectedTemplate.fields.forEach((field) => {
+      const value = fieldValues[field.id]
+      const isComplete = field.required
+        ? value && (Array.isArray(value) ? value.length > 0 : value.toString().trim() !== "")
+        : true
+      completion[field.id] = isComplete
+    })
+    setFieldCompletion(completion)
+  }, [selectedTemplate, fieldValues])
+
   return (
     <TooltipProvider>
       <div className="space-y-4">
@@ -805,16 +889,22 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                   </div>
                   <Progress value={getCompletionPercentage()} className="h-1" />
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Fill in the required fields to generate your prompt</span>
+                    <span>
+                      {Object.values(fieldCompletion).filter(Boolean).length} of{" "}
+                      {selectedTemplate?.fields.filter((f) => f.required).length} required fields completed
+                    </span>
                     {getCompletionPercentage() === 100 && (
-                      <span className="text-green-600 font-medium">Ready to generate!</span>
+                      <span className="text-green-600 font-medium flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        Ready to generate!
+                      </span>
                     )}
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Form Fields */}
+            {/* Form Fields - Single Column Layout */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -822,8 +912,8 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                   Template Configuration
                 </CardTitle>
                 <CardDescription className="text-sm">
-                  Configure the template fields to customize your V0 prompt. Required fields are marked with an
-                  asterisk.
+                  Configure the template fields to customize your V0 prompt. Required fields are marked with an asterisk
+                  and completion indicator.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -851,16 +941,14 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                             {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                           </Button>
                           {isExpanded && (
-                            <div className="grid gap-4 md:grid-cols-2 pl-4 border-l-2 border-muted">
-                              {fields.map(renderField)}
-                            </div>
+                            <div className="space-y-4 pl-4 border-l-2 border-muted">{fields.map(renderField)}</div>
                           )}
                         </div>
                       )
                     })
                   ) : (
-                    // Render fields directly if only one category
-                    <div className="grid gap-4 md:grid-cols-2">{selectedTemplate.fields.map(renderField)}</div>
+                    // Render fields directly if only one category - Single Column
+                    <div className="space-y-4">{selectedTemplate.fields.map(renderField)}</div>
                   )}
                 </div>
               </CardContent>
@@ -988,10 +1076,10 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                   <div className="space-y-1">
                     <h4 className="font-medium text-blue-900 text-sm">V0 Configuration Tips</h4>
                     <ul className="text-sm text-blue-800 space-y-0.5">
-                      <li>• Be specific about V0's technical expertise for better code quality</li>
-                      <li>• Define clear project context so V0 understands your needs</li>
-                      <li>• Set appropriate experience level to match response complexity</li>
-                      <li>• Use constraints to guide V0's recommendations and solutions</li>
+                      <li>• Be specific about V0's work history with recognizable company names</li>
+                      <li>• Choose companies that are leaders in your project domain</li>
+                      <li>• V0 performs better with specific references than generic descriptions</li>
+                      <li>• Use project type to get relevant company and feature suggestions</li>
                     </ul>
                   </div>
                 </div>
