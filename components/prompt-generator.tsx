@@ -64,8 +64,10 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { usePromptGenerator } from "@/lib/hooks/use-prompt-generator"
-import type { PromptField, PromptTemplate } from "@/lib/types/prompt-generator"
+import type { PromptField } from "@/lib/types/prompt-generator"
 import { getProjectTypeSuggestions, getAllProjectTypes } from "@/lib/data/project-suggestions"
+import { PromptTemplate } from "@/lib/core/types"
+
 
 interface PromptGeneratorProps {
   hook?: ReturnType<typeof usePromptGenerator>
@@ -450,6 +452,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                 updateFieldValue(field.id, val)
               }
               if (field.id === "projectType") {
+                setFieldSuggestionsUpdated(false)
                 setSelectedProjectType(val)
               }
             }}
@@ -474,10 +477,10 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
             {selectedValues.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {selectedValues.map((val) => (
-                  <Badge key={val} variant="secondary" className="flex items-center gap-1 text-xs h-6 px-2">
+                  <Badge key={val} variant="secondary" className="flex items-center gap-1 text-xs h-6 px-2 [&>svg]:!pointer-events-auto">
                     {val}
                     <X
-                      className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors"
+                      className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors !pointer-events-auto"
                       onClick={() => {
                         const newValues = selectedValues.filter((v) => v !== val)
                         if (typeof updateFieldValue === "function") {
@@ -524,10 +527,10 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="flex items-center gap-1 text-xs h-6 px-2">
+                  <Badge key={tag} variant="secondary" className="flex items-center gap-1 text-xs h-6 px-2 [&>svg]:!pointer-events-auto">
                     {tag}
                     <X
-                      className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors"
+                      className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors !pointer-events-auto"
                       onClick={() => removeTag(field.id, tag)}
                     />
                   </Badge>
@@ -880,7 +883,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
             </Card>
 
             {/* Progress Indicator */}
-            <Card>
+            <Card >
               <CardContent className="p-3">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
@@ -923,6 +926,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                     Object.entries(groupedFields).map(([category, fields]) => {
                       const sectionId = `section-${category.toLowerCase().replace(/\s+/g, "-")}`
                       const isExpanded = expandedSections[sectionId] !== false // Default to expanded
+                      const typedFields = fields as PromptField[];
 
                       return (
                         <div key={category} className="space-y-3">
@@ -935,13 +939,13 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                               <Target className="h-3 w-3" />
                               {category}
                               <Badge variant="outline" className="text-xs h-4 px-1">
-                                {fields.length}
+                                {typedFields.length}
                               </Badge>
                             </span>
                             {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                           </Button>
                           {isExpanded && (
-                            <div className="space-y-4 pl-4 border-l-2 border-muted">{fields.map(renderField)}</div>
+                            <div className="space-y-4 pl-4 border-l-2 border-muted">{typedFields.map(renderField)}</div>
                           )}
                         </div>
                       )

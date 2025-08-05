@@ -6,6 +6,7 @@ export interface PromptTemplate {
   difficulty: "Beginner" | "Intermediate" | "Advanced"
   prompt: string
   tags: string[]
+  icon?: string
 }
 
 export interface PromptCategory {

@@ -152,6 +152,7 @@ export interface PromptTemplate {
   tags: string[]
   difficulty: "beginner" | "intermediate" | "advanced"
   estimatedTokens: number
+  icon?: any
   successRate: number
   createdAt: Date
   updatedAt: Date
