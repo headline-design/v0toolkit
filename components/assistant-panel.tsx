@@ -231,7 +231,7 @@ Context:
       <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
         <div className="flex-1 overflow-hidden">
           <div className="m-3 mb-3">
-            <TabsList className="w-full grid grid-cols-4 h-8">
+            <TabsList className="w-full grid grid-cols-3 h-8">
               <TabsTrigger value="tips" className="text-xs">
                 Tips
               </TabsTrigger>
@@ -239,14 +239,11 @@ Context:
                 Resources
               </TabsTrigger>
               <TabsTrigger value="practices" className="text-xs">
-                Best Practices
-              </TabsTrigger>
-              <TabsTrigger value="quick" className="text-xs">
-                Quick
+              Actions
               </TabsTrigger>
             </TabsList>
           </div>
-          <ScrollArea className="h-full">
+          <ScrollArea className="h-full max-h-[calc(100vh-7rem)]">
             <div className="p-3 pt-1">
               {/* Tips Tab */}
               <TabsContent value="tips" className="mt-0 space-y-3">

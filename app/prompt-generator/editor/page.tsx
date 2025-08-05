@@ -133,35 +133,39 @@ export default function PromptGeneratorEditorPage() {
       }
     >
       <SidebarInset>
-        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4 sticky top-0 bg-background z-10 sm:pr-6 lg:pr-8">
           <div className="flex items-center gap-3 flex-1">
             <Button variant="ghost" size="sm" onClick={handleBack} className="h-7">
-              <ArrowLeft className="h-3 w-3 mr-2" />
+              <ArrowLeft className="h-3 w-3" />
               Back
             </Button>
             <div className="h-4 w-px bg-border" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem>
+                <BreadcrumbItem className="hidden sm:block">
                   <BreadcrumbLink href="/prompt-generator">Prompt Generator</BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className="hidden sm:block" />
                 <BreadcrumbItem>
                   <BreadcrumbPage>{selectedTemplate.name}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+             <Badge variant="outline" className="text-xs h-5 px-2 hidden md:block">
+                  {selectedTemplate.category}
+                </Badge>
           </div>
+
           <SidebarTrigger className="-mr-1 rotate-180" />
         </header>
 
         {/* Template Info Banner */}
-        <div className="border-b bg-muted/30">
-          <div className="container mx-auto p-3">
+        <div className="border-b bg-muted/30 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-muted rounded-lg flex items-center justify-center">
-                  <Target className="h-3 w-3" />
+                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
+                  <Target className="h-4 w-4" />
                 </div>
                 <div>
                   <h2 className="font-medium text-sm">{selectedTemplate.name}</h2>
@@ -169,21 +173,6 @@ export default function PromptGeneratorEditorPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs h-5 px-2">
-                  {selectedTemplate.category}
-                </Badge>
-                <Badge
-                  variant={
-                    selectedTemplate.difficulty === "Beginner"
-                      ? "default"
-                      : selectedTemplate.difficulty === "Intermediate"
-                        ? "secondary"
-                        : "destructive"
-                  }
-                  className="text-xs h-5 px-2"
-                >
-                  {selectedTemplate.difficulty}
-                </Badge>
                 {selectedTemplate.examples.length > 0 && (
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Users className="h-3 w-3" />

@@ -833,18 +833,16 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
           <TabsContent value="generator" className="space-y-4 mt-4">
             {/* Template Header */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-0">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="space-y-1">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Sparkles className="h-4 w-4" />
-                      {selectedTemplate.name}
+                    Templates
                     </CardTitle>
                     <div className="flex items-start gap-2">
                       <CardDescription className="text-sm leading-relaxed flex-1">
-                        {selectedTemplate.description.length > 100
-                          ? `${selectedTemplate.description.substring(0, 100)}...`
-                          : selectedTemplate.description}
+                       Get started quickly with our pre-built templates.
                       </CardDescription>
                       {selectedTemplate.description.length > 100 && (
                         <Tooltip>
@@ -861,7 +859,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                   <div className="flex flex-wrap gap-2">
                     {selectedTemplate.examples.length > 0 && typeof loadExample === "function" && (
                       <Select onValueChange={(value) => loadExample(Number.parseInt(value))}>
-                        <SelectTrigger className="w-[140px] h-8">
+                        <SelectTrigger className="w-[140px] h-9">
                           <SelectValue placeholder="Load Example" />
                         </SelectTrigger>
                         <SelectContent>
@@ -873,7 +871,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                         </SelectContent>
                       </Select>
                     )}
-                    <Button variant="outline" size="sm" onClick={resetForm} className="h-8 bg-transparent">
+                    <Button variant="outline" size="sm" onClick={resetForm} className="h-9 bg-transparent">
                       <RotateCcw className="h-3 w-3 mr-2" />
                       Reset
                     </Button>
@@ -884,7 +882,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
 
             {/* Progress Indicator */}
             <Card >
-              <CardContent className="p-3">
+              <CardContent className="py-2 px-6">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium">Configuration Progress</span>
