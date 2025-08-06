@@ -15,21 +15,21 @@ import {LogoSparks} from "@/components/icons/logo-sparks"
 
 
 const navigation = [
-  { 
-    name: "Slate", 
-    href: "/slate", 
+  {
+    name: "Slate",
+    href: "/slate",
     icon: Palette,
     description: "Visual prompt organization"
   },
-  { 
-    name: "v0 Profiles", 
-    href: "/profiles", 
+  {
+    name: "v0 Profiles",
+    href: "/profiles",
     icon: FileText,
     description: "Manage V0 profiles"
   },
-  { 
-    name: "Prompt Generator", 
-    href: "/prompt-generator", 
+  {
+    name: "Prompt Generator",
+    href: "/prompt-generator",
     icon: Layers3,
     description: "Create optimized prompts"
   },
@@ -38,6 +38,7 @@ const navigation = [
   href: "/issues",
   icon: Radar,
   description: "Track v0 issues"
+  }
 ]
 
 function MobileThemeToggle() {
@@ -88,7 +89,7 @@ export function Navigation() {
                     isActive ? "text-foreground" : "text-foreground/60",
                   )}
                 >
-                 
+
                   {item.name}
                 </Link>
               )
@@ -157,15 +158,15 @@ export function Navigation() {
                               onClick={() => setOpen(false)}
                               className={cn(
                                 "flex items-center gap-4 rounded-lg px-4 py-3 text-sm transition-all hover:bg-accent/50",
-                                isActive 
-                                  ? "bg-accent text-accent-foreground shadow-sm" 
+                                isActive
+                                  ? "bg-accent text-accent-foreground shadow-sm"
                                   : "text-foreground/70 hover:text-foreground"
                               )}
                             >
                               <div className={cn(
                                 "flex h-10 w-10 items-center justify-center rounded-md",
-                                isActive 
-                                  ? "bg-primary text-primary-foreground" 
+                                isActive
+                                  ? "bg-primary text-primary-foreground"
                                   : "bg-muted"
                               )}>
                                 <Icon className="h-5 w-5" />
@@ -198,9 +199,9 @@ export function Navigation() {
                   <div className="px-6 py-6">
                     <div className="space-y-4">
                       <Button variant="outline" size="sm" className="w-full justify-start gap-3" asChild>
-                        <Link 
-                          href="https://github.com/headline-design/v0toolkit" 
-                          target="_blank" 
+                        <Link
+                          href="https://github.com/headline-design/v0toolkit"
+                          target="_blank"
                           rel="noopener noreferrer"
                           onClick={() => setOpen(false)}
                         >
@@ -208,7 +209,7 @@ export function Navigation() {
                           View on GitHub
                         </Link>
                       </Button>
-                      
+
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground">
                           Built for the v0 community

@@ -9,6 +9,7 @@ class SlateService {
       id: `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name,
       description: template?.description || "",
+      tags: template?.tags || [],
       createdAt: new Date(),
       updatedAt: new Date(),
       settings: {
@@ -114,7 +115,7 @@ class SlateService {
         name: "Dashboard Project",
         description: "Complete dashboard with charts, tables, and analytics components",
         category: "Web App",
-        difficulty: "Intermediate",
+        difficulty: "intermediate",
         icon: "BarChart3",
         tags: ["dashboard", "analytics", "charts", "tables"],
         items: [
@@ -183,7 +184,7 @@ class SlateService {
         name: "E-commerce Store",
         description: "Full e-commerce solution with product catalog, cart, and checkout",
         category: "E-commerce",
-        difficulty: "Advanced",
+        difficulty: "advanced",
         icon: "ShoppingCart",
         tags: ["ecommerce", "shopping", "products", "cart"],
         items: [
@@ -252,7 +253,7 @@ class SlateService {
         name: "Landing Page",
         description: "High-converting landing page with hero, features, testimonials, and CTA",
         category: "Marketing",
-        difficulty: "Beginner",
+        difficulty: "beginner",
         icon: "Rocket",
         tags: ["landing", "marketing", "conversion", "hero"],
         items: [
@@ -294,7 +295,7 @@ class SlateService {
         name: "SaaS Application",
         description: "Complete SaaS app with authentication, dashboard, and billing",
         category: "SaaS",
-        difficulty: "Advanced",
+        difficulty: "advanced",
         icon: "Crown",
         tags: ["saas", "auth", "billing", "subscription"],
         items: [

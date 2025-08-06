@@ -32,8 +32,8 @@ import {
 } from "lucide-react"
 import { promptGeneratorService } from "@/lib/services/prompt-generator-service"
 import { useGeneratedPrompts } from "@/lib/hooks/use-prompt-generator"
-import type { PromptTemplate } from "@/lib/types/prompt-generator"
 import { useToast } from "@/hooks/use-toast"
+import { PromptTemplate } from "@/lib/core/types"
 
 export default function PromptGeneratorPage() {
   const router = useRouter()

@@ -234,7 +234,7 @@ export function PromptItem({ item, onUpdate, onDelete, onDragStart, onCopy }: Pr
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Type</label>
-                <Select value={editPromptType} onValueChange={setEditPromptType}>
+                <Select value={editPromptType} onValueChange={value => setEditPromptType(value as "create" | "refine" | "analyze" | "custom")}>
                   <SelectTrigger className="h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>

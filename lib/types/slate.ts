@@ -12,9 +12,10 @@ export interface SlateProject {
 
 export interface ProjectSettings {
   autoSave: boolean
-  promptFormat: "v0" | "markdown" | "plain"
+  promptFormat?: "v0" | "markdown" | "plain"
   defaultCategory: string
-  estimateTokens: boolean
+  defaultPromptType?: "create" | "refine" | "analyze" | "custom"
+
 }
 
 export interface SlateItem {
@@ -50,7 +51,7 @@ export interface ProjectTemplate {
   description: string
   category: string
   icon: string
-  items: Omit<SlateItem, "id" | "x" | "y">[]
+  items: SlateItem[]
   tags: string[]
-  difficulty: "Beginner" | "Intermediate" | "Advanced"
+  difficulty: "beginner" | "intermediate" | "advanced"
 }

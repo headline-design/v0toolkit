@@ -9,20 +9,20 @@ class IssueService {
   }
 
   // Convert simple user input to full Issue objects
-  private processUserIssues(userInputs: UserIssueInput[]): Issue[] {
+  private processUserIssues(userInputs: any[]): Issue[] {
     return userInputs.map((input, index) => {
       const id = `v0-${String(index + 1).padStart(3, '0')}`
       const now = new Date().toISOString()
       const createdAt = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString() // Random date within last 30 days
-      
+
       return {
         id,
         title: input.title,
         description: input.description,
-        type: input.type,
+        type: input.type as 'bug' | 'feature' | 'enhancement' | 'documentation' | 'question',
         status: input.status || 'open',
-        priority: input.priority || 'medium',
-        category: input.category || 'other',
+        priority: (input.priority || 'medium') as 'low' | 'medium' | 'high' | 'critical',
+        category: (input.category || 'other') as 'ui' | 'performance' | 'api' | 'documentation' | 'integration' | 'other',
         tags: input.tags || [],
         author: input.author || 'anonymous',
         assignee: input.assignee,
@@ -59,17 +59,17 @@ class IssueService {
         filteredIssues = filteredIssues.filter(issue => filters.category!.includes(issue.category))
       }
       if (filters.tags?.length) {
-        filteredIssues = filteredIssues.filter(issue => 
+        filteredIssues = filteredIssues.filter(issue =>
           filters.tags!.some(tag => issue.tags.includes(tag))
         )
       }
       if (filters.author) {
-        filteredIssues = filteredIssues.filter(issue => 
+        filteredIssues = filteredIssues.filter(issue =>
           issue.author.toLowerCase().includes(filters.author!.toLowerCase())
         )
       }
       if (filters.assignee) {
-        filteredIssues = filteredIssues.filter(issue => 
+        filteredIssues = filteredIssues.filter(issue =>
           issue.assignee?.toLowerCase().includes(filters.assignee!.toLowerCase())
         )
       }
@@ -143,7 +143,7 @@ class IssueService {
       // In a real implementation, this would re-import the data file
       // For now, we'll simulate reloading
       this.issues = this.processUserIssues(userIssues)
-      
+
       return {
         success: true,
         message: `Reloaded ${this.issues.length} issues from data file`
