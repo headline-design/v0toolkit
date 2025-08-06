@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "./theme-toggle"
-import { Bot, FileText, Layers3, Palette, Github, Menu, X, Moon, Sun } from 'lucide-react'
+import { Bot, FileText, Layers3, Palette, Github, Menu, X, Moon, Sun, Radar } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
@@ -33,6 +33,11 @@ const navigation = [
     icon: Layers3,
     description: "Create optimized prompts"
   },
+  {
+  name: "Issue Tracker",
+  href: "/issues",
+  icon: Radar,
+  description: "Track v0 issues"
 ]
 
 function MobileThemeToggle() {
