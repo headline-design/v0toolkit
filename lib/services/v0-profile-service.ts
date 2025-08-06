@@ -100,19 +100,19 @@ class V0ProfileService {
 
     const profile: V0Profile = {
       id: profileId,
-      name: customName || template.name || "Untitled Profile",
-      displayName: template.name || "Untitled Profile",
-      description: template.description ?? "",
+      name: customName || template.name,
+      displayName: template.name,
+      description: template.description,
       basePrompt: template.basePrompt,
       avatar: `https://avatar.vercel.sh/${profileId}?size=400`,
-      traits: (template.suggestedTraits ?? []).map((trait, index) => ({
+      traits: template.suggestedTraits.map((trait, index) => ({
         ...trait,
         id: `trait-${Date.now()}-${index}`,
         isActive: true,
         insertionPoint: "after_base",
         priority: index + 1,
       })),
-      tasks: (template.suggestedTasks ?? []).map((task, index) => ({
+      tasks: template.suggestedTasks.map((task, index) => ({
         ...task,
         id: `task-${Date.now()}-${index}`,
         isActive: true,
@@ -123,7 +123,7 @@ class V0ProfileService {
       updatedAt: new Date(),
       isActive: true,
       tags: template.tags,
-      category: template.category ?? "",
+      category: template.category,
       usageCount: 0,
     }
 

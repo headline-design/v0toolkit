@@ -1,15 +1,14 @@
-import { PromptTemplate } from "@/lib/core/types";
-
+import type { PromptTemplate } from "@/lib/types/prompt-generator"
 
 export const technicalSpecificationTemplate: PromptTemplate = {
   id: "technical-specification",
   name: "Technical Specification",
   description: "Generate detailed technical requirements and specifications for development projects",
   category: "Architecture",
-  difficulty: "advanced",
+  difficulty: "Advanced",
   icon: "FileCode",
   tags: ["technical", "specification", "architecture", "requirements"],
-  template: `Create a comprehensive technical specification for {projectName}, a {projectType} that {projectDescription}.
+  template: `Create a comprehensive technical specification for {projectName}, a {projectType} that {projectDescription}. 
 
 Requirements:
 - Architecture: {architecture}

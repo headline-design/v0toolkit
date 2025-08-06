@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react"
 import { promptGeneratorService } from "@/lib/services/prompt-generator-service"
-import { GeneratedPrompt, PromptTemplate } from "../core/types"
+import type { PromptTemplate, GeneratedPrompt } from "@/lib/types/prompt-generator"
 
 export function usePromptGenerator() {
   const [templates, setTemplates] = useState<PromptTemplate[]>(() => promptGeneratorService.getTemplates())
@@ -41,7 +41,7 @@ export function usePromptGenerator() {
 
       const example = selectedTemplate.examples[exampleIndex]
       if (example) {
-        setFieldValues(example.values as any)
+        setFieldValues(example.values)
         setErrors({})
       }
     },
@@ -70,6 +70,7 @@ export function usePromptGenerator() {
       prompt: generatedPrompt,
       fieldValues: { ...fieldValues },
       tags: selectedTemplate.tags,
+      estimatedTokens: promptGeneratorService.estimateTokens(generatedPrompt),
       createdAt: new Date(),
     }
 

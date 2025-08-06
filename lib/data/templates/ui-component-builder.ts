@@ -1,15 +1,14 @@
-import { PromptTemplate } from "@/lib/core/types";
-
+import type { PromptTemplate } from "@/lib/types/prompt-generator"
 
 export const uiComponentBuilderTemplate: PromptTemplate = {
   id: "ui-component-builder",
   name: "UI Component Builder",
   description: "Generate prompts for creating specific UI components with detailed requirements",
   category: "UI/UX",
-  difficulty: "beginner",
+  difficulty: "Beginner",
   icon: "Palette",
   tags: ["ui", "components", "design", "frontend"],
-  template: `Create a {componentType} component for {projectContext}. The component should {functionality} and include {features}.
+  template: `Create a {componentType} component for {projectContext}. The component should {functionality} and include {features}. 
 
 Design requirements:
 - Style: {designStyle}

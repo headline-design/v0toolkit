@@ -187,10 +187,10 @@ export default function InteractivePromptHero() {
                     key={index}
                     className={`${
                       segment.highlight
-                        ? `px-1 py-0.5 rounded cursor-pointer font-medium transition-colors duration-200 ${getSegmentStyle(segment.category ?? "")}`
+                        ? `px-1 py-0.5 rounded cursor-pointer font-medium transition-colors duration-200 ${getSegmentStyle(segment.category)}`
                         : "text-foreground"
                     }`}
-                    onMouseEnter={() => segment.highlight && setHoveredCategory(segment.category ?? null)}
+                    onMouseEnter={() => segment.highlight && setHoveredCategory(segment.category)}
                     onMouseLeave={() => setHoveredCategory(null)}
                   >
                     {segment.text}

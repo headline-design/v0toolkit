@@ -35,8 +35,8 @@ export interface Issue {
   closedAt?: string
   attachments: IssueAttachment[]
   relatedIssues: string[]
-  issueUrl: string
-  prUrl?: string
+  githubIssueUrl: string
+  githubPrUrl?: string
   reproductionSteps?: string[]
   expectedBehavior?: string
   actualBehavior?: string

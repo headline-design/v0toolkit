@@ -1,7 +1,7 @@
-import { PromptTemplate } from "../core/types"
 import { expertRoleBasedTemplate } from "./templates/expert-role-based"
 import { technicalSpecificationTemplate } from "./templates/technical-specification"
 import { uiComponentBuilderTemplate } from "./templates/ui-component-builder"
+import type { PromptTemplate } from "@/lib/types/prompt-generator"
 
 export const promptTemplates: PromptTemplate[] = [
   expertRoleBasedTemplate,

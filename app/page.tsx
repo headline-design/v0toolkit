@@ -31,8 +31,8 @@ import {
 import { v0ProfileService } from "@/lib/services/v0-profile-service"
 import { promptGeneratorService } from "@/lib/services/prompt-generator-service"
 import type { V0Profile } from "@/lib/types/v0-profile"
+import type { GeneratedPrompt } from "@/lib/types/prompt-generator"
 import { useToast } from "@/hooks/use-toast"
-import { GeneratedPrompt } from "@/lib/core/types"
 
 export default function HomePage() {
   const router = useRouter()

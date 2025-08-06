@@ -822,11 +822,7 @@ interface DashboardData {
     }
 
     if (filters?.difficulty?.length) {
-      filtered = filtered.filter(
-        (item) =>
-          "difficulty" in item &&
-          filters.difficulty!.includes(item.difficulty as "beginner" | "intermediate" | "advanced")
-      )
+      filtered = filtered.filter((item) => filters.difficulty!.includes(item.difficulty))
     }
 
     if (filters?.tags?.length) {
@@ -889,9 +885,7 @@ interface DashboardData {
       authors.set(item.author.name, (authors.get(item.author.name) || 0) + 1)
 
       // Difficulty
-      if ("difficulty" in item && typeof item.difficulty === "string") {
-        difficulty.set(item.difficulty, (difficulty.get(item.difficulty) || 0) + 1)
-      }
+      difficulty.set(item.difficulty, (difficulty.get(item.difficulty) || 0) + 1)
 
       // Complexity
       if ("complexity" in item) {

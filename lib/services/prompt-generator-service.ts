@@ -1,5 +1,5 @@
+import type { PromptTemplate, GeneratedPrompt } from "@/lib/types/prompt-generator"
 import { PROMPT_TEMPLATES } from "@/lib/data/prompt-templates"
-import { GeneratedPrompt, PromptTemplate } from "../core/types"
 
 class PromptGeneratorService {
   private readonly STORAGE_KEY = "v0-toolkit-prompt-history"

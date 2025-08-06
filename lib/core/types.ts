@@ -151,41 +151,37 @@ export interface PromptTemplate {
   examples: PromptExample[]
   tags: string[]
   difficulty: "beginner" | "intermediate" | "advanced"
+  estimatedTokens: number
   icon?: any
-  createdAt?: Date
-  updatedAt?: Date
+  successRate: number
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface PromptField {
   id: string
-  name?: string
+  name: string
   label: string
-  icon?: any
   type: "text" | "textarea" | "select" | "multiselect" | "tags"
-  category?: string
   placeholder: string
   description: string
   required: boolean
   options?: string[]
   defaultValue?: string | string[]
   validation?: {
-    required?: boolean
     minLength?: number
     maxLength?: number
-    minItems?: number
     pattern?: string
   }
   suggestions?: string[]
 }
 
 export interface PromptExample {
-  title?: string
-  name?: string
+  title: string
   description: string
-  fieldValues?: Record<string, string | string[]>
-  values?: Record<string, string | string[]>
-  expectedOutput?: string
-  tags?: string[]
+  fieldValues: Record<string, string | string[]>
+  expectedOutput: string
+  tags: string[]
 }
 
 export interface GeneratedPrompt {
@@ -194,6 +190,7 @@ export interface GeneratedPrompt {
   prompt: string
   fieldValues: Record<string, string | string[]>
   createdAt: Date
+  estimatedTokens: number
   category: string
   tags: string[]
 }
