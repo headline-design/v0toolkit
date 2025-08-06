@@ -1,4 +1,4 @@
-import type { PromptTemplate } from "@/lib/types/prompt-generator"
+import { PromptTemplate } from "@/lib/core/types"
 import { getAllProjectTypes } from "@/lib/data/project-suggestions"
 
 export const expertRoleBasedTemplate: PromptTemplate = {
@@ -7,7 +7,7 @@ export const expertRoleBasedTemplate: PromptTemplate = {
   description:
     "Configure V0 as a specialized expert with defined expertise, experience, and deliverables for optimal responses",
   category: "Development",
-  difficulty: "Intermediate",
+  difficulty: "intermediate",
   icon: "UserCog",
   tags: ["expert", "role-based", "development", "context"],
   template: `You are a {expertiseType} expert (specializing in {workHistory} platforms) who built the documentation website for {primaryCompany} and then worked with {additionalCompanies} on {features}, etc. We are building a {projectType}{additionalContext}. I want you to {action} {deliverables} for our {finalProduct}.`,

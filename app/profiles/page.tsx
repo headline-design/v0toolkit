@@ -625,13 +625,13 @@ export default function V0ProfilesPage() {
                               onProfileUpdate={(updatedProfile) => {
                                 setProfiles(profiles.map((p) => (p.id === updatedProfile.id ? updatedProfile : p)))
                               }}
-                              trigger={
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                  <Edit className="h-3 w-3 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                              }
-                            />
+
+                            >
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Edit className="h-3 w-3 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                            </ProfileEditDialog>
                             <DropdownMenuItem onClick={() => handleDuplicateProfile(profile)}>
                               <Copy className="h-3 w-3 mr-2" />
                               Duplicate
@@ -777,11 +777,11 @@ export default function V0ProfilesPage() {
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1">
                           <Zap className="h-3 w-3" />
-                          <span>{template.suggestedTraits.length} traits</span>
+                          <span>{template?.suggestedTraits?.length} traits</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Settings className="h-3 w-3" />
-                          <span>{template.suggestedTasks.length} tasks</span>
+                          <span>{template?.suggestedTasks?.length} tasks</span>
                         </div>
                       </div>
                     </div>

@@ -30,8 +30,7 @@ import {
   CheckCircle,
 } from "lucide-react"
 import { v0ProfileService } from "@/lib/services/v0-profile-service"
-import type { V0Profile, ProfileTemplate } from "@/lib/types/v0-profile"
-import type { GeneratedPrompt } from "@/lib/types/prompt-generator"
+import type { V0Profile, ProfileTemplate, GeneratedPrompt } from "@/lib/types/v0-profile"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
@@ -69,8 +68,8 @@ export default function CreateProfilePage() {
           if (template) {
             setSelectedTemplate(template)
             setActiveTab("template")
-            setProfileName(template.name)
-            setProfileDescription(template.description)
+            setProfileName(template.name ?? "Bob")
+            setProfileDescription(template.description ?? "Custom V0 profile based on template")
             setCurrentStep(2)
           }
         }
@@ -93,8 +92,8 @@ export default function CreateProfilePage() {
   const filteredGeneratedPrompts = generatedPrompts.filter((prompt) => {
     const matchesSearch =
       prompt.prompt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prompt.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (prompt.tags && prompt.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())))
+      (prompt.category && prompt.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (prompt.tags && prompt.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()) || tag === "all"))
 
     const matchesCategory = selectedCategory === "all" || prompt.category === selectedCategory
 
@@ -151,7 +150,13 @@ export default function CreateProfilePage() {
 
       if (activeTab === "generated" && selectedGeneratedPrompt) {
         // Create profile from generated prompt
-        newProfile = v0ProfileService.createProfileFromGeneratedPrompt(selectedGeneratedPrompt, profileName)
+        newProfile = v0ProfileService.createProfileFromTemplate(
+          {
+            ...selectedGeneratedPrompt,
+            tags: selectedGeneratedPrompt.tags ?? [],
+          } as ProfileTemplate,
+          profileName,
+        )
         if (profileDescription.trim()) {
           newProfile.description = profileDescription
           v0ProfileService.saveProfile(newProfile)
@@ -383,7 +388,7 @@ export default function CreateProfilePage() {
                     {selectedGeneratedPrompt
                       ? selectedGeneratedPrompt.prompt.slice(0, 100) + "..."
                       : selectedTemplate
-                        ? selectedTemplate.basePrompt.slice(0, 100) + "..."
+                        ? (selectedTemplate.basePrompt ? selectedTemplate.basePrompt.slice(0, 100) + "..." : "You are a helpful AI assistant...")
                         : "You are a helpful AI assistant..."}
                     "
                   </div>
@@ -505,7 +510,7 @@ export default function CreateProfilePage() {
                             </SelectTrigger>
                             <SelectContent>
                               {categories.map((category) => (
-                                <SelectItem key={category} value={category} className="capitalize">
+                                <SelectItem key={category} value={category ?? "all"} className="capitalize">
                                   {category === "all" ? "All Categories" : category}
                                 </SelectItem>
                               ))}
@@ -637,11 +642,11 @@ export default function CreateProfilePage() {
                             <div className="flex items-center gap-3">
                               <div className="flex items-center gap-1">
                                 <Zap className="h-3 w-3" />
-                                <span>{template.suggestedTraits.length} traits</span>
+                                <span>{template?.suggestedTraits?.length} traits</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <Settings className="h-3 w-3" />
-                                <span>{template.suggestedTasks.length} tasks</span>
+                                <span>{template?.suggestedTasks?.length} tasks</span>
                               </div>
                             </div>
                           </div>

@@ -53,14 +53,14 @@ export interface TaskVariable {
 
 export interface ProfileTemplate {
   id: string
-  name: string
-  description: string
-  category: string
-  difficulty: "Beginner" | "Intermediate" | "Advanced"
+  name?: string
+  description?: string
+  category?: string
+  difficulty?: "Beginner" | "Intermediate" | "Advanced"
   icon?: string
-  basePrompt: string
-  suggestedTraits: Omit<ProfileTrait, "id" | "isActive" | "insertionPoint" | "priority">[]
-  suggestedTasks: Omit<ProfileTask, "id" | "isActive" | "estimatedTokens" | "variables">[]
+  basePrompt?: string
+  suggestedTraits?: Omit<ProfileTrait, "id" | "isActive" | "insertionPoint" | "priority">[]
+  suggestedTasks?: Omit<ProfileTask, "id" | "isActive" | "estimatedTokens" | "variables">[]
   tags: string[]
 }
 

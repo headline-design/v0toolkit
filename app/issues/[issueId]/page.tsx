@@ -1,357 +1,337 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { ExternalLink, ArrowLeft, Calendar, User, Tag } from 'lucide-react'
 import Link from 'next/link'
 import { Issue } from '@/lib/types/issues'
-import { IssueService } from '@/lib/services/issue-service'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ArrowLeft, Calendar, User, Tag, ExternalLink, Github, Bug, Lightbulb, Zap, FileText, HelpCircle, Clock, CheckCircle, AlertTriangle } from 'lucide-react'
+import { issueService } from '@/lib/services/issue-service'
 
-const typeIcons = {
-  bug: Bug,
-  feature: Lightbulb,
-  enhancement: Zap,
-  documentation: FileText,
-  question: HelpCircle
-}
-
-const statusIcons = {
-  open: Clock,
-  'in-progress': AlertTriangle,
-  closed: CheckCircle,
-  duplicate: AlertTriangle,
-  'wont-fix': AlertTriangle
+const priorityColors = {
+  low: 'bg-blue-100 text-blue-800 border-blue-200',
+  medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  high: 'bg-orange-100 text-orange-800 border-orange-200',
+  critical: 'bg-red-100 text-red-800 border-red-200'
 }
 
 const statusColors = {
-  open: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-  'in-progress': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-  closed: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-  duplicate: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-  'wont-fix': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+  open: 'bg-green-100 text-green-800 border-green-200',
+  'in-progress': 'bg-blue-100 text-blue-800 border-blue-200',
+  closed: 'bg-gray-100 text-gray-800 border-gray-200',
+  duplicate: 'bg-purple-100 text-purple-800 border-purple-200',
+  'wont-fix': 'bg-red-100 text-red-800 border-red-200'
 }
 
-const priorityColors = {
-  low: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-  medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-  high: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-  critical: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+const typeColors = {
+  bug: 'bg-red-100 text-red-800 border-red-200',
+  feature: 'bg-blue-100 text-blue-800 border-blue-200',
+  enhancement: 'bg-green-100 text-green-800 border-green-200',
+  documentation: 'bg-purple-100 text-purple-800 border-purple-200',
+  question: 'bg-yellow-100 text-yellow-800 border-yellow-200'
 }
 
 export default function IssuePage() {
   const params = useParams()
-  const router = useRouter()
   const [issue, setIssue] = useState<Issue | null>(null)
   const [loading, setLoading] = useState(true)
-
-  const issueService = IssueService.getInstance()
-  const issueId = params.issueId as string
+  const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
-    loadIssue()
-  }, [issueId])
-
-  const loadIssue = async () => {
-    setLoading(true)
-    try {
-      const issueData = await issueService.getIssueById(issueId)
-      if (!issueData) {
-        router.push('/issues')
-        return
+    const loadIssue = async () => {
+      try {
+        const issueData = await issueService.getIssue(params.issueId as string)
+        if (issueData) {
+          setIssue(issueData)
+        } else {
+          setNotFound(true)
+        }
+      } catch (error) {
+        console.error('Failed to load issue:', error)
+        setNotFound(true)
+      } finally {
+        setLoading(false)
       }
-      setIssue(issueData)
-    } catch (error) {
-      console.error('Failed to load issue:', error)
-      router.push('/issues')
-    } finally {
-      setLoading(false)
     }
-  }
+
+    if (params.issueId) {
+      loadIssue()
+    }
+  }, [params.issueId])
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-6">
-          <div className="h-8 bg-gray-200 rounded animate-pulse" />
-          <div className="h-64 bg-gray-200 rounded animate-pulse" />
-          <div className="h-32 bg-gray-200 rounded animate-pulse" />
+      <div className="container mx-auto py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading issue...</p>
+          </div>
         </div>
       </div>
     )
   }
 
-  if (!issue) {
+  if (notFound || !issue) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <AlertTriangle className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Issue not found</h3>
-            <p className="text-muted-foreground mb-4">
-              The issue you're looking for doesn't exist or has been removed.
-            </p>
-            <Button asChild>
-              <Link href="/issues">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Issues
-              </Link>
+      <div className="container mx-auto py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Issue Not Found</h1>
+          <p className="text-muted-foreground mb-6">
+            The issue you're looking for doesn't exist or has been removed.
+          </p>
+          <Link href="/issues">
+            <Button>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Issues
             </Button>
-          </CardContent>
-        </Card>
+          </Link>
+        </div>
       </div>
     )
   }
-
-  const TypeIcon = typeIcons[issue.type]
-  const StatusIcon = statusIcons[issue.status]
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/issues">
+      <div className="flex items-center gap-4">
+        <Link href="/issues">
+          <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Issues
-          </Link>
-        </Button>
+          </Button>
+        </Link>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>Issue</span>
           <span>#{issue.id}</span>
-          <span>•</span>
-          <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
         </div>
       </div>
 
-      {/* Main Issue */}
-      <Card className="mb-6">
+      {/* Issue Header */}
+      <Card>
         <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-muted">
-                  <TypeIcon className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <StatusIcon className="h-4 w-4" />
-                  <Badge className={statusColors[issue.status]}>
-                    {issue.status.replace('-', ' ')}
-                  </Badge>
-                </div>
+          <div className="flex items-start justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-bold">{issue.title}</h1>
+                {issue.issueUrl && issue.issueUrl !== `#issue-${issue.id.split('-')[1]}` && (
+                  <a
+                    href={issue.issueUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    <ExternalLink className="h-5 w-5" />
+                  </a>
+                )}
               </div>
-              <CardTitle className="text-2xl mb-2">{issue.title}</CardTitle>
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <Badge variant="outline" className={priorityColors[issue.priority]}>
-                  {issue.priority} priority
-                </Badge>
-                <Badge variant="secondary">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge className={typeColors[issue.type]}>
                   {issue.type}
                 </Badge>
-                <Badge variant="secondary">
+                <Badge className={statusColors[issue.status]}>
+                  {issue.status}
+                </Badge>
+                <Badge className={priorityColors[issue.priority]}>
+                  {issue.priority} priority
+                </Badge>
+                <Badge variant="outline">
                   {issue.category}
                 </Badge>
               </div>
             </div>
-            
-            {/* GitHub Actions */}
-            <div className="flex flex-col gap-2 min-w-[140px]">
-              <Button asChild>
-                <Link href={issue.githubIssueUrl} target="_blank" rel="noopener noreferrer">
-                  <Github className="h-4 w-4 mr-2" />
-                  View on GitHub
-                  <ExternalLink className="h-3 w-3 ml-1" />
-                </Link>
-              </Button>
-              {issue.githubPrUrl && (
-                <Button variant="outline" asChild>
-                  <Link href={issue.githubPrUrl} target="_blank" rel="noopener noreferrer">
-                    <Github className="h-4 w-4 mr-2" />
-                    View PR
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </Link>
-                </Button>
-              )}
-            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
           {/* Description */}
-          <div>
-            <h3 className="font-semibold mb-2">Description</h3>
-            <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{issue.description}</p>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Description</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-sm max-w-none">
+                <p className="whitespace-pre-wrap">{issue.description}</p>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Reproduction Steps */}
           {issue.reproductionSteps && issue.reproductionSteps.length > 0 && (
-            <div>
-              <h3 className="font-semibold mb-2">Steps to Reproduce</h3>
-              <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                {issue.reproductionSteps.map((step, index) => (
-                  <li key={index} className="leading-relaxed">{step}</li>
-                ))}
-              </ol>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Steps to Reproduce</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ol className="list-decimal list-inside space-y-2">
+                  {issue.reproductionSteps.map((step, index) => (
+                    <li key={index} className="text-sm">
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
           )}
 
           {/* Expected vs Actual Behavior */}
           {(issue.expectedBehavior || issue.actualBehavior) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {issue.expectedBehavior && (
-                <div className="p-4 rounded-lg border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-                  <h3 className="font-semibold mb-2 text-green-700 dark:text-green-300">Expected Behavior</h3>
-                  <p className="text-green-600 dark:text-green-400 leading-relaxed">{issue.expectedBehavior}</p>
-                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-green-700">Expected Behavior</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm">{issue.expectedBehavior}</p>
+                  </CardContent>
+                </Card>
               )}
               {issue.actualBehavior && (
-                <div className="p-4 rounded-lg border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
-                  <h3 className="font-semibold mb-2 text-red-700 dark:text-red-300">Actual Behavior</h3>
-                  <p className="text-red-600 dark:text-red-400 leading-relaxed">{issue.actualBehavior}</p>
-                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-red-700">Actual Behavior</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm">{issue.actualBehavior}</p>
+                  </CardContent>
+                </Card>
               )}
             </div>
           )}
 
           {/* Environment */}
           {issue.environment && (
-            <div>
-              <h3 className="font-semibold mb-3">Environment</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                {issue.environment.browser && (
-                  <div className="flex justify-between p-2 rounded bg-muted/50">
-                    <span className="font-medium">Browser:</span> 
-                    <span className="font-mono">{issue.environment.browser}</span>
-                  </div>
-                )}
-                {issue.environment.os && (
-                  <div className="flex justify-between p-2 rounded bg-muted/50">
-                    <span className="font-medium">OS:</span> 
-                    <span className="font-mono">{issue.environment.os}</span>
-                  </div>
-                )}
-                {issue.environment.v0Version && (
-                  <div className="flex justify-between p-2 rounded bg-muted/50">
-                    <span className="font-medium">V0 Version:</span> 
-                    <span className="font-mono">{issue.environment.v0Version}</span>
-                  </div>
-                )}
-                {issue.environment.nodeVersion && (
-                  <div className="flex justify-between p-2 rounded bg-muted/50">
-                    <span className="font-medium">Node Version:</span> 
-                    <span className="font-mono">{issue.environment.nodeVersion}</span>
-                  </div>
-                )}
+            <Card>
+              <CardHeader>
+                <CardTitle>Environment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  {issue.environment.browser && (
+                    <div>
+                      <span className="font-medium">Browser:</span> {issue.environment.browser}
+                    </div>
+                  )}
+                  {issue.environment.os && (
+                    <div>
+                      <span className="font-medium">OS:</span> {issue.environment.os}
+                    </div>
+                  )}
+                  {issue.environment.v0Version && (
+                    <div>
+                      <span className="font-medium">V0 Version:</span> {issue.environment.v0Version}
+                    </div>
+                  )}
+                  {issue.environment.nodeVersion && (
+                    <div>
+                      <span className="font-medium">Node Version:</span> {issue.environment.nodeVersion}
+                    </div>
+                  )}
+                  {issue.environment.additionalInfo && (
+                    <div className="col-span-2">
+                      <span className="font-medium">Additional Info:</span> {issue.environment.additionalInfo}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Issue Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Issue Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-2 text-sm">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Author:</span>
+                <span>{issue.author}</span>
               </div>
-              {issue.environment.additionalInfo && (
-                <div className="mt-3 p-3 rounded bg-muted/50">
-                  <span className="font-medium">Additional Info:</span>
-                  <p className="text-muted-foreground mt-1 leading-relaxed">{issue.environment.additionalInfo}</p>
+              {issue.assignee && (
+                <div className="flex items-center gap-2 text-sm">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Assignee:</span>
+                  <span>{issue.assignee}</span>
                 </div>
               )}
-            </div>
-          )}
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Created:</span>
+                <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Updated:</span>
+                <span>{new Date(issue.updatedAt).toLocaleDateString()}</span>
+              </div>
+              {issue.closedAt && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Closed:</span>
+                  <span>{new Date(issue.closedAt).toLocaleDateString()}</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Tags */}
           {issue.tags.length > 0 && (
-            <div>
-              <h3 className="font-semibold mb-2">Tags</h3>
-              <div className="flex flex-wrap gap-2">
-                {issue.tags.map(tag => (
-                  <Badge key={tag} variant="outline">
-                    <Tag className="h-3 w-3 mr-1" />
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  Tags
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {issue.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           )}
 
-          {/* Related Issues */}
-          {issue.relatedIssues.length > 0 && (
-            <div>
-              <h3 className="font-semibold mb-2">Related Issues</h3>
-              <div className="flex flex-wrap gap-2">
-                {issue.relatedIssues.map(relatedId => (
-                  <Button key={relatedId} variant="outline" size="sm" asChild>
-                    <Link href={`/issues/${relatedId}`}>
-                      #{relatedId}
-                    </Link>
+          {/* Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {issue.issueUrl && issue.issueUrl !== `#issue-${issue.id.split('-')[1]}` && (
+                <a href={issue.issueUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" className="w-full justify-start">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    View External Issue
                   </Button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Meta Information */}
-          <Separator />
-          <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-6 w-6">
-                <AvatarFallback className="text-xs">
-                  {issue.author.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span>Created by <strong>{issue.author}</strong></span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              <span>Created {new Date(issue.createdAt).toLocaleDateString()}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              <span>Updated {new Date(issue.updatedAt).toLocaleDateString()}</span>
-            </div>
-            {issue.assignee && (
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                <span>Assigned to <strong>{issue.assignee}</strong></span>
-              </div>
-            )}
-            {issue.closedAt && (
-              <div className="flex items-center gap-1">
-                <CheckCircle className="h-4 w-4" />
-                <span>Closed {new Date(issue.closedAt).toLocaleDateString()}</span>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* GitHub Notice */}
-      <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
-        <CardContent className="p-6">
-          <div className="flex items-start gap-3">
-            <Github className="h-5 w-5 text-blue-600 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Discuss on GitHub</h3>
-              <p className="text-sm text-blue-700 dark:text-blue-300 mb-4">
-                This issue is managed on GitHub. To add comments, provide additional information, or track progress, 
-                please visit the GitHub issue page. All discussions and updates happen there.
-              </p>
-              <div className="flex gap-2">
-                <Button size="sm" asChild>
-                  <Link href={issue.githubIssueUrl} target="_blank" rel="noopener noreferrer">
-                    <Github className="h-3 w-3 mr-1" />
-                    Join Discussion
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </Link>
-                </Button>
-                {issue.githubPrUrl && (
-                  <Button size="sm" variant="outline" asChild>
-                    <Link href={issue.githubPrUrl} target="_blank" rel="noopener noreferrer">
-                      View Pull Request
-                      <ExternalLink className="h-3 w-3 ml-1" />
-                    </Link>
+                </a>
+              )}
+              {issue.prUrl && (
+                <a href={issue.prUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" className="w-full justify-start">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    View Pull Request
                   </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                </a>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }

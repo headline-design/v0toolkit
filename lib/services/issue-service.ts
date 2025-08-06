@@ -9,20 +9,20 @@ class IssueService {
   }
 
   // Convert simple user input to full Issue objects
-  private processUserIssues(userInputs: UserIssueInput[]): Issue[] {
+  private processUserIssues(userInputs: any[]): Issue[] {
     return userInputs.map((input, index) => {
       const id = `v0-${String(index + 1).padStart(3, '0')}`
       const now = new Date().toISOString()
       const createdAt = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString() // Random date within last 30 days
-      
+
       return {
         id,
         title: input.title,
         description: input.description,
-        type: input.type,
+        type: input.type as 'bug' | 'feature' | 'enhancement' | 'documentation' | 'question',
         status: input.status || 'open',
-        priority: input.priority || 'medium',
-        category: input.category || 'other',
+        priority: (input.priority || 'medium') as 'low' | 'medium' | 'high' | 'critical',
+        category: (input.category || 'other') as 'ui' | 'performance' | 'api' | 'documentation' | 'integration' | 'other',
         tags: input.tags || [],
         author: input.author || 'anonymous',
         assignee: input.assignee,
@@ -31,8 +31,8 @@ class IssueService {
         closedAt: input.status === 'closed' ? now : undefined,
         attachments: [],
         relatedIssues: [],
-        githubIssueUrl: input.githubIssueUrl || `https://github.com/vercel/v0-issues/issues/${index + 1}`,
-        githubPrUrl: input.githubPrUrl,
+        issueUrl: input.issueUrl || `#issue-${index + 1}`,
+        prUrl: input.prUrl,
         reproductionSteps: input.reproductionSteps,
         expectedBehavior: input.expectedBehavior,
         actualBehavior: input.actualBehavior,
@@ -59,17 +59,17 @@ class IssueService {
         filteredIssues = filteredIssues.filter(issue => filters.category!.includes(issue.category))
       }
       if (filters.tags?.length) {
-        filteredIssues = filteredIssues.filter(issue => 
+        filteredIssues = filteredIssues.filter(issue =>
           filters.tags!.some(tag => issue.tags.includes(tag))
         )
       }
       if (filters.author) {
-        filteredIssues = filteredIssues.filter(issue => 
+        filteredIssues = filteredIssues.filter(issue =>
           issue.author.toLowerCase().includes(filters.author!.toLowerCase())
         )
       }
       if (filters.assignee) {
-        filteredIssues = filteredIssues.filter(issue => 
+        filteredIssues = filteredIssues.filter(issue =>
           issue.assignee?.toLowerCase().includes(filters.assignee!.toLowerCase())
         )
       }
@@ -137,19 +137,22 @@ class IssueService {
     return [...new Set(allAuthors)].sort()
   }
 
-  // Simulate syncing with GitHub (in a real app, this would fetch from GitHub API)
-  async syncWithGitHub(): Promise<{ success: boolean; message: string }> {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // In a real implementation, this would:
-    // 1. Fetch issues from GitHub API
-    // 2. Update the local issues array
-    // 3. Return sync results
-    
-    return {
-      success: true,
-      message: `Synced ${this.issues.length} issues from GitHub`
+  // Reload issues from the data file
+  async reloadIssues(): Promise<{ success: boolean; message: string }> {
+    try {
+      // In a real implementation, this would re-import the data file
+      // For now, we'll simulate reloading
+      this.issues = this.processUserIssues(userIssues)
+
+      return {
+        success: true,
+        message: `Reloaded ${this.issues.length} issues from data file`
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Failed to reload issues from data file'
+      }
     }
   }
 }
