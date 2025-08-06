@@ -103,7 +103,7 @@ export default function IssuesPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto py-8 space-y-8 px-4 md:px-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -244,7 +244,7 @@ export default function IssuesPage() {
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Link 
+                      <Link
                         href={`/issues/${issue.id}`}
                         className="text-lg font-semibold hover:text-primary transition-colors"
                       >
