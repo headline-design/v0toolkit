@@ -1,4 +1,3 @@
-
 import { PromptTemplate } from "@/lib/core/types"
 import { getAllProjectTypes } from "@/lib/data/project-suggestions"
 
