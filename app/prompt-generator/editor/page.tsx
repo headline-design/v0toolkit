@@ -185,20 +185,9 @@ export default function PromptGeneratorEditorPage() {
         </div>
 
         {/* Main Content Layout */}
-        <div className="flex-1 min-w-0 overflow-auto max-w-5xl mx-auto">
-          <div className="p-4 space-y-4">
-            {/* Quick Tips */}
-            <Alert className="bg-blue-50 border-blue-200">
-              <Lightbulb className="h-3 w-3 text-blue-600" />
-              <AlertDescription className="text-blue-800 text-sm">
-                <strong>Quick Tips:</strong> Fill in all required fields to generate your prompt. Use the examples
-                dropdown to load pre-configured settings, and check the assistant panel for help and guidance.
-              </AlertDescription>
-            </Alert>
 
             <PromptGenerator hook={promptGeneratorHook} onTemplateSelect={handleBack} />
-          </div>
-        </div>
+
       </SidebarInset>
       <AppSidebar side="right" />
     </SidebarProvider>
