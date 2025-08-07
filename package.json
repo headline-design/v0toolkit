@@ -62,8 +62,8 @@
     "zod": "3.25.67"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.11",
     "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
