@@ -21,7 +21,11 @@ class PromptGeneratorService {
           replacementValue = value.join(", ")
         }
       } else if (typeof value === "string") {
-        replacementValue = value
+        if (field.id === "additionalContext") {
+          replacementValue = ` and ${value}` // Use placeholder if no value provided
+        } else {
+          replacementValue = value
+      }
       }
 
       // Replace the placeholder in the template
@@ -61,11 +65,6 @@ class PromptGeneratorService {
     })
 
     return errors
-  }
-
-  estimateTokens(text: string): number {
-    // Rough estimation: ~4 characters per token
-    return Math.ceil(text.length / 4)
   }
 
   saveToHistory(prompt: GeneratedPrompt): void {

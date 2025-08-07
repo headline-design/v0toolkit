@@ -1,3 +1,5 @@
+import { ProjectTypeName } from "../data/project-suggestions"
+
 export interface Author {
   id: string
   name: string
@@ -183,6 +185,7 @@ export interface PromptExample {
   name?: string
   description: string
   fieldValues?: Record<string, string | string[]>
+  projectType: ProjectTypeName
   values?: Record<string, string | string[]>
   expectedOutput?: string
   tags?: string[]

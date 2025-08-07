@@ -185,7 +185,7 @@ export default function PromptGeneratorEditorPage() {
         </div>
 
         {/* Main Content Layout */}
-        <div className="flex-1 min-w-0 overflow-auto">
+        <div className="flex-1 min-w-0 overflow-auto max-w-5xl mx-auto">
           <div className="p-4 space-y-4">
             {/* Quick Tips */}
             <Alert className="bg-blue-50 border-blue-200">

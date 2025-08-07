@@ -1,6 +1,6 @@
 export interface ProjectTypeSuggestions {
   id: string
-  name: string
+  name: ProjectTypeName
   description: string
   workHistory: string[]
   primaryCompanies: string[]
@@ -9,10 +9,33 @@ export interface ProjectTypeSuggestions {
   deliverables: string[]
 }
 
+export enum ProjectTypeId {
+  DeveloperTooling = "dev-tooling",
+  GenAICoding = "gen-ai-coding",
+  Fintech = "fintech",
+  Ecommerce = "ecommerce",
+  Web3Crypto = "web3-crypto",
+  FundraisingTech = "fundraising-tech",
+  Healthcare = "healthcare",
+  Education = "education",
+}
+
+export enum ProjectTypeName {
+  DeveloperTooling = "Developer Tooling",
+  GenAICoding = "AI-Powered Coding",
+  Business = "Business",
+  Fintech = "Financial Technology",
+  FundraisingTech = "Fundraising Technology",
+  Ecommerce = "E-commerce & Retail",
+  Web3Crypto = "Web3 & Cryptocurrency",
+  Healthcare = "Healthcare & Medical",
+  Education = "Education Technology",
+}
+
 export const PROJECT_TYPE_SUGGESTIONS: ProjectTypeSuggestions[] = [
   {
     id: "dev-tooling",
-    name: "Developer Tooling",
+    name: ProjectTypeName.DeveloperTooling,
     description: "Development tools, IDEs, and developer productivity platforms",
     workHistory: [
       "GitHub",
@@ -82,7 +105,7 @@ export const PROJECT_TYPE_SUGGESTIONS: ProjectTypeSuggestions[] = [
   },
   {
     id: "gen-ai-coding",
-    name: "AI-Powered Coding",
+    name: ProjectTypeName.GenAICoding,
     description: "AI coding assistants, code generation, and intelligent development tools",
     workHistory: [
       "OpenAI",
@@ -152,7 +175,7 @@ export const PROJECT_TYPE_SUGGESTIONS: ProjectTypeSuggestions[] = [
   },
   {
     id: "fintech",
-    name: "Financial Technology",
+    name: ProjectTypeName.Fintech,
     description: "Banking, payments, investment platforms, and financial services",
     workHistory: [
       "Stripe",
@@ -222,7 +245,7 @@ export const PROJECT_TYPE_SUGGESTIONS: ProjectTypeSuggestions[] = [
   },
   {
     id: "ecommerce",
-    name: "E-commerce & Retail",
+    name: ProjectTypeName.Ecommerce,
     description: "Online marketplaces, retail platforms, and commerce solutions",
     workHistory: [
       "Shopify",
@@ -292,7 +315,7 @@ export const PROJECT_TYPE_SUGGESTIONS: ProjectTypeSuggestions[] = [
   },
   {
     id: "web3-crypto",
-    name: "Web3 & Cryptocurrency",
+    name: ProjectTypeName.Web3Crypto,
     description: "Blockchain applications, DeFi platforms, and cryptocurrency services",
     workHistory: [
       "Coinbase",
@@ -361,8 +384,8 @@ export const PROJECT_TYPE_SUGGESTIONS: ProjectTypeSuggestions[] = [
     ],
   },
   {
-    id: "startup-investor",
-    name: "Startup & Investment Platforms",
+    id: "fundraising-tech",
+    name: ProjectTypeName.FundraisingTech,
     description: "Venture capital, startup accelerators, and investment matching platforms",
     workHistory: [
       "AngelList",
@@ -432,7 +455,7 @@ export const PROJECT_TYPE_SUGGESTIONS: ProjectTypeSuggestions[] = [
   },
   {
     id: "healthcare",
-    name: "Healthcare & Medical",
+    name: ProjectTypeName.Healthcare,
     description: "Healthcare platforms, medical devices, and health technology solutions",
     workHistory: [
       "Epic",
@@ -502,7 +525,7 @@ export const PROJECT_TYPE_SUGGESTIONS: ProjectTypeSuggestions[] = [
   },
   {
     id: "education",
-    name: "Education Technology",
+    name: ProjectTypeName.Education,
     description: "Learning platforms, educational tools, and academic management systems",
     workHistory: [
       "Coursera",
@@ -570,6 +593,76 @@ export const PROJECT_TYPE_SUGGESTIONS: ProjectTypeSuggestions[] = [
       "instructor tools",
     ],
   },
+  {
+    id: "business",
+    name: ProjectTypeName.Business,
+    description: "Business applications, CRM systems, and enterprise solutions",
+    workHistory: [
+      "Salesforce",
+      "HubSpot",
+      "Zoho",
+      "SAP",
+      "Oracle",
+      "Microsoft Dynamics 365",
+      "Slack",
+      "Asana",
+      "Trello",
+      "Monday.com",
+      "Jira",
+      "Confluence",
+      "Notion",
+      "Airtable",
+      "ClickUp",
+    ],
+    primaryCompanies: [
+      "Salesforce",
+      "HubSpot",
+      "Zoho",
+      "SAP",
+      "Oracle",
+      "Microsoft Dynamics 365",
+      "Slack",
+      "Asana",
+      "Trello",
+      "Monday.com",
+    ],
+    additionalCompanies: [
+      "Jira",
+      "Confluence",
+      "Notion",
+      "Airtable",
+      "ClickUp",
+      "Basecamp",
+      "Wrike",
+      "Smartsheet",
+      "Teamwork",
+      "Podio",
+    ],
+    features: [
+      "customer relationship management",
+      "project management",
+      "team collaboration",
+      "task automation",
+      "reporting and analytics",
+      "workflow management",
+      "document sharing",
+      "communication tools",
+      "time tracking",
+      "resource allocation",
+    ],
+    deliverables: [
+      "CRM system",
+      "project management tool",
+      "collaboration platform",
+      "analytics dashboard",
+      "document management system",
+      "time tracking tool",
+      "workflow automation tool",
+      "communication platform",
+      "reporting tool",
+      "resource planning tool",
+    ],
+  }
 ]
 
 export function getProjectTypeSuggestions(projectTypeId: string): ProjectTypeSuggestions | null {

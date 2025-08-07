@@ -343,7 +343,7 @@ export default function HomePage() {
         <div className="space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="space-y-2">
-              <h1 className="text-2xl font-bold tracking-tight">V0 Toolkit Dashboard</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
               <p className="text-muted-foreground">Manage your prompts, profiles, and development workflow</p>
             </div>
             <div className="flex items-center gap-2">

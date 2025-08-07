@@ -1,4 +1,5 @@
 import { PromptTemplate } from "@/lib/core/types";
+import { ProjectTypeName } from "../project-suggestions";
 
 
 export const uiComponentBuilderTemplate: PromptTemplate = {
@@ -167,6 +168,7 @@ Please provide the complete React component with TypeScript, proper styling usin
     {
       name: "Contact Form",
       description: "A comprehensive contact form with validation",
+      projectType: ProjectTypeName.Business,
       values: {
         componentType: "Form",
         projectContext: "business website",

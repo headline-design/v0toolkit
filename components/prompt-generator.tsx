@@ -14,54 +14,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import {
-  Wand2,
-  Copy,
-  RotateCcw,
-  Save,
-  Eye,
-  CheckCircle,
-  AlertCircle,
-  Target,
-  X,
-  Plus,
-  Sparkles,
-  FileText,
-  Settings,
-  ChevronDown,
-  ChevronUp,
-  Star,
-  Users,
-  ArrowRight,
-  Lightbulb,
-  Download,
-  Share,
-  UserCog,
-  FileCode,
-  Palette,
-  Zap,
-  Building2,
-  TrendingUp,
-  AlertTriangle,
-  Package,
-  MessageSquare,
-  Folder,
-  Code,
-  Layers,
-  Wrench,
-  Shield,
-  Square,
-  Briefcase,
-  Paintbrush,
-  Smartphone,
-  MousePointer,
-  Clock,
-  BookOpen,
-  HelpCircle,
-  FolderOpen,
-  Play,
-  Rocket,
-} from "lucide-react"
+import { Wand2, Copy, RotateCcw, Save, Eye, CheckCircle, AlertCircle, Target, X, Plus, Sparkles, FileText, Settings, ChevronDown, ChevronUp, Star, Users, ArrowRight, Lightbulb, Download, Share, UserCog, FileCode, Palette, Zap, Building2, TrendingUp, AlertTriangle, Package, MessageSquare, Folder, Code, Layers, Wrench, Shield, Square, Briefcase, Paintbrush, Smartphone, MousePointer, Clock, BookOpen, HelpCircle, FolderOpen, Play, Rocket } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import type { usePromptGenerator } from "@/lib/hooks/use-prompt-generator"
 import type { PromptField } from "@/lib/types/prompt-generator"
@@ -86,6 +39,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
   const [showPreview, setShowPreview] = useState(false)
   const promptRef = useRef<HTMLDivElement>(null)
   const [fieldCompletion, setFieldCompletion] = useState<Record<string, boolean>>({})
+  const [requiredFieldsCompleted, setRequiredFieldsCompleted] = useState<Record<string, boolean>>({})
   const [selectedProjectType, setSelectedProjectType] = useState<string>("")
 
   // Use passed hook or create a new one (fallback for standalone usage)
@@ -335,8 +289,8 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
   const getCompletionPercentage = () => {
     if (!selectedTemplate) return 0
     const requiredFields = selectedTemplate.fields.filter((field) => field.required)
-    const completedFields = requiredFields.filter((field) => fieldCompletion[field.id] === true)
-    return Math.round((completedFields.length / requiredFields.length) * 100)
+    const completedRequiredFields = requiredFields.filter((field) => requiredFieldsCompleted[field.id] === true)
+    return Math.round((completedRequiredFields.length / requiredFields.length) * 100)
   }
 
   // Group fields by category for better organization
@@ -805,8 +759,15 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
         ? value && (Array.isArray(value) ? value.length > 0 : value.toString().trim() !== "")
         : true
       completion[field.id] = isComplete
+      if (field.required) {
+        setRequiredFieldsCompleted((prev) => ({
+          ...prev,
+          [field.id]: isComplete,
+        }))
+      }
     })
     setFieldCompletion(completion)
+
   }, [selectedTemplate, fieldValues])
 
   return (
@@ -838,11 +799,11 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                   <div className="space-y-1">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Sparkles className="h-4 w-4" />
-                    Templates
+                      Templates
                     </CardTitle>
                     <div className="flex items-start gap-2">
                       <CardDescription className="text-sm leading-relaxed flex-1">
-                       Get started quickly with our pre-built templates.
+                        Get started quickly with our pre-built templates.
                       </CardDescription>
                       {selectedTemplate.description.length > 100 && (
                         <Tooltip>
@@ -858,7 +819,13 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {selectedTemplate.examples.length > 0 && typeof loadExample === "function" && (
-                      <Select onValueChange={(value) => loadExample(Number.parseInt(value))}>
+                      <Select onValueChange={(value) => {
+                        loadExample(Number.parseInt(value))
+                        setSelectedProjectType(selectedTemplate.examples[Number.parseInt(value)].projectType || "")
+                        console.log("Selected project type:", selectedTemplate.examples[Number.parseInt(value)].projectType || "", value)
+                        updateFieldSuggestions(selectedTemplate.examples[Number.parseInt(value)].projectType || "")
+                        setFieldSuggestionsUpdated(true)
+                      }}>
                         <SelectTrigger className="w-[140px] h-9">
                           <SelectValue placeholder="Load Example" />
                         </SelectTrigger>
@@ -891,7 +858,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                   <Progress value={getCompletionPercentage()} className="h-1" />
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>
-                      {Object.values(fieldCompletion).filter(Boolean).length} of{" "}
+                      {Object.values(requiredFieldsCompleted).filter(Boolean).length} of{" "}
                       {selectedTemplate?.fields.filter((f) => f.required).length} required fields completed
                     </span>
                     {getCompletionPercentage() === 100 && (
@@ -1030,9 +997,9 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <ScrollArea className="h-[240px] w-full">
-                    <div className="bg-muted/30 p-3 rounded-lg border">
-                      <pre className="whitespace-pre-wrap text-sm leading-relaxed font-mono">{generatedPrompt}</pre>
+                  <ScrollArea className="h-[300px] w-full">
+                    <div className="bg-muted/30 p-4 rounded-lg border">
+                      <pre className="whitespace-pre-wrap text-sm leading-relaxed font-mono break-words">{generatedPrompt}</pre>
                     </div>
                   </ScrollArea>
                   <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
@@ -1044,6 +1011,9 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                       <div className="flex items-center gap-1">
                         <FileText className="h-3 w-3" />
                         <span>~{Math.ceil(generatedPrompt.length / 4)} tokens</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span>{generatedPrompt.length} characters</span>
                       </div>
                     </div>
                     <Button
@@ -1135,8 +1105,8 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="p-4 rounded-lg border-2 bg-background">
-                      <pre className="whitespace-pre-wrap text-sm leading-relaxed">{generatedPrompt}</pre>
+                    <div className="p-4 rounded-lg border-2 bg-background max-h-[500px] overflow-y-auto">
+                      <pre className="whitespace-pre-wrap text-sm leading-relaxed break-words">{generatedPrompt}</pre>
                     </div>
                     <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
@@ -1150,6 +1120,9 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         Generated: {new Date().toLocaleString()}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span>{generatedPrompt.length} characters</span>
                       </div>
                     </div>
                   </div>

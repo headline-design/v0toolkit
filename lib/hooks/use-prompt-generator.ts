@@ -93,10 +93,6 @@ export function usePromptGenerator() {
     setErrors({})
   }, [selectedTemplate])
 
-  const estimateTokens = useCallback((text: string) => {
-    return promptGeneratorService.estimateTokens(text)
-  }, [])
-
   return {
     templates,
     selectedTemplate,
@@ -110,7 +106,6 @@ export function usePromptGenerator() {
     validateAndGenerate,
     savePrompt,
     resetForm,
-    estimateTokens,
   }
 }
 

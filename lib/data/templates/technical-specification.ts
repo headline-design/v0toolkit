@@ -1,4 +1,5 @@
 import { PromptTemplate } from "@/lib/core/types";
+import { ProjectTypeName } from "../project-suggestions";
 
 
 export const technicalSpecificationTemplate: PromptTemplate = {
@@ -194,10 +195,11 @@ Please provide detailed implementation guidance including file structure, compon
   examples: [
     {
       name: "E-commerce Platform",
+      projectType: ProjectTypeName.Ecommerce,
       description: "Technical spec for a modern e-commerce platform",
       values: {
         projectName: "ModernShop",
-        projectType: "full-stack application",
+        projectType: ProjectTypeName.Ecommerce,
         projectDescription:
           "enables small businesses to create and manage online stores with integrated payment processing, inventory management, and customer analytics",
         architecture: ["Microservices", "Event-driven"],

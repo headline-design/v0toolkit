@@ -1,5 +1,5 @@
 import { PromptTemplate } from "@/lib/core/types"
-import { getAllProjectTypes } from "@/lib/data/project-suggestions"
+import { getAllProjectTypes, ProjectTypeName } from "@/lib/data/project-suggestions"
 
 export const expertRoleBasedTemplate: PromptTemplate = {
   id: "expert-role-based",
@@ -10,7 +10,7 @@ export const expertRoleBasedTemplate: PromptTemplate = {
   difficulty: "intermediate",
   icon: "UserCog",
   tags: ["expert", "role-based", "development", "context"],
-  template: `You are a {expertiseType} expert (specializing in {workHistory} platforms) who built the documentation website for {primaryCompany} and then worked with {additionalCompanies} on {features}, etc. We are building a {projectType}{additionalContext}. I want you to {action} {deliverables} for our {finalProduct}.`,
+  template: `You are a {expertiseType} expert (specializing in {workHistory} platforms) who {primaryWorkExperience} for {primaryCompany} and then worked with {additionalCompanies} on {features}, etc. We are building a {projectType} project{additionalContext}. I want you to {action} the {deliverables} for our {finalProduct}.`,
   fields: [
     {
       id: "projectType",
@@ -72,10 +72,86 @@ export const expertRoleBasedTemplate: PromptTemplate = {
       type: "select",
       icon: "Building2",
       placeholder: "Select a well-known company for V0's background",
-      description: "A reputable company to establish V0's credibility in your project domain",
+      description: "A reputable company where V0 did their primary work - this will determine available work experience options",
       required: true,
       category: "V0 Configuration",
       options: [], // Will be populated dynamically based on project type
+      validation: {
+        required: true,
+      },
+    },
+    {
+      id: "primaryWorkExperience",
+      label: "V0's Primary Work Experience",
+      type: "select",
+      icon: "Star",
+      placeholder: "Select what V0 built or worked on at the primary company",
+      description: "The main type of work or project V0 completed at the selected primary company",
+      required: true,
+      category: "V0 Configuration",
+      options: [
+        // Documentation & Content
+        "built the documentation website",
+        "created the developer documentation platform",
+        "developed the knowledge base system",
+        "built the technical blog platform",
+
+        // Web & Mobile Applications
+        "developed the main web application",
+        "built the mobile app",
+        "created the progressive web app",
+        "developed the customer portal",
+        "built the admin dashboard",
+
+        // Platform & Infrastructure
+        "architected the core platform",
+        "built the API infrastructure",
+        "developed the microservices architecture",
+        "created the cloud infrastructure",
+        "built the DevOps pipeline",
+
+        // E-commerce & Payments
+        "built the e-commerce platform",
+        "developed the payment processing system",
+        "built the payment processing system",
+        "created the checkout experience",
+        "built the subscription management system",
+
+        // Data & Analytics
+        "developed the analytics platform",
+        "built the data pipeline",
+        "created the reporting dashboard",
+        "developed the machine learning models",
+        "built the recommendation engine",
+
+        // Design & User Experience
+        "designed the user interface",
+        "created the design system",
+        "built the component library",
+        "developed the user experience framework",
+
+        // Developer Tools & APIs
+        "built the developer tools",
+        "created the SDK",
+        "developed the API gateway",
+        "built the integration platform",
+
+        // Security & Authentication
+        "developed the authentication system",
+        "built the security framework",
+        "created the identity management system",
+
+        // Content & Communication
+        "built the content management system",
+        "developed the communication platform",
+        "created the collaboration tools",
+
+        // Monitoring & Operations
+        "built the monitoring system",
+        "developed the logging infrastructure",
+        "created the alerting system",
+        "built the performance optimization tools",
+      ],
       validation: {
         required: true,
       },
@@ -86,7 +162,7 @@ export const expertRoleBasedTemplate: PromptTemplate = {
       type: "multiselect",
       icon: "Building",
       placeholder: "Select additional companies for V0's background",
-      description: "Other companies to mention for V0's broader credibility in your domain",
+      description: "Other companies V0 worked with after the primary company experience",
       required: false,
       category: "V0 Configuration",
       options: [], // Will be populated dynamically based on project type
@@ -97,7 +173,7 @@ export const expertRoleBasedTemplate: PromptTemplate = {
       type: "tags",
       icon: "Lightbulb",
       placeholder: "Add features or areas V0 should have experience with",
-      description: "Specific features, practices, or areas V0 should have worked on in your domain",
+      description: "Specific features, practices, or areas V0 worked on at the additional companies",
       required: true,
       category: "Project Requirements",
       suggestions: [], // Will be populated dynamically based on project type
@@ -178,11 +254,13 @@ export const expertRoleBasedTemplate: PromptTemplate = {
     {
       name: "V0 Toolkit Example",
       description: "Example for building a V0-focused development toolkit",
+      projectType: ProjectTypeName.GenAICoding,
       values: {
-        projectType: "AI-Powered Coding",
+        projectType: ProjectTypeName.GenAICoding,
         expertiseType: "dev relations",
         workHistory: ["gen-ai coding", "V0", "Cursor", "Bolt"],
         primaryCompany: "Cursor",
+        primaryWorkExperience: "built the documentation website",
         additionalCompanies: ["Loveable", "Bolt", "V0"],
         features: ["best-practices", "demo apps", "developer experience"],
         finalProduct: "V0-focused toolkit",
@@ -195,11 +273,13 @@ export const expertRoleBasedTemplate: PromptTemplate = {
     {
       name: "Fintech Investment Platform",
       description: "Example for creating a fintech investment platform",
+      projectType: ProjectTypeName.Fintech,
       values: {
-        projectType: "Financial Technology",
+        projectType: ProjectTypeName.Fintech,
         expertiseType: "full-stack development",
         workHistory: ["payment processing", "financial analytics", "trading platforms"],
         primaryCompany: "Stripe",
+        primaryWorkExperience: "built the payment processing system",
         additionalCompanies: ["Robinhood", "Plaid"],
         features: ["payment processing", "real-time analytics", "investment tracking"],
         finalProduct: "investment tracking platform",
@@ -212,11 +292,13 @@ export const expertRoleBasedTemplate: PromptTemplate = {
     {
       name: "Startup Matchmaking Platform",
       description: "Example for building a startup-investor matchmaking platform",
+      projectType: ProjectTypeName.FundraisingTech,
       values: {
-        projectType: "Startup & Investment Platforms",
+        projectType: ProjectTypeName.FundraisingTech,
         expertiseType: "product management",
         workHistory: ["venture capital platforms", "startup accelerators", "investment analytics"],
         primaryCompany: "AngelList",
+        primaryWorkExperience: "developed the main web application",
         additionalCompanies: ["Crunchbase", "Y Combinator"],
         features: ["startup discovery", "investor matching", "due diligence workflows"],
         finalProduct: "startup-investor matchmaking platform",
