@@ -37,7 +37,7 @@ export default function HeroExpert() {
 
         {/* Content */}
         <>
-          <div className="relative z-50 px-4 md:px-6">
+          <div className="relative z-50 px-4 md:px-6 text-white">
             <h1 className="text-[8rem] font-semibold leading-none -tracking-4 text-balance !text-[clamp(3.625rem,_1.6250rem_+_8.3333vw,_128px)] !leading-[0.95]">
               The v0 Expert
               <br className="md:hidden" /> Prompt
@@ -45,7 +45,7 @@ export default function HeroExpert() {
           </div>
         </>
 
-<div className="relative z-50 mb-6 px-4 md:mb-4 md:px-0"><p className="[&amp;_b]:md:font-semibold [&amp;_strong]:md:font-semibold text-base/[1.25rem] md:text-1.5xl/[1.6875rem] !text-balance [&amp;&gt;br]:hidden sm:[&amp;&gt;br]:inline">   Compose high‑signal system prompts with role, credibility, and concrete deliverables —
+<div className="relative z-50 mb-6 px-4 md:mb-4 md:px-0 text-white"><p className="[&amp;_b]:md:font-semibold [&amp;_strong]:md:font-semibold text-base/[1.25rem] md:text-1.5xl/[1.6875rem] !text-balance [&amp;&gt;br]:hidden sm:[&amp;&gt;br]:inline">   Compose high‑signal system prompts with role, credibility, and concrete deliverables —
             consistent expert output for any task.
             </p></div>
 
@@ -109,7 +109,7 @@ function GlowButton({
   return (
     <button
       onClick={onClick}
-      className={`group relative flex flex-col rounded-xl border p-1 transition
+      className={`group relative flex flex-col rounded-xl border p-1 transition cursor-pointer
         ${primary ? "border-white/30 text-white" : "border-white/30 text-black dark:text-white"}
       `}
     >

@@ -3,7 +3,7 @@
 import type React from "react"
 
 import Link from "next/link"
-import { Github, Twitter, ArrowUpRight, ShieldCheck, Globe, ChevronDown } from "lucide-react"
+import { Github, Twitter, ArrowUpRight, ShieldCheck, Globe, ChevronDown, ArrowRight } from "lucide-react"
 import { LogoSparks } from "@/components/icons/logo-sparks"
 import { useTheme } from "next-themes"
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
@@ -32,12 +32,12 @@ export default function BigFooter() {
             <p className="-tracking-2 w-[101%] text-[clamp(2.625rem,_0.7086rem_+_8.1768vw,_7.25rem)] font-semibold leading-[clamp(2.938rem,_0.8144rem_+_9.0608vw,_8.063rem)] -tracking-4 flex-wrap flex w-full">
               Try v0 Toolkit Now
             </p>
-            <button className="group relative rounded-xl p-1 before:absolute before:inset-0 before:z-10 before:rounded-xl before:bg-[linear-gradient(to_top,_#e6e6e600_0%,_#e6e6e6_73%)] before:p-px dark:before:bg-[linear-gradient(to_top,_#33333300_0%,_#333333_73%)] after:absolute after:inset-0 after:z-10 after:rounded-xl after:bg-brand-borders after:p-px after:transition-opacity after:duration-700 hover:after:opacity-0 motion-reduce:after:transition-none style-grad-withGradient w-fit">
+            <Link href="/prompt-generator/editor?template=expert-role-based" className="group relative rounded-xl p-1 before:absolute before:inset-0 before:z-10 before:rounded-xl before:bg-[linear-gradient(to_top,_#e6e6e600_0%,_#e6e6e6_73%)] before:p-px dark:before:bg-[linear-gradient(to_top,_#33333300_0%,_#333333_73%)] after:absolute after:inset-0 after:z-10 after:rounded-xl after:bg-brand-borders after:p-px after:transition-opacity after:duration-700 hover:after:opacity-0 motion-reduce:after:transition-none style-grad-withGradient w-fit">
               <div className="absolute inset-0 translate-y-1 scale-x-[97%] scale-y-[95%] overflow-hidden rounded-xl border border-brand-neutrals-100 opacity-0 blur-sm transition-opacity duration-700 group-hover:opacity-100 motion-reduce:transition-none"></div>
-              <span className="relative inline-flex items-center justify-center gap-6 whitespace-nowrap rounded-lg bg-brand-black text-brand-white transition-colors motion-reduce:transition-none dark:text-brand-light-black px-4 py-3.5 text-base/[1.3125rem] font-medium">
-                Download for free
+              <span className="relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-brand-black text-brand-white transition-colors motion-reduce:transition-none dark:text-brand-light-black px-4 py-3.5 text-base/[1.3125rem] font-medium">
+                Get Started <ArrowRight className="h-5 w-5" />
               </span>
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -99,11 +99,11 @@ export default function BigFooter() {
                             />
                           </svg>
                         </a>
-                        <a
-                          target="_blank"
+                         <button
+
                           disabled
                           className="grid place-items-center p-1.5 rounded-md bg-transparent dark:text-brand-gray-400 text-brand-gray-700 hover:bg-brand-gray-100 hover:text-brand-gray-800 dark:hover:text-brand-gray-800 transition-colors duration-200"
-                          href="#"
+
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -116,12 +116,12 @@ export default function BigFooter() {
                               fill="currentColor"
                             />
                           </svg>
-                        </a>
-                        <a
-                          target="_blank"
+                        </button>
+                        <button
+
                           disabled
                           className="grid place-items-center p-1.5 rounded-md bg-transparent dark:text-brand-gray-400 text-brand-gray-700 hover:bg-brand-gray-100 hover:text-brand-gray-800 dark:hover:text-brand-gray-800 transition-colors duration-200"
-                          href="#"
+
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -138,7 +138,7 @@ export default function BigFooter() {
                               d="m102.421 128.06 66.328-38.418-66.328-38.418z"
                             />
                           </svg>
-                        </a>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -200,10 +200,10 @@ export default function BigFooter() {
               </p>
 
 
-              <div className="block w-full md:hidden">
-                <div className="ml-auto w-fit" aria-label="Theme selector" role="group">
-                  <ThemeSegmentedControl />
-                </div>
+              <div className="flex items-center gap-2 ml-auto min-[1120px]:hidden">
+                <>
+                  <ThemeSegmentedControl size="lg" />
+                </>
               </div>
 
               <p className="text-sm text-muted-foreground">
@@ -217,12 +217,12 @@ export default function BigFooter() {
               <>
                 <div className="hidden w-auto min-[1120px]:block lg:w-40 min-[1420px]:w-60">
                   <button type="button" role="combobox" aria-controls="radix-_R_2mkj6ivb_" aria-expanded="false" aria-autocomplete="none" dir="ltr" data-state="closed" className="flex items-center justify-between whitespace-nowrap border border-brand-borders rounded-lg cursor-pointer outline-none w-full !bg-transparent text-brand-gray-600 dark:text-brand-gray-400 text-base/[1.5rem] relative z-10 pl-2 pr-1.5 py-0.5 disabled:cursor-not-allowed disabled:opacity-50">
-                    <span className="inline-flex gap-x-2 items-center w-full"><Globe className="w-4 h-4 shrink-0"/> English <ChevronDown className="w-4 h-4 shrink-0 size-4 ml-auto"/></span></button></div>
+                    <span className="inline-flex gap-x-2 items-center w-full"><Globe className="w-4 h-4 shrink-0" /> English <ChevronDown className="w-4 h-4 shrink-0 size-4 ml-auto" /></span></button></div>
 
                 <div className="hidden lg:flex flex-col gap-3">
                   <div aria-label="Theme selector" role="group">
                     {/* Reuse the same segmented control used on mobile */}
-                    <ThemeSegmentedControl />
+                    <ThemeSegmentedControl size="sm" />
                   </div>
                 </div>
 
@@ -297,7 +297,7 @@ function SocialLink({
   )
 }
 
-function ThemeSegmentedControl() {
+function ThemeSegmentedControl({ size }: { size: "sm" | "lg" }) {
   const { theme, setTheme, resolvedTheme } = useTheme()
 
   // Determine active key: "system" | "light" | "dark"
@@ -313,7 +313,7 @@ function ThemeSegmentedControl() {
 
   const [indicator, setIndicator] = useState<{ x: number; w: number }>({ x: 0, w: 0 })
 
- const calcIndicator = () => {
+  const calcIndicator = () => {
     const container = containerRef.current
     if (!container) return
     const map = {
@@ -326,8 +326,8 @@ function ThemeSegmentedControl() {
     const cRect = container.getBoundingClientRect()
     const r = el.getBoundingClientRect()
     setIndicator({
-      x: map[activeKey] === sysRef.current ? -1 : map[activeKey] === lightRef.current ? 23 : 47,
-      w: 24
+      x: size === "sm" ? (map[activeKey] === sysRef.current ? -1 : map[activeKey] === lightRef.current ? 23 : 47) : (map[activeKey] === sysRef.current ? -1 : map[activeKey] === lightRef.current ? 33 : 67),
+      w: size === "sm" ? 24 : 34
     }) // -1/+2 to cover border seam
   }
 
@@ -344,7 +344,7 @@ function ThemeSegmentedControl() {
   }, [])
 
   const baseBtn =
-    "option-tab relative z-[2] flex items-center justify-center -outline-offset-2 text-brand-borders hover:text-brand-neutrals-400 transition-colors duration-300 motion-reduce:transition-none aspect-square h-8 px-1.5 md:p-0 md:h-5.5 !bg-transparent"
+    "cursor-pointer option-tab relative z-[2] flex items-center justify-center -outline-offset-2 text-brand-borders hover:text-brand-neutrals-400 transition-colors duration-300 motion-reduce:transition-none aspect-square h-8 px-1.5 md:p-0 md:h-5.5 !bg-transparent"
 
   return (
     <div
@@ -394,7 +394,7 @@ function ThemeSegmentedControl() {
         className="animate-in fade-in absolute top-1/2 z-[1] -translate-y-1/2 translate-x-[var(--transform-x)] h-[calc(100%_+_1px)] w-[var(--width)] rounded-md border bg-brand-white dark:bg-brand-neutrals-900 border-brand-neutrals-100 dark:border-brand-neutrals-800 transition-all duration-400 ease-out-cubic rounded-[0.375rem]"
         style={
           {
-            // @ts-expect-error custom CSS vars
+
             "--transform-x": `${indicator.x}px`,
             "--width": `${indicator.w}px`,
             // keep initial alignment on mount

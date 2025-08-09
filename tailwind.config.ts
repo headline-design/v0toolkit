@@ -43,7 +43,13 @@ const config: Config = {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
-				"brand-neutrals": {
+				"brand": {
+					foreground: 'var(--brand-foreground)',
+					background: 'var(--brand-background)',
+					borders: 'var(--brand-borders)',
+					white: 'var(--brand-white)',
+					black: 'var(--brand-black)',
+					neutrals: {
 					900: 'var(--brand-neutrals-900)',
 					800: 'var(--brand-neutrals-800)',
 					700: 'var(--brand-neutrals-700)',
@@ -54,6 +60,7 @@ const config: Config = {
 					200: 'var(--brand-neutrals-200)',
 					100: 'var(--brand-neutrals-100)'
 				},
+			},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',

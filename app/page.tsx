@@ -148,7 +148,7 @@ export default function HomePage() {
               <h2 className="text-lg font-semibold">Quick start</h2>
               <p className="text-sm text-muted-foreground">Generate, save, and reuse expert prompts.</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
                 size="sm"
                 className="h-8"

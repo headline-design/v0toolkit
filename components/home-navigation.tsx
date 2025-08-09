@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { LogoSparks } from "@/components/icons/logo-sparks"
 import { V0ToolkitTypeLogo } from "@/components/icons/v0-toolkit-typelogo"
 import { HamburgerToggle } from "@/components/home/hamburger/hamburger-toggle"
+import { ArrowRight } from "lucide-react"
 
 const navItems = [
   { name: "Slate", href: "/slate" },
@@ -76,8 +77,7 @@ export default function HomeNavigation() {
                     <Link
                       href={item.href}
                       className={cn(
-                        "rounded-md p-2 transition-colors duration-300 motion-reduce:transition-none",
-                        "hover:text-foreground hover:bg-muted/60 dark:hover:bg-muted/40",
+                        "transition-colors duration-300 p-2 hover:text-brand-foreground hover:bg-brand-neutrals-100 dark:hover:bg-brand-neutrals-900 rounded-md motion-reduce:transition-none",
                         isActive && "text-foreground",
                       )}
                       aria-current={isActive ? "page" : undefined}
@@ -144,21 +144,9 @@ export default function HomeNavigation() {
               Sign in
             </SecondaryLink>
             <PrimaryCTA href="/prompt-generator" className="w-full h-11" onClick={() => setOpen(false)}>
-              <span className="flex items-center gap-3">
-                {/* small glyph (Download-like) */}
-                <svg
-                  className="w-3 md:w-3.5"
-                  fill="none"
-                  viewBox="0 0 14 16"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M13.9984.98236c-2.53.35112-5.06001.71507-7.58521 1.10147a3272.65486 3272.65486 0 0 0 0 5.60513C8.9432 7.68094 11.4716 7.64246 14 7.63284c-.0016-2.21736 0-4.43312-.0016-6.65048ZM5.72073 2.19285C3.8112 2.43174 1.90151 2.68506 0 2.97847v4.75217c1.90792.00481 3.81601-.02405 5.72394-.02244-.00161-1.83899-.00161-3.67637-.00321-5.51535ZM5.71896 8.33028C3.81264 8.33348 1.90648 8.30302 0 8.30943v4.76497c1.90792.2582 3.81601.5049 5.72073.7873.00304-1.8438-.00177-3.6876-.00177-5.53142ZM13.9984 8.38319H6.40197c.00321 1.85501.00802 3.70841.01122 5.56201 2.53001.3429 5.06001.6941 7.58521 1.0724 0-2.2125.0032-4.4235 0-6.63441Z"
-                    fill="currentColor"
-                  />
-                </svg>
+              <span className="flex items-center gap-2">
                 Try V0 Toolkit
+                <ArrowRight className="w-4 h-4" />
               </span>
             </PrimaryCTA>
           </div>
@@ -248,7 +236,7 @@ function PrimaryCTA({
         "overflow-hidden bg-brand-black text-brand-white",
         "after:absolute after:inset-0 after:bg-gradient-to-t after:from-brand-neutrals-800 after:to-brand-neutrals-600",
         "dark:after:from-brand-neutrals-100 dark:after:to-brand-neutrals-100",
-        "before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-1000",
+        "before:bg-[radial-gradient(circle_100px_at_var(--mask-x)_var(--mask-y),_var(--tw-gradient-stops))] before:from-brand-neutrals-700 before:via-brand-neutrals-700 before:to-transparent dark:before:from-brand-neutrals-300  before:transition-opacity before:duration-1000 hover:before:opacity-100 before:opacity-0 before:absolute before:inset-0",
         "hover:before:opacity-100",
         "before:bg-[radial-gradient(circle_100px_at_var(--mask-x)_var(--mask-y),_rgba(255,255,255,0.18),_rgba(255,255,255,0.12),_transparent_70%)]",
         "md:px-4 md:py-3.5 font-medium text-sm/[1.125rem] tracking-normal",
