@@ -1,10 +1,11 @@
-export const V0ToolkitTypeLogo = () => (
+export const V0ToolkitTypeLogo = ({className}) => (
   <>
         <svg
       id="Layer_1"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 1096.72266 181.70947"
       height="16"
+      className={className}
     >
       <path
         d="M0,56.24316h35.57227l31.72754,83.64453,31.72656-83.64453h35.0918l-50.95508,122.58203h-32.44824L0,56.24316Z"

@@ -39,6 +39,7 @@ export const metadata: Metadata = {
       "A collection of tools designed to enhance your V0 development workflow, including prompt generation, profile management, and more.",
     creator: "@ussaaron_",
   },
+    generator: 'v0.dev'
 }
 
 
@@ -49,9 +50,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
+      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased flex min-h-screen flex-col bg-brand-background-base`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <div className="min-h-screen bg-background">
+          <div className="min-h-screen ">
             <Navigation />
             <main>{children}</main>
           </div>

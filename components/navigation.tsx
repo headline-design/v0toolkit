@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "./theme-toggle"
-import { Bot, FileText, Layers3, Palette, Github, Menu, X, Moon, Sun, Radar } from 'lucide-react'
+import { Bot, FileText, Layers3, Book, Palette, Github, Menu, X, Moon, Sun, Radar } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
 import { useTheme } from "next-themes"
 import {V0ToolkitTypeLogo} from "@/components/icons/v0-toolkit-typelogo"
 import {LogoSparks} from "@/components/icons/logo-sparks"
+import HomeNavigation from "./home-navigation"
 
 
 const navigation = [
@@ -32,6 +33,12 @@ const navigation = [
     href: "/prompt-generator",
     icon: Layers3,
     description: "Create optimized prompts"
+  },
+    {
+    name: "Library",
+    href: "/lib",
+    icon: Book,
+    description: "Explore library"
   },
   {
   name: "Issue Tracker",
@@ -64,6 +71,13 @@ function MobileThemeToggle() {
 export function Navigation() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+
+  if (pathname === "/") {
+  return (
+  <HomeNavigation />
+
+  )
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

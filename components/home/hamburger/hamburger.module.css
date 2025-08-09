@@ -1,0 +1,35 @@
+.hamburger {
+    width: 100%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .3s;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none
+}
+
+.hamburger.active {
+    transform: rotate(45deg)
+}
+
+.hamburger.active .bottom,.hamburger.active .top {
+    stroke-dashoffset: -4.25rem
+}
+
+
+.hamburger.active {
+    transform: rotate(45deg)
+}
+
+.hamburger.active .bottom,.hamburger.active .top {
+    stroke-dashoffset: -4.25rem
+}
+
+
+.line {
+    transition: stroke-dasharray .3s,stroke-dashoffset .3s
+}
+
+.bottom,.top {
+    stroke-dasharray: 40 121
+}

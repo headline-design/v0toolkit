@@ -1,38 +1,21 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  ArrowRight,
-  Wand2,
-  Users,
-  Target,
-  Sparkles,
-  Clock,
-  ChevronRight,
-  Zap,
-  Settings,
-  Code,
-  Palette,
-  UserCog,
-  Plus,
-  Eye,
-  Copy,
-  TrendingUp,
-  Activity,
-  Play,
-  FileText,
-  Folder,
-} from "lucide-react"
+import { ArrowRight, Wand2, Users, Target, Sparkles, Clock, ChevronRight, Zap, Activity, Play, Plus, Copy, TrendingUp } from 'lucide-react'
 import { v0ProfileService } from "@/lib/services/v0-profile-service"
 import { promptGeneratorService } from "@/lib/services/prompt-generator-service"
 import type { V0Profile } from "@/lib/types/v0-profile"
 import { useToast } from "@/hooks/use-toast"
-import { GeneratedPrompt } from "@/lib/core/types"
+import type { GeneratedPrompt } from "@/lib/core/types"
+import HeroExpert from "@/components/hero-expert"
+import ExpertRoleExplainer from "@/components/expert-role-explainer"
+import FeaturedSection from "@/components/featured-section"
+import BigFooter from "@/components/big-footer"
 
 export default function HomePage() {
   const router = useRouter()
@@ -45,9 +28,8 @@ export default function HomePage() {
     try {
       const loadedProfiles = v0ProfileService.getProfiles()
       const loadedPrompts = promptGeneratorService.getHistory()
-
       setProfiles(loadedProfiles)
-      setRecentPrompts(loadedPrompts.slice(0, 3)) // Show only 3 most recent
+      setRecentPrompts(loadedPrompts.slice(0, 3))
     } catch (error) {
       console.error("Failed to load data:", error)
     } finally {
@@ -55,35 +37,12 @@ export default function HomePage() {
     }
   }, [])
 
-  const getProfileIcon = (iconName?: string) => {
-    switch (iconName) {
-      case "UserCog":
-        return <UserCog className="h-3 w-3" />
-      case "Palette":
-        return <Palette className="h-3 w-3" />
-      case "FileCode":
-        return <Code className="h-3 w-3" />
-      default:
-        return <Users className="h-3 w-3" />
-    }
-  }
-
   const handleCopyPrompt = async (prompt: string) => {
     try {
       await navigator.clipboard.writeText(prompt)
-      toast({
-        title: "Copied!",
-        description: "Prompt copied to clipboard",
-        duration: 2000,
-      })
-    } catch (error) {
-      console.error("Failed to copy prompt:", error)
-      toast({
-        title: "Error",
-        description: "Failed to copy prompt",
-        variant: "destructive",
-        duration: 3000,
-      })
+      toast({ title: "Copied!", description: "Prompt copied to clipboard", duration: 2000 })
+    } catch {
+      toast({ title: "Error", description: "Failed to copy prompt", variant: "destructive", duration: 3000 })
     }
   }
 
@@ -91,43 +50,32 @@ export default function HomePage() {
     try {
       const newProfile = v0ProfileService.createQuickProfile()
       setProfiles((prev) => [newProfile, ...prev])
-      toast({
-        title: "Profile Created!",
-        description: `${newProfile.name} is ready to use`,
-        duration: 3000,
-      })
+      toast({ title: "Profile Created!", description: `${newProfile.name} is ready to use`, duration: 3000 })
       router.push(`/profile/${newProfile.id}`)
-    } catch (error) {
-      console.error("Failed to create quick profile:", error)
-      toast({
-        title: "Error",
-        description: "Failed to create profile",
-        variant: "destructive",
-        duration: 3000,
-      })
+    } catch {
+      toast({ title: "Error", description: "Failed to create profile", variant: "destructive", duration: 3000 })
     }
   }
 
-  const getInitials = (name: string) => {
-    return name
+  const getInitials = (name: string) =>
+    name
       .split(" ")
-      .map((word) => word[0])
+      .map((w) => w[0])
       .join("")
       .toUpperCase()
       .slice(0, 2)
-  }
 
   if (isLoading) {
     return (
       <div className="min-h-screen">
         <div className="container mx-auto p-4">
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center">
-                <Sparkles className="h-6 w-6 text-muted-foreground animate-pulse" />
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <div className="space-y-3 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                <Sparkles className="h-6 w-6 animate-pulse text-muted-foreground" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-lg font-medium">Loading V0 Toolkit...</h3>
+                <h3 className="text-lg font-medium">Loading V0 Toolkit…</h3>
                 <p className="text-sm text-muted-foreground">Setting up your workspace</p>
               </div>
             </div>
@@ -137,311 +85,113 @@ export default function HomePage() {
     )
   }
 
-  // Show onboarding for new users
   const isNewUser = profiles.length === 0 && recentPrompts.length === 0
 
   if (isNewUser) {
     return (
       <div className="min-h-screen">
-        <div className="container mx-auto p-4 space-y-8">
-          {/* Hero Section */}
-          <div className="text-center space-y-6 py-12">
-            <div className="space-y-4">
-              <div className="w-16 h-16 mx-auto bg-foreground rounded-lg flex items-center justify-center">
-                <Palette className="h-8 w-8 text-background" />
-              </div>
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight">Welcome to V0 Toolkit</h1>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Your freestyle scratchpad for V0 prompts and notes. Organize your ideas with drag-and-drop folders and
-                  editable notes.
+        <main className="flex flex-1 flex-col gap-24 md:gap-40">
+          <HeroExpert />
+
+          {/* Trusted by (placeholder copy block to match structure) */}
+          <section className="container mx-auto max-w-[1120px] px-4 md:px-6">
+            <p className="text-center font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+              Trusted by engineers at
+            </p>
+          </section>
+
+          <FeaturedSection />
+
+          <ExpertRoleExplainer />
+
+          {/* Focused CTA */}
+          <section className="mx-auto max-w-[1120px] px-4 md:px-6">
+            <Card className="border bg-background/70 shadow-sm">
+              <CardContent className="p-8 text-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <Wand2 className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold">Ready to generate your expert prompt?</h3>
+                <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
+                  Define expertise, credibility, context, and deliverables—then reuse it across tasks.
                 </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button size="sm" onClick={() => router.push("/slate")} className="h-9 px-6">
-                <Palette className="h-4 w-4 mr-2" />
-                Start with Slate
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => router.push("/prompt-generator")} className="h-9 px-6">
-                <Wand2 className="h-4 w-4 mr-2" />
-                Try Prompt Generator
-                <Badge variant="secondary" className="ml-2 text-xs h-4 px-1">
-                  Experimental
-                </Badge>
-              </Button>
-            </div>
-          </div>
-
-          {/* Features Overview */}
-          <div className="space-y-8">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold">Everything You Need</h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Professional tools designed for modern V0 development workflows
-              </p>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card
-                className="text-center p-6 hover:shadow-md transition-shadow cursor-pointer border-2 border-primary/20"
-                onClick={() => router.push("/slate")}
-              >
-                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  <Palette className="h-6 w-6 text-primary" />
-                </div>
-                <CardTitle className="mb-2 text-lg flex items-center justify-center gap-2">
-                  Slate
-                  <Badge variant="default" className="text-xs h-4 px-1">
-                    Primary
-                  </Badge>
-                </CardTitle>
-                <CardDescription className="mb-4 text-sm">
-                  Freestyle scratchpad for V0 prompts and notes. Drag and drop items into folders, edit inline, and
-                  organize your workflow visually.
-                </CardDescription>
-                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                  <FileText className="h-3 w-3" />
-                  <span>Visual organization</span>
-                </div>
-              </Card>
-
-              <Card
-                className="text-center p-6 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => router.push("/prompt-generator")}
-              >
-                <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4">
-                  <Wand2 className="h-6 w-6" />
-                </div>
-                <CardTitle className="mb-2 text-lg flex items-center justify-center gap-2">
-                  Prompt Generator
-                  <Badge variant="secondary" className="text-xs h-4 px-1">
-                    Experimental
-                  </Badge>
-                </CardTitle>
-                <CardDescription className="mb-4 text-sm">
-                  Create sophisticated AI prompts using professional templates designed for V0 and modern development
-                  workflows
-                </CardDescription>
-                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                  <Target className="h-3 w-3" />
-                  <span>Expert templates</span>
-                </div>
-              </Card>
-
-              <Card
-                className="text-center p-6 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => router.push("/profiles")}
-              >
-                <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4">
-                  <Users className="h-6 w-6" />
-                </div>
-                <CardTitle className="mb-2 text-lg flex items-center justify-center gap-2">
-                  V0 Profiles
-                  <Badge variant="secondary" className="text-xs h-4 px-1">
-                    Experimental
-                  </Badge>
-                </CardTitle>
-                <CardDescription className="mb-4 text-sm">
-                  Create personalized AI assistants with custom traits, tasks, and specialized knowledge for different
-                  use cases
-                </CardDescription>
-                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                  <Settings className="h-3 w-3" />
-                  <span>Personalized assistants</span>
-                </div>
-              </Card>
-            </div>
-          </div>
-
-          {/* Getting Started Steps */}
-          <div className="space-y-8">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold">Get Started with Slate</h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Follow these simple steps to organize your V0 prompts and notes
-              </p>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-3">
-              <div className="text-center space-y-4">
-                <div className="w-10 h-10 mx-auto bg-foreground text-background rounded-lg flex items-center justify-center font-bold text-lg">
-                  1
-                </div>
-                <h3 className="text-lg font-semibold">Create Notes & Folders</h3>
-                <p className="text-muted-foreground text-sm">
-                  Add notes for your V0 prompts and create folders to organize them by project or category
-                </p>
-                <Button variant="outline" size="sm" onClick={() => router.push("/slate")} className="h-8 px-4">
-                  Open Slate
-                  <ArrowRight className="h-3 w-3 ml-2" />
-                </Button>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-10 h-10 mx-auto bg-muted text-muted-foreground rounded-lg flex items-center justify-center font-bold text-lg">
-                  2
-                </div>
-                <h3 className="text-lg font-semibold">Drag & Drop</h3>
-                <p className="text-muted-foreground text-sm">
-                  Organize your workspace by dragging notes around and dropping them into folders for better
-                  organization
-                </p>
-                <Button variant="outline" size="sm" disabled className="h-8 px-4 bg-transparent">
-                  Organize Items
-                  <Folder className="h-3 w-3 ml-2" />
-                </Button>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-10 h-10 mx-auto bg-muted text-muted-foreground rounded-lg flex items-center justify-center font-bold text-lg">
-                  3
-                </div>
-                <h3 className="text-lg font-semibold">Edit & Copy</h3>
-                <p className="text-muted-foreground text-sm">
-                  Click to edit notes inline, read content in folders via popover, and copy prompts to use with V0
-                </p>
-                <Button variant="outline" size="sm" disabled className="h-8 px-4 bg-transparent">
-                  Copy to V0
-                  <Copy className="h-3 w-3 ml-2" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Call to Action */}
-          <div className="text-center space-y-6 py-12">
-            <Card className="max-w-2xl mx-auto border-2 border-primary/20">
-              <CardContent className="p-8">
-                <div className="space-y-4">
-                  <div className="w-12 h-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Palette className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold">Ready to Get Started?</h3>
-                  <p className="text-muted-foreground max-w-lg mx-auto">
-                    Create your first note and start organizing your V0 prompts in a visual, intuitive workspace
-                  </p>
-                  <Button size="sm" onClick={() => router.push("/slate")} className="h-9 px-6">
-                    <Palette className="h-4 w-4 mr-2" />
-                    Open Slate Workspace
+                <div className="mt-4">
+                  <Button
+                    size="sm"
+                    className="h-9"
+                    onClick={() => router.push("/prompt-generator/editor?template=expert-role-based")}
+                  >
+                    Use Expert Role‑Based Prompt
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
+          </section>
+          <BigFooter />
+        </main>
       </div>
     )
   }
 
-  // Dashboard for existing users
+  // Existing users
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto p-4 space-y-6">
-        {/* Header */}
-        <div className="space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground">Manage your prompts, profiles, and development workflow</p>
+      <main className="flex flex-1 flex-col gap-16 p-4 md:gap-24">
+        <HeroExpert />
+        <FeaturedSection />
+
+        {/* Quick start */}
+        <section className="mx-auto max-w-[1120px] rounded-xl border bg-background/70 p-4 shadow-sm md:p-6">
+          <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
+            <div className="space-y-1">
+              <h2 className="text-lg font-semibold">Quick start</h2>
+              <p className="text-sm text-muted-foreground">Generate, save, and reuse expert prompts.</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button onClick={() => router.push("/slate")} size="sm" className="h-8 px-4">
-                <Palette className="h-3 w-3 mr-2" />
-                Open Slate
-              </Button>
-              <Button variant="outline" onClick={() => router.push("/prompt-generator")} size="sm" className="h-8 px-4">
-                <Wand2 className="h-3 w-3 mr-2" />
-                Generate Prompt
-                <Badge variant="secondary" className="ml-2 text-xs h-4 px-1">
-                  Experimental
+              <Button
+                size="sm"
+                className="h-8"
+                onClick={() => router.push("/prompt-generator/editor?template=expert-role-based")}
+              >
+                <Wand2 className="h-4 w-4" />
+                <span className="ml-2">Use Expert Role Prompt</span>
+                <Badge variant="secondary" className="ml-2 h-4 px-1 text-[10px]">
+                  Primary
                 </Badge>
+              </Button>
+              <Button size="sm" variant="outline" className="h-8" onClick={() => router.push("/prompt-generator")}>
+                <Target className="h-4 w-4" />
+                <span className="ml-2">Browse Templates</span>
               </Button>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="hover:shadow-md transition-shadow border-2 border-primary/20">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Palette className="h-4 w-4 text-primary" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold mb-1">Slate</div>
-              <div className="text-xs text-muted-foreground">Primary Workspace</div>
-            </CardContent>
-          </Card>
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                  <Users className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold mb-1">{profiles.length}</div>
-              <div className="text-xs text-muted-foreground">V0 Profiles</div>
-            </CardContent>
-          </Card>
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                  <Wand2 className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold mb-1">{recentPrompts.length}</div>
-              <div className="text-xs text-muted-foreground">Generated Prompts</div>
-            </CardContent>
-          </Card>
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                  <Activity className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold mb-1">{profiles.filter((p) => p.isActive).length}</div>
-              <div className="text-xs text-muted-foreground">Active Profiles</div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Stats */}
+        <section className="mx-auto grid max-w-[1120px] grid-cols-2 gap-3 md:grid-cols-4">
+          <StatCard title="Expert Prompt" subtitle="Primary feature" icon={<Wand2 className="h-4 w-4 text-primary" />} highlight />
+          <StatCard title={String(profiles.length)} subtitle="V0 Profiles" icon={<Users className="h-4 w-4" />} />
+          <StatCard title={String(recentPrompts.length)} subtitle="Generated Prompts" icon={<Target className="h-4 w-4" />} />
+          <StatCard title={String(profiles.filter((p) => p.isActive).length)} subtitle="Active Profiles" icon={<Activity className="h-4 w-4" />} />
+        </section>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <section className="mx-auto grid max-w-[1120px] gap-6 lg:grid-cols-3">
           {/* Recent Profiles */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold">Recent Profiles</h2>
-                <Badge variant="secondary" className="text-xs h-4 px-1">
-                  Experimental
-                </Badge>
-              </div>
-              <Button variant="outline" onClick={() => router.push("/profiles")} size="sm" className="h-7 px-3 text-xs">
-                View All
-                <ArrowRight className="h-3 w-3 ml-1" />
-              </Button>
-            </div>
-
+            <HeaderRow title="Recent Profiles" actionLabel="View All" onAction={() => router.push("/profiles")} />
             {profiles.length === 0 ? (
-              <Card className="border-dashed">
+              <Card className="border bg-background/70 shadow-sm">
                 <CardContent className="p-8 text-center">
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 mx-auto bg-muted rounded-lg flex items-center justify-center">
-                      <Users className="h-6 w-6 text-muted-foreground" />
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="font-medium">No profiles yet</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Create your first V0 profile to get personalized AI assistance
-                      </p>
-                    </div>
-                    <Button onClick={createQuickProfile} size="sm" className="h-8 px-4">
-                      <Plus className="h-3 w-3 mr-2" />
-                      Create Your First Profile
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                    <Users className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-medium">No profiles yet</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">Create your first V0 profile to get personalized assistance.</p>
+                  <div className="mt-4">
+                    <Button size="sm" className="h-8" onClick={createQuickProfile}>
+                      <Plus className="h-3.5 w-3.5" />
+                      <span className="ml-2">Create Your First Profile</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -451,21 +201,21 @@ export default function HomePage() {
                 {profiles.slice(0, 3).map((profile) => (
                   <Card
                     key={profile.id}
-                    className="hover:shadow-md transition-shadow cursor-pointer"
+                    className="cursor-pointer border bg-background/70 shadow-sm transition-shadow hover:shadow-md"
                     onClick={() => router.push(`/profile/${profile.id}`)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10">
-                            <AvatarImage src={`https://avatar.vercel.sh/${profile.id}?size=400`} />
+                            <AvatarImage src={`https://avatar.vercel.sh/${profile.id}?size=400`} alt="" />
                             <AvatarFallback className="text-xs font-medium">{getInitials(profile.name)}</AvatarFallback>
                           </Avatar>
                           <div className="space-y-1">
-                            <h3 className="font-medium text-sm">{profile.name}</h3>
-                            <p className="text-xs text-muted-foreground line-clamp-1">{profile.description}</p>
+                            <h3 className="text-sm font-medium">{profile.name}</h3>
+                            <p className="line-clamp-1 text-xs text-muted-foreground">{profile.description}</p>
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs h-5 px-2">
+                              <Badge variant="outline" className="h-5 px-2 text-[11px]">
                                 {profile.category}
                               </Badge>
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -478,14 +228,14 @@ export default function HomePage() {
                         <div className="flex items-center gap-2">
                           <Button
                             size="sm"
+                            className="h-7 px-3 text-xs opacity-0 transition-opacity group-hover:opacity-100"
                             onClick={(e) => {
                               e.stopPropagation()
                               router.push(`/profile/${profile.id}`)
                             }}
-                            className="h-7 px-3 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                           >
-                            <Play className="h-3 w-3 mr-1" />
-                            Use
+                            <Play className="h-3 w-3" />
+                            <span className="ml-1">Use</span>
                           </Button>
                           <ChevronRight className="h-4 w-4 text-muted-foreground" />
                         </div>
@@ -499,38 +249,23 @@ export default function HomePage() {
 
           {/* Recent Prompts */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold">Recent Prompts</h2>
-                <Badge variant="secondary" className="text-xs h-4 px-1">
-                  Experimental
-                </Badge>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => router.push("/prompt-generator")}
-                size="sm"
-                className="h-7 px-3 text-xs"
-              >
-                View All
-                <ArrowRight className="h-3 w-3 ml-1" />
-              </Button>
-            </div>
-
+            <HeaderRow title="Recent Prompts" actionLabel="View All" onAction={() => router.push("/prompt-generator")} />
             {recentPrompts.length === 0 ? (
-              <Card className="border-dashed">
+              <Card className="border bg-background/70 shadow-sm">
                 <CardContent className="p-6 text-center">
-                  <div className="space-y-3">
-                    <div className="w-10 h-10 mx-auto bg-muted rounded-lg flex items-center justify-center">
-                      <Wand2 className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="font-medium text-sm">No prompts yet</h3>
-                      <p className="text-xs text-muted-foreground">Generate your first V0 prompt</p>
-                    </div>
-                    <Button onClick={() => router.push("/prompt-generator")} size="sm" className="h-7 px-3 text-xs">
-                      <Wand2 className="h-3 w-3 mr-1" />
-                      Generate
+                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                    <Wand2 className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-sm font-medium">No prompts yet</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">Generate your first expert prompt.</p>
+                  <div className="mt-3">
+                    <Button
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => router.push("/prompt-generator/editor?template=expert-role-based")}
+                    >
+                      <Wand2 className="h-3 w-3" />
+                      <span className="ml-1">Use Expert Prompt</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -538,10 +273,10 @@ export default function HomePage() {
             ) : (
               <div className="space-y-3">
                 {recentPrompts.map((prompt) => (
-                  <Card key={prompt.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-3 space-y-3">
+                  <Card key={prompt.id} className="border bg-background/70 shadow-sm">
+                    <CardContent className="space-y-3 p-3">
                       <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="text-xs h-5 px-2">
+                        <Badge variant="outline" className="h-5 px-2 text-[11px]">
                           {prompt.category}
                         </Badge>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -549,32 +284,30 @@ export default function HomePage() {
                           <span>{prompt.createdAt.toLocaleDateString()}</span>
                         </div>
                       </div>
-
-                      <div className="bg-muted p-3 rounded text-xs">
-                        <pre className="whitespace-pre-wrap line-clamp-3 font-mono">{prompt.prompt}</pre>
+                      <div className="rounded border bg-muted/40 p-3 text-xs">
+                        <pre className="line-clamp-3 whitespace-pre-wrap font-mono">{prompt.prompt}</pre>
                       </div>
-
                       <div className="flex items-center justify-between">
                         <Button
                           variant="ghost"
                           size="sm"
+                          className="h-6 px-2 text-xs"
                           onClick={(e) => {
                             e.stopPropagation()
                             handleCopyPrompt(prompt.prompt)
                           }}
-                          className="h-6 text-xs px-2"
                         >
-                          <Copy className="h-3 w-3 mr-1" />
-                          Copy
+                          <Copy className="h-3 w-3" />
+                          <span className="ml-1">Copy</span>
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
+                          className="h-6 px-2 text-xs"
                           onClick={() => router.push(`/profiles/create?prompt=${prompt.id}`)}
-                          className="h-6 text-xs px-2"
                         >
-                          <Plus className="h-3 w-3 mr-1" />
-                          Profile
+                          <Plus className="h-3 w-3" />
+                          <span className="ml-1">Profile</span>
                         </Button>
                       </div>
                     </CardContent>
@@ -583,95 +316,62 @@ export default function HomePage() {
               </div>
             )}
           </div>
+        </section>
+
+        <ExpertRoleExplainer />
+        <BigFooter />
+      </main>
+    </div>
+  )
+}
+
+function StatCard({
+  title,
+  subtitle,
+  icon,
+  highlight,
+}: {
+  title: string
+  subtitle: string
+  icon: React.ReactNode
+  highlight?: boolean
+}) {
+  return (
+    <Card className={`border p-4 text-center shadow-sm ${highlight ? "border-primary/30" : ""}`}>
+      <CardContent className="p-0">
+        <div className="mb-2 flex items-center justify-center">
+          <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${highlight ? "bg-primary/10" : "bg-muted"}`}>
+            {icon}
+          </div>
         </div>
+        <div className="text-2xl font-semibold">{title}</div>
+        <div className="text-xs text-muted-foreground">{subtitle}</div>
+      </CardContent>
+    </Card>
+  )
+}
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Zap className="h-4 w-4" />
-              Quick Actions
-            </CardTitle>
-            <CardDescription className="text-sm">
-              Common tasks to help you get the most out of V0 Toolkit
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-              <Button
-                variant="outline"
-                className="h-auto p-4 flex-col gap-2 bg-transparent border-2 border-primary/20"
-                onClick={() => router.push("/slate")}
-              >
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Palette className="h-4 w-4 text-primary" />
-                </div>
-                <div className="text-center space-y-1">
-                  <div className="font-medium text-sm">Open Slate</div>
-                  <div className="text-xs text-muted-foreground">Visual prompt workspace</div>
-                </div>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-auto p-4 flex-col gap-2 bg-transparent"
-                onClick={() => router.push("/prompt-generator")}
-              >
-                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                  <Wand2 className="h-4 w-4" />
-                </div>
-                <div className="text-center space-y-1">
-                  <div className="font-medium text-sm flex items-center gap-1">
-                    Generate Prompt
-                    <Badge variant="secondary" className="text-xs h-3 px-1">
-                      Exp
-                    </Badge>
-                  </div>
-                  <div className="text-xs text-muted-foreground">Create a new V0 prompt</div>
-                </div>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-auto p-4 flex-col gap-2 bg-transparent"
-                onClick={() => router.push("/profiles/create")}
-              >
-                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                  <Users className="h-4 w-4" />
-                </div>
-                <div className="text-center space-y-1">
-                  <div className="font-medium text-sm flex items-center gap-1">
-                    Create Profile
-                    <Badge variant="secondary" className="text-xs h-3 px-1">
-                      Exp
-                    </Badge>
-                  </div>
-                  <div className="text-xs text-muted-foreground">Build a personalized assistant</div>
-                </div>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-auto p-4 flex-col gap-2 bg-transparent"
-                onClick={() => router.push("/profiles")}
-              >
-                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                  <Eye className="h-4 w-4" />
-                </div>
-                <div className="text-center space-y-1">
-                  <div className="font-medium text-sm flex items-center gap-1">
-                    Browse Profiles
-                    <Badge variant="secondary" className="text-xs h-3 px-1">
-                      Exp
-                    </Badge>
-                  </div>
-                  <div className="text-xs text-muted-foreground">View all your profiles</div>
-                </div>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+function HeaderRow({
+  title,
+  actionLabel,
+  onAction,
+}: {
+  title: string
+  actionLabel: string
+  onAction: () => void
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+          Experimental
+        </Badge>
       </div>
+      <Button variant="outline" size="sm" className="h-7 px-3 text-xs" onClick={onAction}>
+        {actionLabel}
+        <ArrowRight className="ml-1 h-3 w-3" />
+      </Button>
     </div>
   )
 }
