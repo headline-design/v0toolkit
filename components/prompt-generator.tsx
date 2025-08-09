@@ -902,7 +902,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                       <span className="hidden sm:inline">Preview</span>
                       {generatedPrompt && (
                         <Badge variant="secondary" className="ml-1 h-3 w-3 rounded-full p-0 text-xs">
-                          !
+                          1
                         </Badge>
                       )}
                     </TabsTrigger>
@@ -1034,12 +1034,12 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
 
                                 {/* Section Fields - Clean spacing */}
 
-                                  <div className="space-y-4 w-full">
-                                    {typedFields.map((field, index) => {
-                                      const globalIndex = selectedTemplate?.fields.findIndex(f => f.id === field.id) ?? index
-                                      return renderField(field, globalIndex)
-                                    })}
-                                  </div>
+                                <div className="space-y-4 w-full">
+                                  {typedFields.map((field, index) => {
+                                    const globalIndex = selectedTemplate?.fields.findIndex(f => f.id === field.id) ?? index
+                                    return renderField(field, globalIndex)
+                                  })}
+                                </div>
 
                               </div>
                             )
@@ -1051,43 +1051,43 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                           </div>
                         )}
                         <div >
-                                             <div className="space-y-6">
-                        {/* Generate Button */}
+                          <div className="space-y-6">
+                            {/* Generate Button */}
 
-                        <div className="justify-end flex gap-3 ">
-                          <Button variant="outline" size="sm" onClick={resetForm} className="h-8">
-                            <RotateCcw className="h-3 w-3 mr-2" />
-                            Reset Form
-                          </Button>
-                          <div className="space-y-3">
+                            <div className="justify-end flex gap-3 ">
+                              <Button variant="outline" size="sm" onClick={resetForm} className="h-8">
+                                <RotateCcw className="h-3 w-3 mr-2" />
+                                Reset Form
+                              </Button>
+                              <div className="space-y-3">
 
-                            {isGenerating && (
-                              <div className="space-y-1">
-                                <Progress value={generationProgress} className="w-[160px]" />
-                                <div className="text-xs text-center text-muted-foreground">Generating your prompt...</div>
+                                {isGenerating && (
+                                  <div className="space-y-1">
+                                    <Progress value={generationProgress} className="w-[160px]" />
+                                    <div className="text-xs text-center text-muted-foreground">Generating your prompt...</div>
+                                  </div>
+                                )}
+                                <Button
+                                  onClick={handleGenerate}
+                                  disabled={isGenerating || getCompletionPercentage() < 100}
+                                  size="sm"
+                                  className="min-w-[160px] h-8"
+                                >
+                                  {isGenerating ? (
+                                    <div className="flex items-center">
+                                      <div className="w-3 h-3 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                      Generating...
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center">
+                                      <Wand2 className="h-3 w-3 mr-2" />
+                                      Generate Prompt
+                                    </div>
+                                  )}
+                                </Button>
                               </div>
-                            )}
-                            <Button
-                              onClick={handleGenerate}
-                              disabled={isGenerating || getCompletionPercentage() < 100}
-                              size="sm"
-                              className="min-w-[160px] h-8"
-                            >
-                              {isGenerating ? (
-                                <div className="flex items-center">
-                                  <div className="w-3 h-3 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                  Generating...
-                                </div>
-                              ) : (
-                                <div className="flex items-center">
-                                  <Wand2 className="h-3 w-3 mr-2" />
-                                  Generate Prompt
-                                </div>
-                              )}
-                            </Button>
+                            </div>
                           </div>
-                        </div>
-                      </div>
 
                         </div>
                       </div>
@@ -1097,79 +1097,81 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
 
                   {/* Generated Prompt */}
                   {generatedPrompt && (
-                    <Card ref={promptRef} className="border-2 border-foreground/20">
-                      <CardHeader className="pb-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                          <CardTitle className="flex items-center gap-2 text-lg">
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                            Generated Prompt
-                          </CardTitle>
-                          <div className="flex items-center gap-2">
+                    <div className="p-4">
+                      <Card ref={promptRef} className="border-2 border-foreground/20">
+                        <CardHeader className="pb-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              Generated Prompt
+                            </CardTitle>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleCopy(generatedPrompt)}
+                                className="bg-background h-7 text-xs"
+                              >
+                                {copiedField === "prompt" ? (
+                                  <>
+                                    <CheckCircle className="h-3 w-3 mr-1 text-green-600" />
+                                    Copied!
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="h-3 w-3 mr-1" />
+                                    Copy
+                                  </>
+                                )}
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={handleShare} className="bg-background h-7 text-xs">
+                                <Share className="h-3 w-3 mr-1" />
+                                Share
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={handleExport} className="bg-background h-7 text-xs">
+                                <Download className="h-3 w-3 mr-1" />
+                                Export
+                              </Button>
+                              <Button size="sm" onClick={savePrompt} className="h-7 text-xs">
+                                <Save className="h-3 w-3 mr-1" />
+                                Save
+                              </Button>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <ScrollArea className="h-[300px] w-full">
+                            <div className="bg-muted/30 p-4 rounded-lg border">
+                              <pre className="whitespace-pre-wrap text-sm leading-relaxed font-mono break-words">{generatedPrompt}</pre>
+                            </div>
+                          </ScrollArea>
+                          <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground flex-wrap gap-2">
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                <span>Generated {new Date().toLocaleTimeString()}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <FileText className="h-3 w-3" />
+                                <span>~{Math.ceil(generatedPrompt.length / 4)} tokens</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span>{generatedPrompt.length} characters</span>
+                              </div>
+                            </div>
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
-                              onClick={() => handleCopy(generatedPrompt)}
-                              className="bg-background h-7 text-xs"
+                              onClick={() => setActiveTab("preview")}
+                              className="h-5 text-xs px-2"
                             >
-                              {copiedField === "prompt" ? (
-                                <>
-                                  <CheckCircle className="h-3 w-3 mr-1 text-green-600" />
-                                  Copied!
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="h-3 w-3 mr-1" />
-                                  Copy
-                                </>
-                              )}
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={handleShare} className="bg-background h-7 text-xs">
-                              <Share className="h-3 w-3 mr-1" />
-                              Share
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={handleExport} className="bg-background h-7 text-xs">
-                              <Download className="h-3 w-3 mr-1" />
-                              Export
-                            </Button>
-                            <Button size="sm" onClick={savePrompt} className="h-7 text-xs">
-                              <Save className="h-3 w-3 mr-1" />
-                              Save
+                              View in Preview Tab
+                              <ArrowRight className="h-3 w-3 ml-1" />
                             </Button>
                           </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <ScrollArea className="h-[300px] w-full">
-                          <div className="bg-muted/30 p-4 rounded-lg border">
-                            <pre className="whitespace-pre-wrap text-sm leading-relaxed font-mono break-words">{generatedPrompt}</pre>
-                          </div>
-                        </ScrollArea>
-                        <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              <span>Generated {new Date().toLocaleTimeString()}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <FileText className="h-3 w-3" />
-                              <span>~{Math.ceil(generatedPrompt.length / 4)} tokens</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span>{generatedPrompt.length} characters</span>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setActiveTab("preview")}
-                            className="h-5 text-xs px-2"
-                          >
-                            View in Preview Tab
-                            <ArrowRight className="h-3 w-3 ml-1" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    </div>
                   )}
 
                   {/* Validation Errors */}
@@ -1184,7 +1186,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                 </TabsContent>
 
                 {/* Preview Tab */}
-                <TabsContent value="preview" className="space-y-4 mt-4">
+                <TabsContent value="preview" className="space-y-4 mt-4 mx-4">
                   {generatedPrompt && (
                     <Card>
                       <CardHeader className="pb-3">
@@ -1193,7 +1195,7 @@ export function PromptGenerator({ hook, onTemplateSelect }: PromptGeneratorProps
                             <Eye className="h-4 w-4" />
                             Prompt Preview
                           </CardTitle>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-wrap">
                             <Button
                               variant="outline"
                               onClick={() => handleCopy(generatedPrompt)}
